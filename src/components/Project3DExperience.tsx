@@ -98,8 +98,19 @@ export default function Project3DExperience() {
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(false);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
+
+  // Responsive device check
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Dynamically load Google <model-viewer> official standalone bundle on client mount
   useEffect(() => {
@@ -114,8 +125,33 @@ export default function Project3DExperience() {
     document.body.appendChild(s);
   }, []);
 
+  // Stop auto-rotation permanently when user touches, drags, or wheels over the model
+  useEffect(() => {
+    const mv = modelViewerRef.current;
+    if (!mv) return;
+
+    const stopRotate = () => {
+      mv.removeAttribute("auto-rotate");
+      setShowGestureHint(false);
+    };
+
+    mv.addEventListener("pointerdown", stopRotate);
+    mv.addEventListener("touchstart", stopRotate, { passive: true });
+    mv.addEventListener("wheel", stopRotate, { passive: true });
+
+    return () => {
+      mv.removeEventListener("pointerdown", stopRotate);
+      mv.removeEventListener("touchstart", stopRotate);
+      mv.removeEventListener("wheel", stopRotate);
+    };
+  }, [is3dLoaded, selectedProject.id]);
+
   const dismissGestureHint = () => {
     setShowGestureHint(false);
+    const mv = modelViewerRef.current;
+    if (mv) {
+      mv.removeAttribute("auto-rotate");
+    }
   };
 
   // Zoom In / Zoom Out via cameraOrbit
@@ -125,7 +161,7 @@ export default function Project3DExperience() {
     try {
       const orbit = mv.getCameraOrbit();
       if (!orbit) return;
-      mv.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius * 0.82}m`;
+      mv.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius * 0.8}m`;
     } catch (e) {
       console.warn("Zoom in error:", e);
     }
@@ -137,7 +173,7 @@ export default function Project3DExperience() {
     try {
       const orbit = mv.getCameraOrbit();
       if (!orbit) return;
-      mv.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius * 1.2}m`;
+      mv.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius * 1.25}m`;
     } catch (e) {
       console.warn("Zoom out error:", e);
     }
@@ -147,8 +183,9 @@ export default function Project3DExperience() {
     const mv = modelViewerRef.current;
     if (!mv) return;
     try {
-      mv.cameraOrbit = "35deg 72deg 105%";
-      mv.fieldOfView = "auto";
+      mv.cameraOrbit = `35deg 72deg ${isMobile ? 340 : 280}%`;
+      mv.fieldOfView = "35deg";
+      mv.setAttribute("auto-rotate", "");
     } catch (e) {
       console.warn("Reset camera error:", e);
     }
@@ -332,10 +369,12 @@ export default function Project3DExperience() {
                       alt={selectedProject.title}
                       camera-controls
                       auto-rotate
-                      rotation-per-second="18deg"
-                      camera-orbit="35deg 72deg 105%"
-                      min-camera-orbit="auto auto 50%"
-                      max-camera-orbit="auto auto 220%"
+                      rotation-per-second="6deg"
+                      auto-rotate-delay="0"
+                      camera-orbit={`35deg 72deg ${isMobile ? 340 : 280}%`}
+                      min-camera-orbit="auto auto 120%"
+                      max-camera-orbit="auto auto 450%"
+                      field-of-view="35deg"
                       shadow-intensity="1.2"
                       shadow-softness="0.8"
                       exposure="1.0"
@@ -346,7 +385,8 @@ export default function Project3DExperience() {
                         width: "100%",
                         height: "100%",
                         backgroundColor: "#0a0a0d",
-                        outline: "none"
+                        outline: "none",
+                        touchAction: "pan-y",
                       }}
                     />
                   </div>
