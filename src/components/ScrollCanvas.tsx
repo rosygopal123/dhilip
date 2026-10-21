@@ -7,11 +7,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Configuration for frame scrubbing
+// Configuration for frame scrubbing (Each video cleanly terminates at frame 192; frames 193-240 were unrelated filler)
 const VIDEO_FRAMES = {
-  1: 240,
-  2: 200,
-  3: 240
+  1: 192,
+  2: 192,
+  3: 192
 } as const;
 
 const STEP = 2; // load every 2nd frame
