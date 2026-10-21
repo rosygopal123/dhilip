@@ -97,7 +97,7 @@ export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(false);
-  const zoomScale = 1.04; // Set 104% zoom
+  const zoomScale = 1.04; // 104% Zoom
 
   const realProjects = [
     { name: "Rajmahal Aishvaryam", loc: "Madurai", img: "/images/danam/ddhvrktrjjjln58schqk.webp", tag: "Turnkey EPC" },
@@ -118,35 +118,35 @@ export default function Project3DExperience() {
   };
 
   return (
-    <section id="project-3d-experience" className="py-12 sm:py-16 bg-[#060A07] border-y border-white/10 relative overflow-hidden text-white">
+    <section id="project-3d-experience" className="py-12 sm:py-16 bg-surface-1 border-y border-border-subtle relative overflow-hidden">
       {/* Background radial glow */}
-      <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-brand-forest/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-10 w-[350px] h-[350px] bg-brand-amber/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-brand-forest/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-10 w-[350px] h-[350px] bg-brand-amber/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-8 relative z-10">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-5 mb-8">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-brand-forest/30 border border-brand-leaf/30 text-brand-leaf-light text-xs font-bold uppercase tracking-wider mb-2.5">
+            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-brand-forest/10 border border-brand-forest/20 text-brand-forest text-xs font-bold uppercase tracking-wider mb-2.5">
               <Rotate3D className="w-3.5 h-3.5 animate-spin-slow" />
               <span>Interactive 3D Experience</span>
             </div>
-            <h2 className="font-display text-2xl md:text-4xl font-bold tracking-tight text-white">
+            <h2 className="font-display text-2xl md:text-4xl font-bold tracking-tight text-text-primary">
               Experience Your Building in 3D
             </h2>
-            <p className="font-ui text-xs md:text-sm text-white/70 max-w-2xl mt-1.5 leading-relaxed">
+            <p className="font-ui text-xs md:text-sm text-text-secondary max-w-2xl mt-1.5 leading-relaxed">
               Don’t settle for flat 2D blueprints. Walk around, orbit 360°, inspect structural elevations, and verify architectural finishes before laying a single brick.
             </p>
           </div>
 
           {/* Mode Switcher Tabs */}
-          <div className="flex items-center bg-white/5 border border-white/10 p-1 rounded-xl shadow-xs self-stretch md:self-auto justify-center">
+          <div className="flex items-center bg-surface-0 border border-border-medium p-1 rounded-xl shadow-xs self-stretch md:self-auto justify-center">
             <button
               onClick={() => setActiveView("3d")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                 activeView === "3d"
                   ? "bg-brand-forest text-white shadow-sm"
-                  : "text-white/70 hover:text-white"
+                  : "text-text-secondary hover:text-text-primary"
               }`}
             >
               <Rotate3D className="w-3.5 h-3.5" />
@@ -158,7 +158,7 @@ export default function Project3DExperience() {
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                 activeView === "photos"
                   ? "bg-brand-forest text-white shadow-sm"
-                  : "text-white/70 hover:text-white"
+                  : "text-text-secondary hover:text-text-primary"
               }`}
             >
               <Camera className="w-3.5 h-3.5" />
@@ -170,7 +170,7 @@ export default function Project3DExperience() {
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                 activeView === "specs"
                   ? "bg-brand-forest text-white shadow-sm"
-                  : "text-white/70 hover:text-white"
+                  : "text-text-secondary hover:text-text-primary"
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -181,7 +181,7 @@ export default function Project3DExperience() {
 
         {/* Main Showcase Container */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left / Center: Interactive 3D Viewer (Pure Black Seamless Card) */}
+          {/* Left / Center: Interactive 3D Viewer (Pure Black 3D Model Box) */}
           <div className="lg:col-span-7 bg-black border border-stone-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
             {/* Viewer Stage: Clean Pure Black Edge-to-Edge */}
             <div className="relative w-full bg-black transition-all duration-300 overflow-hidden h-[340px] sm:h-[400px]">
@@ -266,56 +266,56 @@ export default function Project3DExperience() {
               )}
 
               {activeView === "specs" && (
-                <div className="w-full h-full p-6 overflow-y-auto bg-stone-950 text-white flex flex-col justify-between">
+                <div className="w-full h-full p-6 overflow-y-auto bg-surface-0 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-display text-xl font-bold text-white mb-2">
+                    <h3 className="font-display text-xl font-bold text-text-primary mb-2">
                       Engineering & Structural Blueprint
                     </h3>
-                    <p className="font-ui text-xs text-white/70 mb-6 leading-relaxed">
+                    <p className="font-ui text-xs text-text-secondary mb-6 leading-relaxed">
                       Danam Holdings strictly builds adhering to Indian Standard Civil Codes (IS 456, IS 1893 seismic criteria) with lab-certified steel and ready-mix concrete.
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="p-3.5 rounded-xl border border-white/10 bg-white/5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-brand-leaf-light block">
+                      <div className="p-3.5 rounded-xl border border-border-subtle bg-surface-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-brand-forest block">
                           Structural Core
                         </span>
-                        <p className="text-xs font-semibold text-white mt-1">
+                        <p className="text-xs font-semibold text-text-primary mt-1">
                           {selectedProject.specs.structure}
                         </p>
                       </div>
 
-                      <div className="p-3.5 rounded-xl border border-white/10 bg-white/5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-brand-leaf-light block">
+                      <div className="p-3.5 rounded-xl border border-border-subtle bg-surface-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-brand-forest block">
                           Reinforcement Steel
                         </span>
-                        <p className="text-xs font-semibold text-white mt-1">
+                        <p className="text-xs font-semibold text-text-primary mt-1">
                           {selectedProject.specs.steel}
                         </p>
                       </div>
 
-                      <div className="p-3.5 rounded-xl border border-white/10 bg-white/5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-brand-leaf-light block">
+                      <div className="p-3.5 rounded-xl border border-border-subtle bg-surface-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-brand-forest block">
                           Concrete Matrix
                         </span>
-                        <p className="text-xs font-semibold text-white mt-1">
+                        <p className="text-xs font-semibold text-text-primary mt-1">
                           {selectedProject.specs.concrete}
                         </p>
                       </div>
 
-                      <div className="p-3.5 rounded-xl border border-white/10 bg-white/5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-brand-leaf-light block">
+                      <div className="p-3.5 rounded-xl border border-border-subtle bg-surface-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-brand-forest block">
                           Vastu Alignment
                         </span>
-                        <p className="text-xs font-semibold text-white mt-1">
+                        <p className="text-xs font-semibold text-text-primary mt-1">
                           {selectedProject.specs.vastu}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
-                    <span className="text-xs font-bold text-brand-leaf-light flex items-center gap-1.5">
+                  <div className="pt-6 border-t border-border-subtle flex flex-wrap items-center justify-between gap-3">
+                    <span className="text-xs font-bold text-brand-forest flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4" />
                       <span>Certified Quality & 100% Transparency</span>
                     </span>
@@ -334,44 +334,44 @@ export default function Project3DExperience() {
           {/* Right Column: Key Architectural Highlights & Direct Consultation */}
           <div className="lg:col-span-5 flex flex-col gap-5">
             {/* Quick Details Card */}
-            <div className="bg-[#0c140e] border border-white/10 rounded-2xl p-5 shadow-xl text-white">
-              <span className="inline-block px-2.5 py-0.5 rounded-full bg-brand-amber/20 border border-brand-amber/40 text-amber-400 text-[10px] font-extrabold uppercase tracking-wider mb-2">
+            <div className="bg-surface-0 border border-border-medium rounded-2xl p-5 shadow-sm text-text-primary">
+              <span className="inline-block px-2.5 py-0.5 rounded-full bg-brand-amber/10 border border-brand-amber/30 text-brand-gold text-[10px] font-extrabold uppercase tracking-wider mb-2">
                 Featured 3D Concept
               </span>
-              <h3 className="font-display text-2xl font-bold text-white leading-tight">
+              <h3 className="font-display text-2xl font-bold text-text-primary leading-tight">
                 {selectedProject.title}
               </h3>
-              <p className="font-ui text-xs text-white/70 mt-1.5 leading-relaxed">
+              <p className="font-ui text-xs text-text-secondary mt-1.5 leading-relaxed">
                 {selectedProject.tagline}
               </p>
 
-              <div className="mt-5 space-y-2.5 border-t border-white/10 pt-4 text-xs font-ui">
-                <div className="flex justify-between py-1 border-b border-white/5">
-                  <span className="text-white/60">Built-up Area</span>
-                  <span className="font-semibold text-white">{selectedProject.builtUpArea}</span>
+              <div className="mt-5 space-y-2.5 border-t border-border-subtle pt-4 text-xs font-ui">
+                <div className="flex justify-between py-1 border-b border-border-subtle/50">
+                  <span className="text-text-tertiary">Built-up Area</span>
+                  <span className="font-semibold text-text-primary">{selectedProject.builtUpArea}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-white/5">
-                  <span className="text-white/60">Location Coverage</span>
-                  <span className="font-semibold text-white">{selectedProject.location}</span>
+                <div className="flex justify-between py-1 border-b border-border-subtle/50">
+                  <span className="text-text-tertiary">Location Coverage</span>
+                  <span className="font-semibold text-text-primary">{selectedProject.location}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-white/5">
-                  <span className="text-white/60">Handover Timeline</span>
-                  <span className="font-semibold text-brand-leaf-light">{selectedProject.specs.handoverTime}</span>
+                <div className="flex justify-between py-1 border-b border-border-subtle/50">
+                  <span className="text-text-tertiary">Handover Timeline</span>
+                  <span className="font-semibold text-brand-forest">{selectedProject.specs.handoverTime}</span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="text-white/60">Standard Code</span>
-                  <span className="font-semibold text-white">IS 456 Structural Compliant</span>
+                  <span className="text-text-tertiary">Standard Code</span>
+                  <span className="font-semibold text-text-primary">IS 456 Structural Compliant</span>
                 </div>
               </div>
 
               {/* Highlights List */}
               <div className="mt-5 space-y-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-white/90 block">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-text-primary block">
                   Design & Quality Highlights:
                 </span>
                 {selectedProject.highlights.map((h, i) => (
-                  <div key={i} className="flex items-start gap-2 text-xs text-white/70">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-leaf-light shrink-0 mt-0.5" />
+                  <div key={i} className="flex items-start gap-2 text-xs text-text-secondary">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-forest shrink-0 mt-0.5" />
                     <span>{h}</span>
                   </div>
                 ))}
@@ -389,7 +389,7 @@ export default function Project3DExperience() {
 
                 <button
                   onClick={handleOpenWhatsApp}
-                  className="w-full py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-ui text-xs font-semibold tracking-wide transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2.5 bg-surface-1 hover:bg-surface-2 border border-border-medium text-text-primary rounded-xl font-ui text-xs font-semibold tracking-wide transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Chat on WhatsApp</span>
                 </button>
@@ -397,16 +397,16 @@ export default function Project3DExperience() {
             </div>
 
             {/* Client Note Banner */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5 text-white">
+            <div className="bg-gradient-to-br from-brand-forest/10 via-brand-forest/5 to-transparent border border-brand-forest/20 rounded-2xl p-5">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-brand-forest text-white flex items-center justify-center shrink-0 shadow-xs">
                   <FileText className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wide">
+                  <h4 className="text-xs font-bold text-text-primary uppercase tracking-wide">
                     Custom 3D Models For Clients
                   </h4>
-                  <p className="text-[11px] text-white/70 mt-1 leading-relaxed">
+                  <p className="text-[11px] text-text-secondary mt-1 leading-relaxed">
                     When you provide your elevation drawing, CAD model, or 3D Sketchfab link, we plug it directly into your portfolio seamlessly.
                   </p>
                 </div>
