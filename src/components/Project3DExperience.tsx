@@ -98,83 +98,20 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
 
 export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
-  const iframeRef = React.useRef<HTMLIFrameElement>(null);
-  const apiRef = React.useRef<any>(null);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(true);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
+  const [modelZoom, setModelZoom] = useState<number>(0.84); // 0.84x CSS scale: perfectly zoomed out to show full house, compound walls & roof deck
   const sectionRef = React.useRef<HTMLDivElement>(null);
 
-  // Function to programmatically zoom out camera via Sketchfab WebGL API
-  const zoomCameraOut = (factor = 2.4) => {
-    if (!apiRef.current) return;
-    try {
-      if (typeof apiRef.current.getCameraLookAt === "function") {
-        apiRef.current.getCameraLookAt((err: any, camera: any) => {
-          if (!err && camera && camera.position && camera.target) {
-            const p = camera.position;
-            const t = camera.target;
-            const dir = [p[0] - t[0], p[1] - t[1], p[2] - t[2]];
-            const dist = Math.sqrt(dir[0]*dir[0] + dir[1]*dir[1] + dir[2]*dir[2]);
-            if (dist > 0) {
-              const norm = [dir[0]/dist, dir[1]/dist, dir[2]/dist];
-              const newDist = dist * factor;
-              const newPos = [t[0] + norm[0] * newDist, t[1] + norm[1] * newDist, t[2] + norm[2] * newDist];
-              apiRef.current.setCameraLookAt(newPos, t, 0.4);
-            }
-          }
-        });
-      }
-    } catch (e) {}
+  // Pure client-side zoom controls (No external script injection, 100% CSP-safe & zero console errors)
+  const zoomCameraOut = () => {
+    setModelZoom((prev) => Math.max(0.55, Number((prev - 0.12).toFixed(2))));
   };
 
   const zoomCameraIn = () => {
-    zoomCameraOut(0.75);
+    setModelZoom((prev) => Math.min(1.35, Number((prev + 0.12).toFixed(2))));
   };
-
-  // Initialize Sketchfab WebGL Viewer API to programmatically control camera zoom on load
-  React.useEffect(() => {
-    const scriptId = "sketchfab-viewer-api-script";
-    let script = document.getElementById(scriptId) as HTMLScriptElement;
-
-    const initViewer = () => {
-      if (!iframeRef.current || !(window as any).Sketchfab) return;
-      try {
-        const client = new (window as any).Sketchfab(iframeRef.current);
-        client.init(selectedProject.sketchfabId, {
-          autostart: 1,
-          preload: 1,
-          transparent: 1,
-          ui_hint: 0,
-          ui_infos: 0,
-          ui_controls: 0,
-          ui_watermark: 0,
-          ui_settings: 0,
-          ui_inspector: 0,
-          success: (api: any) => {
-            apiRef.current = api;
-            api.start();
-            api.addEventListener("viewerready", () => {
-              // Immediately zoom out 2.4x so the whole building, compound walls, gate, and roof deck are in view
-              zoomCameraOut(2.4);
-            });
-          },
-          error: () => {}
-        });
-      } catch (e) {}
-    };
-
-    if (!script) {
-      script = document.createElement("script");
-      script.id = scriptId;
-      script.src = "https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js";
-      script.async = true;
-      script.onload = initViewer;
-      document.body.appendChild(script);
-    } else if ((window as any).Sketchfab) {
-      initViewer();
-    }
-  }, [selectedProject.id]);
 
   const realProjects = [
     { name: "Rajmahal Aishvaryam", loc: "Madurai", img: "/images/danam/ddhvrktrjjjln58schqk.webp", tag: "Turnkey EPC" },
@@ -277,7 +214,7 @@ export default function Project3DExperience() {
                   {/* Clean Interactive Zoom Controls in Top-Right */}
                   <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/20 p-1 rounded-xl shadow-lg pointer-events-auto select-none">
                     <button
-                      onClick={() => zoomCameraOut(1.35)}
+                      onClick={zoomCameraOut}
                       className="px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer flex items-center gap-1"
                       title="Zoom Out (Full View)"
                     >
@@ -332,33 +269,30 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Sketchfab 3D Embed Iframe - Connected with WebGL API for Real Camera Zoom Out */}
+                  {/* Sketchfab 3D Embed Iframe - Scaled cleanly via CSS transform for full view without any JS errors */}
                   <div
                     onMouseDown={() => setShowGestureHint(false)}
                     onTouchStart={() => setShowGestureHint(false)}
                     className="w-full h-full flex items-center justify-center overflow-hidden bg-white relative cursor-grab active:cursor-grabbing"
                   >
                     <iframe
-                      ref={iframeRef}
                       id="sketchfab-viewport-iframe"
                       key={selectedProject.id}
                       title={selectedProject.title}
                       src={selectedProject.embedUrl}
-                      className="w-full border-0 bg-white"
+                      className="w-full border-0 bg-white transition-transform duration-300 ease-out"
                       style={{
-                        height: "calc(100% + 112px)",
-                        marginTop: "-54px",
-                        marginBottom: "-58px",
+                        height: "calc(100% + 120px)",
+                        marginTop: "-55px",
+                        marginBottom: "-65px",
                         maxWidth: "none",
                         maxHeight: "none",
                         backgroundColor: "#ffffff",
+                        transform: `scale(${modelZoom})`,
+                        transformOrigin: "center center",
                       }}
-                      allow="autoplay; fullscreen; xr-spatial-tracking; execution-while-out-of-viewport; execution-while-not-rendered; web-share; accelerometer; gyroscope"
-                      onLoad={() => {
-                        setIs3dLoaded(true);
-                        // Trigger WebGL camera zoom out once loaded
-                        setTimeout(() => zoomCameraOut(2.4), 600);
-                      }}
+                      allow="autoplay; fullscreen; xr-spatial-tracking"
+                      loading="lazy"
                     />
                   </div>
                 </div>
