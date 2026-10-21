@@ -214,7 +214,7 @@ export default function Project3DExperience() {
           {/* Left / Center: Interactive 3D Viewer (Clean Framed 3D Card with White Background) */}
           <div className="lg:col-span-7 bg-white border-[1.5px] border-neutral-900 rounded-[22px] overflow-hidden shadow-md flex flex-col">
             {/* Viewer Stage: Clean Luxury 3D Card with Architectural Corner Accents */}
-            <div className="relative w-full bg-[#0a0a0d] transition-all duration-300 overflow-hidden h-[420px] sm:h-[480px] lg:h-[540px]">
+            <div className="relative w-full bg-[#0a0a0d] transition-all duration-300 overflow-hidden h-[480px] sm:h-[540px] lg:h-[600px]">
               {/* Luxury Architectural Viewfinder Corner Reticles */}
               <span className="pointer-events-none absolute left-4 top-4 z-20 h-4 w-4 border-l border-t border-white/40" />
               <span className="pointer-events-none absolute right-4 top-4 z-20 h-4 w-4 border-r border-t border-white/40" />
