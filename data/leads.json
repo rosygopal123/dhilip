@@ -1,0 +1,137 @@
+[
+  {
+    "id": "LEAD-408999",
+    "name": "HubSpot Live Test",
+    "mobile": "9361599097",
+    "email": "hubspot.test@abcbuilders.in",
+    "district": "Madurai",
+    "projectType": "Duplex Villa",
+    "budget": "₹1 Crore - ₹2 Crore",
+    "areaSqFt": "1800 Sq.Ft",
+    "message": "Testing direct HubSpot CRM synchronization live!",
+    "vastuPreferred": true,
+    "aadhaarNumber": "",
+    "source": "HubSpot API Test",
+    "assignedManager": {
+      "name": "Er. Ramesh Kumar",
+      "role": "Chief Manager (South & Central Zone)",
+      "office": "Madurai HQ Office"
+    },
+    "status": "NEW",
+    "createdAt": "2026-09-07T07:08:55.004Z",
+    "hubspotSynced": true,
+    "n8nSynced": true
+  },
+  {
+    "id": "LEAD-454100",
+    "name": "rosy",
+    "mobile": "7871762490",
+    "email": "sureshkumar20133151@gmail.com",
+    "district": "Chennai",
+    "projectType": "Residential Bungalow",
+    "budget": "₹30 Lakh - ₹50 Lakh",
+    "areaSqFt": "1800 Sq.Ft",
+    "message": "Referral",
+    "vastuPreferred": true,
+    "aadhaarNumber": "",
+    "source": "Contact Page Form",
+    "assignedManager": {
+      "name": "Er. S. Anbarasan",
+      "role": "Regional Manager (North Zone & Chennai)",
+      "office": "Chennai Office"
+    },
+    "status": "NEW",
+    "createdAt": "2026-09-07T06:41:10.252Z",
+    "hubspotSynced": true,
+    "n8nSynced": true
+  },
+  {
+    "id": "LEAD-817154",
+    "name": "Suresh Kumar R",
+    "mobile": "807223959",
+    "email": "sureshkumar20133151@gmail.com",
+    "district": "Madurai",
+    "projectType": "Residential Bungalow",
+    "budget": "₹30 Lakh - ₹50 Lakh",
+    "areaSqFt": "1800 Sq.Ft",
+    "message": "Referral",
+    "vastuPreferred": true,
+    "aadhaarNumber": "",
+    "source": "Contact Page Form",
+    "assignedManager": {
+      "name": "Er. Ramesh Kumar",
+      "role": "Chief Manager (South & Central Zone)",
+      "office": "Madurai HQ Office"
+    },
+    "status": "NEW",
+    "createdAt": "2026-09-07T06:30:44.147Z",
+    "hubspotSynced": true,
+    "n8nSynced": true
+  },
+  {
+    "id": "LEAD-1001",
+    "name": "Karthik Subramanian",
+    "mobile": "9840123456",
+    "email": "karthik.subramanian@example.com",
+    "district": "Madurai",
+    "projectType": "Residential Bungalow",
+    "budget": "₹50 Lakh - ₹1 Crore",
+    "areaSqFt": "2400 Sq.Ft",
+    "message": "Looking for G+1 duplex home design near KK Nagar, Madurai.",
+    "vastuPreferred": true,
+    "source": "Contact Form",
+    "assignedManager": {
+      "name": "Er. Ramesh Kumar",
+      "role": "Chief Manager (South Zone)",
+      "office": "Madurai HQ Office"
+    },
+    "status": "QUALIFIED",
+    "createdAt": "2026-09-05T05:58:23.205Z",
+    "hubspotSynced": true,
+    "n8nSynced": true
+  },
+  {
+    "id": "LEAD-1002",
+    "name": "Priya Rajan",
+    "mobile": "9790987654",
+    "email": "priya.rajan@example.com",
+    "district": "Chennai",
+    "projectType": "Renovation/Extension",
+    "budget": "₹30 Lakh - ₹50 Lakh",
+    "areaSqFt": "1500 Sq.Ft",
+    "message": "Want to extend 2nd floor with modern terrace garden in Adyar.",
+    "vastuPreferred": false,
+    "source": "Quick Quote Modal",
+    "assignedManager": {
+      "name": "Er. S. Anbarasan",
+      "role": "Regional Manager (North Zone)",
+      "office": "Chennai Office"
+    },
+    "status": "NEW",
+    "createdAt": "2026-09-07T01:58:23.205Z",
+    "hubspotSynced": false,
+    "n8nSynced": true
+  },
+  {
+    "id": "LEAD-1003",
+    "name": "Muthu Kumar",
+    "mobile": "9443112233",
+    "email": "muthu.m@example.com",
+    "district": "Coimbatore",
+    "projectType": "Commercial Space",
+    "budget": "₹1 Crore - ₹2 Crore",
+    "areaSqFt": "4500 Sq.Ft",
+    "message": "Inquiring for corporate showroom building construction.",
+    "vastuPreferred": true,
+    "source": "WhatsApp Widget",
+    "assignedManager": {
+      "name": "Ms. Meera Krishnan",
+      "role": "Regional Manager (West Zone)",
+      "office": "Coimbatore/Salem Office"
+    },
+    "status": "CONTACTED",
+    "createdAt": "2026-09-06T17:58:23.205Z",
+    "hubspotSynced": true,
+    "n8nSynced": true
+  }
+]

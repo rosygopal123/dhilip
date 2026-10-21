@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+:root {
+  /* Danam Holdings Brand Constants */
+  --brand-forest: #2D5911;
+  --brand-forest-dark: #102208;
+  --brand-leaf: #55AA22;
+  --brand-leaf-light: #8FDC55;
+  --brand-gold: #D97706;
+  --brand-amber: #F59E0B;
+  --brand-teak: #2D5911; /* mapped for component compatibility */
+  --brand-teal: #55AA22;
+  --brand-charcoal: #141A15;
+  --brand-white: #F7FAF4;
+  --brand-night: #060E08;
+
+  /* Blueprint / Architectural Styles */
+  --bp-paper: #F2EFE4;
+  --bp-ink: #1B380A;
+  --bp-wood: #8B6340;
+
+  /* Construction colors */
+  --con-brick: #B5431A;
+  --con-concrete: #8A9289;
+  --con-sand: #D4C9B5;
+
+  /* Night scene variables */
+  --night-glow: #F59E0B;
+  --night-uplight: #D97706;
+  --night-garden: #55AA22;
+  --night-moon: #F8F9F5;
+  --night-sky: #060E08;
+
+  /* Light Theme Semantics (Danam Fresh & Corporate) */
+  --surface-0: #FFFFFF;
+  --surface-1: #F7FAF4;
+  --surface-2: #EDF5E7;
+  --text-primary: #121A14;
+  --text-secondary: #4A564D;
+  --text-tertiary: #7D8A80;
+  --border-subtle: rgba(45, 89, 17, 0.12);
+  --border-medium: rgba(45, 89, 17, 0.25);
+}
+
+[data-theme="night"] {
+  /* Dark Theme Semantics (Danam Deep Luxury Emerald Night) */
+  --surface-0: #060E08;
+  --surface-1: #0B190E;
+  --surface-2: #102414;
+  --text-primary: #F7FAF5;
+  --text-secondary: #B0C4B4;
+  --text-tertiary: #6E8472;
+  --border-subtle: rgba(143, 220, 85, 0.12);
+  --border-medium: rgba(143, 220, 85, 0.22);
+}
+
+@theme {
+  --color-brand-forest: var(--brand-forest);
+  --color-brand-forest-dark: var(--brand-forest-dark);
+  --color-brand-leaf: var(--brand-leaf);
+  --color-brand-leaf-light: var(--brand-leaf-light);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-amber: var(--brand-amber);
+  --color-brand-teak: var(--brand-teak);
+  --color-brand-charcoal: var(--brand-charcoal);
+  --color-brand-white: var(--brand-white);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-night: var(--brand-night);
+
+  --color-bp-paper: var(--bp-paper);
+  --color-bp-ink: var(--bp-ink);
+  --color-bp-wood: var(--bp-wood);
+
+  --color-con-brick: var(--con-brick);
+  --color-con-concrete: var(--con-concrete);
+  --color-con-sand: var(--con-sand);
+
+  --color-night-glow: var(--night-glow);
+  --color-night-uplight: var(--night-uplight);
+  --color-night-garden: var(--night-garden);
+  --color-night-moon: var(--night-moon);
+  --color-night-sky: var(--night-sky);
+
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-medium: var(--border-medium);
+
+  --font-display: var(--font-cormorant), serif;
+  --font-ui: var(--font-dmsans), sans-serif;
+  --font-tamil-display: var(--font-notoserif-tamil), serif;
+  --font-tamil-body: var(--font-notosans-tamil), sans-serif;
+}
+
+body {
+  background-color: var(--surface-0);
+  color: var(--text-primary);
+  transition: background-color 0.5s ease, color 0.5s ease;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface-1);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--brand-forest);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-leaf);
+}
+
+/* Blueprint Grid Background Pattern */
+.blueprint-grid {
+  background-size: 30px 30px;
+  background-image: 
+    linear-gradient(to right, rgba(45, 89, 17, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(45, 89, 17, 0.05) 1px, transparent 1px);
+  background-color: var(--bp-paper);
+  transition: background-color 0.5s ease;
+}
+
+[data-theme="night"] .blueprint-grid {
+  background-image: 
+    linear-gradient(to right, rgba(143, 220, 85, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(143, 220, 85, 0.04) 1px, transparent 1px);
+  background-color: var(--surface-0);
+}
+
+.blueprint-grid-dark {
+  background-size: 30px 30px;
+  background-image: 
+    linear-gradient(to right, rgba(143, 220, 85, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(143, 220, 85, 0.04) 1px, transparent 1px);
+  background-color: var(--surface-0);
+}
+
+/* Custom animations helper */
+.line-draw {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw 3s forwards ease-in-out;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Hide default scroll during loader */
+.no-scroll {
+  overflow: hidden !important;
+  height: 100vh;
+}
