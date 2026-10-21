@@ -23,24 +23,73 @@ export default function ScrollCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isPreloadFinished, setIsPreloadFinished] = useState(false);
   
   // Track active section for progress dots
   const [activeStep, setActiveStep] = useState(0); // 0 = Design, 1 = Build, 2 = Dream
   const [scrollProgress, setScrollProgress] = useState(0); // 0 to 100
 
-  // Preload Images
+  // Preload Images with Progressive Loader and Anti-Hang Safety Timeout
   useEffect(() => {
     const loadedImages: HTMLImageElement[] = [];
+    let loadedCount = 0;
+    const TARGET_CRITICAL_FRAMES = 24; // Fast launch: only need first 24 frames ready to start smoothly
 
-    // Load first frame immediately for LCP and set loaded state to trigger ScrollTrigger setup
+    const handleSingleImageLoaded = () => {
+      loadedCount++;
+      const percent = Math.min(100, Math.round((loadedCount / TARGET_CRITICAL_FRAMES) * 100));
+      setLoadingProgress(percent);
+
+      if (loadedCount >= TARGET_CRITICAL_FRAMES) {
+        setIsLoaded(true);
+        setTimeout(() => setIsPreloadFinished(true), 400);
+      }
+    };
+
+    // Safety timeout: Automatically unlock in max 2.2 seconds even on slow networks so it NEVER hangs!
+    const safetyTimer = setTimeout(() => {
+      setLoadingProgress(100);
+      setIsLoaded(true);
+      setTimeout(() => setIsPreloadFinished(true), 400);
+    }, 2200);
+
+    // Load first frame immediately for instant first paint
     const tempImg = new Image();
     tempImg.src = "/assets/video1/ezgif-frame-001.jpg";
     tempImg.onload = () => {
-      setIsLoaded(true);
+      handleSingleImageLoaded();
+      // Pre-draw frame 0 immediately onto canvas so it is NEVER pitch black
+      if (canvasRef.current) {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          const imgRatio = 16 / 9;
+          const canvasRatio = canvas.width / canvas.height;
+          let drawWidth = canvas.width;
+          let drawHeight = canvas.height;
+          let offsetX = 0;
+          let offsetY = 0;
+          if (canvasRatio < 0.85) {
+            drawWidth = canvas.width;
+            drawHeight = canvas.width / imgRatio;
+            offsetY = Math.max(68, Math.floor((canvas.height * 0.35) - (drawHeight / 2)));
+          } else {
+            if (canvasRatio > imgRatio) {
+              drawHeight = canvas.width / imgRatio;
+              offsetY = (canvas.height - drawHeight) / 2;
+            } else {
+              drawWidth = canvas.height * imgRatio;
+              offsetX = (canvas.width - drawWidth) / 2;
+            }
+          }
+          ctx.drawImage(tempImg, offsetX, offsetY, drawWidth, drawHeight);
+        }
+      }
     };
-    tempImg.onerror = () => {
-      setIsLoaded(true);
-    };
+    tempImg.onerror = handleSingleImageLoaded;
 
     // Populate arrays dynamically based on video lengths
     for (let v = 1; v <= 3; v++) {
@@ -52,10 +101,14 @@ export default function ScrollCanvas() {
         const url = `/assets/video${v}/ezgif-frame-${paddedNum}.jpg`;
         const img = new Image();
         img.src = url;
+        img.onload = handleSingleImageLoaded;
+        img.onerror = handleSingleImageLoaded;
         loadedImages.push(img);
       }
     }
     setImages(loadedImages);
+
+    return () => clearTimeout(safetyTimer);
   }, []);
 
   // Canvas Drawing & ScrollTrigger Sync
@@ -195,6 +248,38 @@ export default function ScrollCanvas() {
   return (
     <div ref={containerRef} className="relative w-full h-screen bg-black overflow-hidden select-none">
 
+
+      {/* Luxury Brand Preloader Screen (Counts 1 to 100%, Never Hangs) */}
+      {!isPreloadFinished && (
+        <div
+          className={`absolute inset-0 z-50 flex flex-col items-center justify-center bg-black transition-opacity duration-600 ease-out select-none ${
+            loadingProgress >= 100 ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
+        >
+          {/* Brand Logo & Name */}
+          <div className="flex flex-col items-center gap-2 mb-6">
+            <span className="font-display italic text-3xl md:text-5xl text-brand-leaf font-bold tracking-tight">
+              Danam Holdings
+            </span>
+            <span className="font-ui text-[10px] md:text-xs text-white/60 tracking-widest uppercase">
+              Towards Fortune Unfolding
+            </span>
+          </div>
+
+          {/* Subtle Emerald / Gold Progress Line */}
+          <div className="w-56 md:w-72 h-[1.5px] bg-white/10 relative overflow-hidden rounded-full">
+            <div
+              className="absolute left-0 top-0 h-full bg-gradient-to-r from-brand-forest to-brand-leaf transition-all duration-200"
+              style={{ width: `${loadingProgress}%` }}
+            />
+          </div>
+
+          {/* Realtime Loading Percentage Counter */}
+          <div className="mt-3 text-[11px] font-mono text-white/50 tracking-wider">
+            LOADING {loadingProgress}%
+          </div>
+        </div>
+      )}
 
       {/* Render Canvas */}
       <canvas
