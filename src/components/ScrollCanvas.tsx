@@ -115,12 +115,24 @@ export default function ScrollCanvas() {
       let offsetX = 0;
       let offsetY = 0;
 
-      if (canvasRatio > imgRatio) {
+      const isMobilePortrait = canvasRatio < 0.85;
+
+      if (isMobilePortrait) {
+        // Mobile portrait: Show full 16:9 width without cropping edges
+        drawWidth = canvasWidth;
         drawHeight = canvasWidth / imgRatio;
-        offsetY = (canvasHeight - drawHeight) / 2;
+        offsetX = 0;
+        // Vertically place building comfortably in upper-mid viewport
+        offsetY = Math.max(68, Math.floor((canvasHeight * 0.35) - (drawHeight / 2)));
       } else {
-        drawWidth = canvasHeight * imgRatio;
-        offsetX = (canvasWidth - drawWidth) / 2;
+        // Desktop / Landscape: Cinematic cover mode
+        if (canvasRatio > imgRatio) {
+          drawHeight = canvasWidth / imgRatio;
+          offsetY = (canvasHeight - drawHeight) / 2;
+        } else {
+          drawWidth = canvasHeight * imgRatio;
+          offsetX = (canvasWidth - drawWidth) / 2;
+        }
       }
 
       ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
@@ -193,7 +205,7 @@ export default function ScrollCanvas() {
 
       {/* TEXT OVERLAYS - VIDEO 1 SEGMENT (0% to 33% scroll) */}
       <div
-        className="absolute inset-0 flex flex-col justify-end p-8 md:p-24 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none transition-opacity duration-300"
+        className="absolute inset-0 flex flex-col justify-end p-5 sm:p-8 md:p-24 pb-16 sm:pb-20 md:pb-24 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none transition-opacity duration-300"
         style={{
           opacity: scrollProgress <= 30 ? (scrollProgress < 2 ? 0 : 1 - (scrollProgress - 20) / 10) : 0,
         }}
@@ -201,7 +213,7 @@ export default function ScrollCanvas() {
         <div className="max-w-3xl flex flex-col gap-2">
           {/* Line 1 */}
           <span
-            className="font-display italic text-brand-teak tracking-wider transition-all duration-500 text-sm md:text-lg"
+            className="font-display italic text-brand-teak tracking-wider transition-all duration-500 text-xs sm:text-sm md:text-lg"
             style={{
               opacity: scrollProgress >= 2 ? 1 : 0,
               transform: `translateY(${scrollProgress >= 2 ? 0 : 10}px)`,
@@ -211,7 +223,7 @@ export default function ScrollCanvas() {
           </span>
           {/* Line 2 & 3 */}
           <h1
-            className="font-display text-white text-5xl md:text-8xl leading-none font-medium flex flex-col tracking-tight"
+            className="font-display text-white text-3xl sm:text-5xl md:text-8xl leading-tight md:leading-none font-medium flex flex-col tracking-tight"
             style={{
               opacity: scrollProgress >= 3 ? 1 : 0,
               transform: `scale(${scrollProgress >= 3 ? 1 : 0.96})`,
@@ -223,7 +235,7 @@ export default function ScrollCanvas() {
           </h1>
           {/* Line 4 */}
           <p
-            className="font-ui text-sm md:text-base text-white/70 mt-4 leading-relaxed max-w-md"
+            className="font-ui text-xs sm:text-sm md:text-base text-white/70 mt-2 md:mt-4 leading-relaxed max-w-md line-clamp-2 sm:line-clamp-none"
             style={{
               opacity: scrollProgress >= 5 ? 1 : 0,
               transition: "opacity 0.5s ease 0.2s",
@@ -234,7 +246,7 @@ export default function ScrollCanvas() {
 
           {/* CTA Buttons */}
           <div
-            className="flex items-center gap-4 mt-8 pointer-events-auto"
+            className="flex items-center gap-3 sm:gap-4 mt-4 md:mt-8 pointer-events-auto"
             style={{
               opacity: scrollProgress >= 8 ? 1 : 0,
               transition: "opacity 0.5s ease 0.4s",
@@ -266,7 +278,7 @@ export default function ScrollCanvas() {
 
       {/* TEXT OVERLAYS - VIDEO 2 SEGMENT (33% to 66% scroll) */}
       <div
-        className="absolute inset-0 flex items-center justify-end p-8 md:p-24 pointer-events-none"
+        className="absolute inset-0 flex items-end md:items-center justify-end p-6 pb-24 md:p-24 pointer-events-none"
         style={{
           opacity: scrollProgress >= 48 && scrollProgress <= 60 ? 1 : 0,
           transition: "opacity 0.5s ease",
@@ -281,7 +293,7 @@ export default function ScrollCanvas() {
 
       {/* TEXT OVERLAYS - VIDEO 3 SEGMENT (66% to 100% scroll) */}
       <div
-        className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-black/30 pointer-events-none"
+        className="absolute inset-0 flex flex-col items-center justify-end md:justify-center text-center p-6 pb-24 md:p-8 bg-black/40 pointer-events-none"
         style={{
           opacity: scrollProgress >= 82 ? (scrollProgress - 82) / 10 : 0,
           transition: "opacity 0.3s ease",
@@ -291,7 +303,7 @@ export default function ScrollCanvas() {
           <span className="font-display italic text-4xl md:text-6xl text-night-glow">
             {t.hero.thisCouldBe}
           </span>
-          <span className="font-display text-white text-5xl md:text-8xl tracking-tight leading-none uppercase font-semibold">
+          <span className="font-display text-white text-3xl sm:text-5xl md:text-8xl tracking-tight leading-none uppercase font-semibold">
             {t.hero.yourHome}
           </span>
           <span className="font-ui text-xs text-night-glow/70 mt-6 tracking-widest uppercase">
@@ -301,7 +313,7 @@ export default function ScrollCanvas() {
       </div>
 
       {/* Progress Dots Indicator (Bottom-Right) */}
-      <div className="absolute bottom-10 right-10 flex items-center gap-4 z-20">
+      <div className="absolute bottom-6 right-6 md:bottom-10 md:right-10 flex items-center gap-3 md:gap-4 z-20">
         {[
           { name: t.hero.design, percent: 0.15 },
           { name: t.hero.build, percent: 0.5 },
