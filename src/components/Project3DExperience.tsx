@@ -101,16 +101,16 @@ export default function Project3DExperience() {
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(true);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
-  const [modelZoom, setModelZoom] = useState<number>(0.84); // 0.84x CSS scale: perfectly zoomed out to show full house, compound walls & roof deck
+  const [modelZoom, setModelZoom] = useState<number>(0.65); // 0.65x scale: wide cinematic view showing full house, compound walls & roof pergola
   const sectionRef = React.useRef<HTMLDivElement>(null);
 
   // Pure client-side zoom controls (No external script injection, 100% CSP-safe & zero console errors)
   const zoomCameraOut = () => {
-    setModelZoom((prev) => Math.max(0.55, Number((prev - 0.12).toFixed(2))));
+    setModelZoom((prev) => Math.max(0.45, Number((prev - 0.10).toFixed(2))));
   };
 
   const zoomCameraIn = () => {
-    setModelZoom((prev) => Math.min(1.35, Number((prev + 0.12).toFixed(2))));
+    setModelZoom((prev) => Math.min(1.20, Number((prev + 0.10).toFixed(2))));
   };
 
   const realProjects = [
@@ -198,7 +198,7 @@ export default function Project3DExperience() {
           {/* Left / Center: Interactive 3D Viewer (Clean Framed 3D Card with White Background) */}
           <div className="lg:col-span-7 bg-white border-[1.5px] border-neutral-900 rounded-[22px] overflow-hidden shadow-md flex flex-col">
             {/* Viewer Stage: Clean Pure White Canvas Edge-to-Edge */}
-            <div className="relative w-full bg-white transition-all duration-300 overflow-hidden h-[320px] sm:h-[420px] lg:h-[485px]">
+            <div className="relative w-full bg-white transition-all duration-300 overflow-hidden h-[350px] sm:h-[440px] lg:h-[510px]">
               {activeView === "3d" && (
                 <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center">
 
@@ -280,11 +280,8 @@ export default function Project3DExperience() {
                       key={selectedProject.id}
                       title={selectedProject.title}
                       src={selectedProject.embedUrl}
-                      className="w-full border-0 bg-white transition-transform duration-300 ease-out"
+                      className="w-full h-full border-0 bg-white transition-transform duration-300 ease-out"
                       style={{
-                        height: "calc(100% + 120px)",
-                        marginTop: "-55px",
-                        marginBottom: "-65px",
                         maxWidth: "none",
                         maxHeight: "none",
                         backgroundColor: "#ffffff",
