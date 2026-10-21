@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Rotate3D,
   Sparkles,
@@ -29,6 +29,9 @@ export interface Project3DItem {
   embedUrl: string;
   directUrl: string;
   thumbnail: string;
+  author: string;
+  cameraPos: [number, number, number];
+  cameraTarget: [number, number, number];
   specs: {
     structure: string;
     steel: string;
@@ -50,9 +53,12 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Kamarajar Salai / KK Nagar, Madurai",
     builtUpArea: "4,650 Sq.Ft (G+2)",
     sketchfabId: "d8e6be2601474f7d8cb7d06f8566f01a",
-    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&ui_infos=0&ui_watermark=0&ui_hint=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_stop=0&ui_ar=0&ui_vr=0&ui_annotations=0&dnt=1",
+    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&camera=0&ui_infos=0&ui_watermark=0&ui_hint=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_stop=0&ui_vr=0&ui_fullscreen=0&ui_ar=0&ui_annotations=0&dnt=1",
     directUrl: "https://sketchfab.com/3d-models/modern-luxury-villa-house-building-d8e6be2601474f7d8cb7d06f8566f01a",
     thumbnail: "/images/danam/about-villa.webp",
+    author: "Zigurat Architecture Studio",
+    cameraPos: [6, -8, 3],
+    cameraTarget: [0, 0, 1.5],
     specs: {
       structure: "Seismic Zone-III Earthquake Resistant RCC Frame",
       steel: "Fe550D High-Ductility TMT Rebars",
@@ -76,9 +82,12 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Anna Nagar / Iyer Bungalow, Madurai",
     builtUpArea: "3,800 Sq.Ft (G+1)",
     sketchfabId: "2b9e6717a0ef457685dc41ce994ffabf",
-    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&ui_infos=0&ui_watermark=0&ui_hint=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_stop=0&ui_ar=0&ui_vr=0&ui_annotations=0&dnt=1",
+    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&camera=0&ui_infos=0&ui_watermark=0&ui_hint=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_stop=0&ui_vr=0&ui_fullscreen=0&ui_ar=0&ui_annotations=0&dnt=1",
     directUrl: "https://sketchfab.com/3d-models/modern-house-2b9e6717a0ef457685dc41ce994ffabf",
     thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
+    author: "Zigurat Architecture Studio",
+    cameraPos: [7, -9, 3.5],
+    cameraTarget: [0, 0, 1.5],
     specs: {
       structure: "Engineered Monolithic Shear Wall + Column RCC",
       steel: "TATA Tiscon 550D Super Ductile",
@@ -99,23 +108,137 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
 export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
-  const [is3dLoaded, setIs3dLoaded] = useState(true);
+  const [is3dLoaded, setIs3dLoaded] = useState(false);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
-  const [modelZoom, setModelZoom] = useState<number>(1.16); // 0.65x scale: wide view showing full building, pergola, steps, compound walls
-  const sectionRef = React.useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const apiRef = useRef<any>(null);
 
-  // Hand gesture hint remains visible on screen until user touches or clicks the model
+  // Initialize Sketchfab Viewer API via official script
+  useEffect(() => {
+    let isCancelled = false;
+
+    const initViewer = () => {
+      const el = iframeRef.current;
+      if (!el || isCancelled) return;
+
+      const SketchfabClass = (window as any).Sketchfab;
+      if (!SketchfabClass) return;
+
+      try {
+        const client = new SketchfabClass("1.12.1", el);
+        client.init(selectedProject.sketchfabId, {
+          success: (api: any) => {
+            if (isCancelled) return;
+            apiRef.current = api;
+            api.start();
+            api.addEventListener("viewerready", () => {
+              if (isCancelled) return;
+              setIs3dLoaded(true);
+              // Camera framing: locks to the ideal architectural perspective so the villa fills the card stage
+              api.setCameraLookAt(selectedProject.cameraPos, selectedProject.cameraTarget, 0);
+            });
+          },
+          error: () => {
+            console.error("Sketchfab init failed");
+          },
+          autostart: 1,
+          preload: 1,
+          camera: 0,
+          dnt: 1,
+          transparent: 1,
+          ui_infos: 0,
+          ui_controls: 0,
+          ui_stop: 0,
+          ui_watermark: 0,
+          ui_hint: 0,
+          ui_help: 0,
+          ui_settings: 0,
+          ui_vr: 0,
+          ui_fullscreen: 0,
+          ui_annotations: 0,
+          ui_ar: 0,
+          ui_inspector: 0,
+        });
+      } catch (err) {
+        console.error("Sketchfab client error:", err);
+      }
+    };
+
+    if ((window as any).Sketchfab) {
+      initViewer();
+    } else {
+      const existing = document.getElementById("sketchfab-viewer-script");
+      if (!existing) {
+        const s = document.createElement("script");
+        s.id = "sketchfab-viewer-script";
+        s.src = "https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js";
+        s.async = true;
+        s.onload = () => initViewer();
+        document.body.appendChild(s);
+      } else {
+        existing.addEventListener("load", () => initViewer(), { once: true });
+      }
+    }
+
+    return () => {
+      isCancelled = true;
+      apiRef.current = null;
+    };
+  }, [selectedProject.sketchfabId]);
+
+  // Dismiss gesture hint when window loses focus (user clicked inside iframe)
+  useEffect(() => {
+    const handleBlur = () => {
+      setShowGestureHint(false);
+    };
+    window.addEventListener("blur", handleBlur);
+    return () => window.removeEventListener("blur", handleBlur);
+  }, []);
+
   const dismissGestureHint = () => {
     setShowGestureHint(false);
   };
 
-  // Pure client-side zoom controls (Zero console errors, zero CSP issues, smoothly scalable)
-  const zoomCameraOut = () => {
-    setModelZoom((prev) => Math.max(0.45, Number((prev - 0.08).toFixed(2))));
+  // Zoom controls using Sketchfab Viewer API
+  const zoomCameraIn = () => {
+    if (!apiRef.current) return;
+    try {
+      apiRef.current.getCameraLookAt((err: any, c: any) => {
+        if (err || !c || !c.position || !c.target) return;
+        const newPos = c.target.map(
+          (t: number, i: number) => t + (c.position[i] - t) * 0.8
+        );
+        apiRef.current.setCameraLookAt(newPos, c.target, 0.3);
+      });
+    } catch (e) {
+      console.warn("Zoom in error:", e);
+    }
   };
 
-  const zoomCameraIn = () => {
-    setModelZoom((prev) => Math.min(1.25, Number((prev + 0.08).toFixed(2))));
+  const zoomCameraOut = () => {
+    if (!apiRef.current) return;
+    try {
+      apiRef.current.getCameraLookAt((err: any, c: any) => {
+        if (err || !c || !c.position || !c.target) return;
+        const newPos = c.target.map(
+          (t: number, i: number) => t + (c.position[i] - t) * 1.25
+        );
+        apiRef.current.setCameraLookAt(newPos, c.target, 0.3);
+      });
+    } catch (e) {
+      console.warn("Zoom out error:", e);
+    }
+  };
+
+  const resetCamera = () => {
+    if (apiRef.current) {
+      try {
+        apiRef.current.setCameraLookAt(selectedProject.cameraPos, selectedProject.cameraTarget, 0.4);
+      } catch (e) {
+        console.warn("Reset camera error:", e);
+      }
+    }
   };
 
   const realProjects = [
@@ -213,7 +336,6 @@ export default function Project3DExperience() {
               {activeView === "3d" && (
                 <div className="relative w-full h-full bg-[#0a0a0d] overflow-hidden flex items-center justify-center">
 
-
                   {/* Top Status & Zoom Controls */}
                   <div className="absolute top-3 left-6 z-20 pointer-events-none select-none">
                     <div className="bg-black/80 backdrop-blur-md border border-white/15 px-2.5 sm:px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
@@ -283,27 +405,20 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Sketchfab 3D Embed Iframe - Scaled cleanly via CSS transform for full view without any JS errors */}
+                  {/* Sketchfab 3D Embed Iframe - Initialized via Sketchfab Viewer API */}
                   <div
                     onMouseDown={() => dismissGestureHint()}
                     onTouchStart={() => dismissGestureHint()}
                     className="w-full h-full flex items-center justify-center overflow-hidden bg-[#0a0a0d] relative cursor-grab active:cursor-grabbing"
                   >
                     <iframe
+                      ref={iframeRef}
                       id="sketchfab-viewport-iframe"
-                      key={selectedProject.id}
+                      key={selectedProject.sketchfabId}
                       title={selectedProject.title}
                       src={selectedProject.embedUrl}
-                      className="w-full h-full border-0 bg-transparent transition-transform duration-300 ease-out"
-                      style={{
-                        maxWidth: "none",
-                        maxHeight: "none",
-                        backgroundColor: "transparent",
-                        transform: `scale(${modelZoom})`,
-                        transformOrigin: "center center",
-                      }}
+                      className="w-full h-full border-0 bg-transparent"
                       allow="autoplay; fullscreen; xr-spatial-tracking; accelerometer; gyroscope"
-                      loading="lazy"
                     />
                   </div>
                 </div>
@@ -397,14 +512,16 @@ export default function Project3DExperience() {
                   </div>
                 </div>
               )}
-              {/* Sub-bar: Instructions & Direct Fullscreen/Reset View to match Skyline reference */}
-              <div className="bg-[#0e0e12] px-4 py-2.5 border-t border-white/10 flex items-center justify-between gap-4 text-xs font-ui">
-                <span className="text-[#8D8A83] text-[11px] sm:text-xs">
-                  Drag model to rotate · Pinch to zoom
-                </span>
+              {/* Sub-bar: Instructions & Direct Fullscreen/Reset View */}
+              <div className="bg-[#0e0e12] px-4 py-2.5 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs font-ui">
+                <div className="flex items-center gap-2 text-[#8D8A83] text-[11px] sm:text-xs">
+                  <span>Drag to rotate · Pinch to zoom</span>
+                  <span className="hidden sm:inline text-white/20">|</span>
+                  <span className="hidden sm:inline text-[#706E68]">3D Model by {selectedProject.author}</span>
+                </div>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setModelZoom(1.16)}
+                    onClick={resetCamera}
                     className="text-[#C5A880] hover:text-[#F3EFEA] text-[11px] sm:text-xs font-semibold tracking-wider uppercase transition-colors cursor-pointer"
                   >
                     Reset view
