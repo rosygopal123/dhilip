@@ -50,7 +50,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Kamarajar Salai / KK Nagar, Madurai",
     builtUpArea: "4,650 Sq.Ft (G+2)",
     sketchfabId: "d8e6be2601474f7d8cb7d06f8566f01a",
-    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&autospin=0.35&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0",
+    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0",
     directUrl: "https://sketchfab.com/3d-models/modern-luxury-villa-house-building-d8e6be2601474f7d8cb7d06f8566f01a",
     thumbnail: "/images/danam/about-villa.webp",
     specs: {
@@ -76,7 +76,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Anna Nagar / Iyer Bungalow, Madurai",
     builtUpArea: "3,800 Sq.Ft (G+1)",
     sketchfabId: "2b9e6717a0ef457685dc41ce994ffabf",
-    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&autospin=0.35&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0",
+    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0",
     directUrl: "https://sketchfab.com/3d-models/modern-house-2b9e6717a0ef457685dc41ce994ffabf",
     thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
     specs: {
@@ -98,14 +98,79 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
 
 export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(true);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
 
+  // Auto-hide hand hint after 5 seconds or upon user interaction
   React.useEffect(() => {
-    const timer = setTimeout(() => setShowGestureHint(false), 6000);
-    return () => clearTimeout(timer);
+    const timer = setTimeout(() => setShowGestureHint(false), 5000);
+    const handleUserInteraction = () => setShowGestureHint(false);
+    window.addEventListener("mousedown", handleUserInteraction, { once: true });
+    window.addEventListener("touchstart", handleUserInteraction, { once: true });
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("mousedown", handleUserInteraction);
+      window.removeEventListener("touchstart", handleUserInteraction);
+    };
   }, []);
+
+  // Initialize Sketchfab Viewer API on load to zoom out to the exact full compound view (~35-40% zoom out)
+  React.useEffect(() => {
+    const scriptId = "sketchfab-viewer-api-script";
+    let script = document.getElementById(scriptId) as HTMLScriptElement;
+
+    const setupCameraZoom = () => {
+      if (!iframeRef.current || !(window as any).Sketchfab) return;
+      try {
+        const client = new (window as any).Sketchfab(iframeRef.current);
+        client.init(selectedProject.sketchfabId, {
+          autostart: 1,
+          preload: 1,
+          transparent: 1,
+          ui_hint: 0,
+          ui_infos: 0,
+          ui_controls: 0,
+          ui_watermark: 0,
+          ui_settings: 0,
+          ui_inspector: 0,
+          success: (api: any) => {
+            api.start();
+            api.addEventListener("viewerready", () => {
+              api.getCamera((err: any, camera: any) => {
+                if (!err && camera && camera.position && camera.target) {
+                  const p = camera.position;
+                  const t = camera.target;
+                  const dir = [p[0] - t[0], p[1] - t[1], p[2] - t[2]];
+                  const dist = Math.sqrt(dir[0]*dir[0] + dir[1]*dir[1] + dir[2]*dir[2]);
+                  if (dist > 0) {
+                    const norm = [dir[0]/dist, dir[1]/dist, dir[2]/dist];
+                    // 1.58x distance zooms out by ~37% matching user screenshot
+                    const newDist = dist * 1.58;
+                    const newPos = [t[0] + norm[0] * newDist, t[1] + norm[1] * newDist, t[2] + norm[2] * newDist];
+                    api.setCameraLookAt(newPos, t, 0);
+                  }
+                }
+              });
+            });
+          },
+          error: () => {}
+        });
+      } catch (e) {}
+    };
+
+    if (!script) {
+      script = document.createElement("script");
+      script.id = scriptId;
+      script.src = "https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js";
+      script.async = true;
+      script.onload = setupCameraZoom;
+      document.body.appendChild(script);
+    } else if ((window as any).Sketchfab) {
+      setupCameraZoom();
+    }
+  }, [selectedProject.id]);
 
   const realProjects = [
     { name: "Rajmahal Aishvaryam", loc: "Madurai", img: "/images/danam/ddhvrktrjjjln58schqk.webp", tag: "Turnkey EPC" },
@@ -197,80 +262,48 @@ export default function Project3DExperience() {
                 <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center">
 
 
-                  {/* Top Floating Orbit Badge & Gesture Toggle */}
-                  <div className="absolute top-3.5 left-3.5 z-20 flex items-center gap-2 pointer-events-auto">
-                    <div className="bg-black/75 backdrop-blur-md border border-white/20 px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md select-none">
-                      <Rotate3D className="w-3.5 h-3.5 text-brand-forest animate-spin-slow" />
-                      <span>Live 3D • Auto-Orbit</span>
+                  {/* Top Clean Status Indicator */}
+                  <div className="absolute top-3.5 left-3.5 z-20 pointer-events-none select-none">
+                    <div className="bg-black/70 backdrop-blur-md border border-white/20 px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
+                      <Rotate3D className="w-3.5 h-3.5 text-brand-forest" />
+                      <span>3D Elevation View</span>
                     </div>
-
-                    {!showGestureHint && (
-                      <button
-                        onClick={() => setShowGestureHint(true)}
-                        className="bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white/80 hover:text-white px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider transition-all cursor-pointer shadow-sm"
-                        title="Show Interaction Guide"
-                      >
-                        Gesture Guide 🖐️
-                      </button>
-                    )}
                   </div>
 
-                  {/* Animated Hand Interaction Gesture Overlay for Mobile & PC */}
+                  {/* Exact White Pointer Hand & Arrows (User Reference media_1792568252760_50054305.png) */}
                   {showGestureHint && (
                     <div
-                      onClick={() => setShowGestureHint(false)}
-                      onTouchStart={() => setShowGestureHint(false)}
-                      className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] transition-all duration-500 cursor-pointer p-4 select-none"
+                      className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none select-none transition-opacity duration-300"
                     >
-                      <div className="relative flex flex-col items-center justify-center pointer-events-none">
-                        {/* Orbital Motion Wave Rings */}
-                        <div className="absolute w-28 h-28 rounded-full border border-white/30 animate-ping opacity-30" />
-                        <div className="absolute w-20 h-20 rounded-full border border-brand-forest/60 animate-pulse" />
-
-                        {/* Orbit Motion Track Arrows */}
-                        <div className="flex items-center justify-between w-40 mb-2">
-                          <span className="text-white/80 text-xs font-mono animate-pulse">◀◀</span>
-                          <span className="text-[10px] uppercase font-mono tracking-widest text-brand-leaf-light font-bold bg-black/50 px-2 py-0.5 rounded-full border border-white/10">
-                            Drag / Swipe 360°
-                          </span>
-                          <span className="text-white/80 text-xs font-mono animate-pulse">▶▶</span>
-                        </div>
-
-                        {/* Swaying & Rotating Hand Icon */}
-                        <div
-                          className="relative mb-3.5"
-                          style={{
-                            animation: "handOrbitSway 2.5s ease-in-out infinite",
-                          }}
+                      <div
+                        className="flex items-center gap-2 opacity-95"
+                        style={{
+                          animation: "handPointerSway 2.2s ease-in-out infinite",
+                        }}
+                      >
+                        {/* Left Arrow */}
+                        <svg
+                          className="w-4 h-4 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)] fill-white"
+                          viewBox="0 0 24 24"
                         >
-                          <svg
-                            className="w-14 h-14 text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v4m0 0V11m0-2.5a1.5 1.5 0 013 0V13"
-                            />
-                          </svg>
-                        </div>
+                          <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                        </svg>
 
-                        {/* Instruction Pill */}
-                        <div className="bg-black/90 border border-white/25 px-4 py-2.5 rounded-xl text-center shadow-2xl flex flex-col items-center gap-1 max-w-[280px]">
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-white uppercase tracking-wider">
-                            <Rotate3D className="w-3.5 h-3.5 text-brand-forest" />
-                            <span>Touch & Orbit 360°</span>
-                          </div>
-                          <span className="text-[10px] text-white/80 font-ui leading-tight">
-                            Drag to rotate • Pinch / Scroll to zoom out
-                          </span>
-                          <span className="text-[9px] text-brand-leaf-light font-mono mt-1 opacity-90">
-                            [ Tap anywhere to start ]
-                          </span>
-                        </div>
+                        {/* Crisp White Hand Pointer Icon */}
+                        <svg
+                          className="w-10 h-10 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] fill-white"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M9 11.24V7.5a2.5 2.5 0 0 1 5 0v3.74c1.21-.81 2-2.18 2-3.74a4.5 4.5 0 0 0-9 0c0 1.56.79 2.93 2 3.74zm9.84 4.63-4.54-2.26a1.98 1.98 0 0 0-1.92.1l-.88.58V7.5a1.5 1.5 0 0 0-3 0v10.74l-3.44-.72a1.53 1.53 0 0 0-1.48.43l-.78.79 4.93 4.93c.38.38.89.59 1.42.59H17c1.02 0 1.88-.77 1.98-1.78l.48-4.8c.07-.68-.21-1.35-.62-1.81z" />
+                        </svg>
+
+                        {/* Right Arrow */}
+                        <svg
+                          className="w-4 h-4 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)] fill-white"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                        </svg>
                       </div>
                     </div>
                   )}
@@ -278,6 +311,8 @@ export default function Project3DExperience() {
                   {/* Sketchfab 3D Embed Iframe - Edge-to-Edge Flush Full View (Zero Inner Square) */}
                   <div className="w-full h-full flex items-center justify-center overflow-hidden bg-white">
                     <iframe
+                      ref={iframeRef}
+                      id="sketchfab-viewport-iframe"
                       key={selectedProject.id}
                       title={selectedProject.title}
                       src={selectedProject.embedUrl}

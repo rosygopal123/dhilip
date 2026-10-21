@@ -174,3 +174,16 @@ body {
     transform: translateX(-26px) rotate(-16deg) scale(0.96);
   }
 }
+
+/* Animated 3D Hand Pointer Sway (User Reference media_1792568252760_50054305.png) */
+@keyframes handPointerSway {
+  0% {
+    transform: translateX(-18px) rotate(-8deg);
+  }
+  50% {
+    transform: translateX(18px) rotate(8deg);
+  }
+  100% {
+    transform: translateX(-18px) rotate(-8deg);
+  }
+}
