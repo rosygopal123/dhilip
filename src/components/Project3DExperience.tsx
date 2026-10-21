@@ -97,7 +97,7 @@ export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(false);
-  const zoomScale = 0.72; // Zoomed out perspective matching client's desired framing
+  const zoomScale = 1.0; // 1.0 Zoom to fill white outer card layer flush
 
   const realProjects = [
     { name: "Rajmahal Aishvaryam", loc: "Madurai", img: "/images/danam/ddhvrktrjjjln58schqk.webp", tag: "Turnkey EPC" },
@@ -184,7 +184,7 @@ export default function Project3DExperience() {
           {/* Left / Center: Interactive 3D Viewer (Clean Framed 3D Card with White Background) */}
           <div className="lg:col-span-7 bg-white border-[1.5px] border-neutral-900 rounded-[22px] overflow-hidden shadow-md flex flex-col">
             {/* Viewer Stage: Clean Pure White Canvas Edge-to-Edge */}
-            <div className="relative w-full bg-white transition-all duration-300 overflow-hidden h-[340px] sm:h-[400px]">
+            <div className="relative w-full bg-white transition-all duration-300 overflow-hidden h-[380px] sm:h-[450px] lg:h-[485px]">
               {activeView === "3d" && (
                 <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center">
                   {/* Loading Overlay */}
