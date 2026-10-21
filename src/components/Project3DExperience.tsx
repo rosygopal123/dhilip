@@ -30,8 +30,6 @@ export interface Project3DItem {
   directUrl: string;
   thumbnail: string;
   author: string;
-  cameraPos: [number, number, number];
-  cameraTarget: [number, number, number];
   specs: {
     structure: string;
     steel: string;
@@ -53,12 +51,10 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Kamarajar Salai / KK Nagar, Madurai",
     builtUpArea: "4,650 Sq.Ft (G+2)",
     sketchfabId: "d8e6be2601474f7d8cb7d06f8566f01a",
-    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&camera=0&ui_infos=0&ui_watermark=0&ui_hint=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_stop=0&ui_vr=0&ui_fullscreen=0&ui_ar=0&ui_annotations=0&dnt=1",
+    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&camera=0&ui_infos=0&ui_controls=0&ui_stop=0&ui_watermark=0&ui_hint=0&ui_help=0&ui_settings=0&ui_vr=0&ui_fullscreen=0&ui_annotations=0&ui_ar=0&ui_inspector=0&ui_theme=dark&dnt=1",
     directUrl: "https://sketchfab.com/3d-models/modern-luxury-villa-house-building-d8e6be2601474f7d8cb7d06f8566f01a",
     thumbnail: "/images/danam/about-villa.webp",
     author: "Zigurat Architecture Studio",
-    cameraPos: [6, -8, 3],
-    cameraTarget: [0, 0, 1.5],
     specs: {
       structure: "Seismic Zone-III Earthquake Resistant RCC Frame",
       steel: "Fe550D High-Ductility TMT Rebars",
@@ -82,12 +78,10 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Anna Nagar / Iyer Bungalow, Madurai",
     builtUpArea: "3,800 Sq.Ft (G+1)",
     sketchfabId: "2b9e6717a0ef457685dc41ce994ffabf",
-    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&camera=0&ui_infos=0&ui_watermark=0&ui_hint=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_stop=0&ui_vr=0&ui_fullscreen=0&ui_ar=0&ui_annotations=0&dnt=1",
+    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&camera=0&ui_infos=0&ui_controls=0&ui_stop=0&ui_watermark=0&ui_hint=0&ui_help=0&ui_settings=0&ui_vr=0&ui_fullscreen=0&ui_annotations=0&ui_ar=0&ui_inspector=0&ui_theme=dark&dnt=1",
     directUrl: "https://sketchfab.com/3d-models/modern-house-2b9e6717a0ef457685dc41ce994ffabf",
     thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
     author: "Zigurat Architecture Studio",
-    cameraPos: [7, -9, 3.5],
-    cameraTarget: [0, 0, 1.5],
     specs: {
       structure: "Engineered Monolithic Shear Wall + Column RCC",
       steel: "TATA Tiscon 550D Super Ductile",
@@ -114,7 +108,7 @@ export default function Project3DExperience() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const apiRef = useRef<any>(null);
 
-  // Initialize Sketchfab Viewer API via official script
+  // Initialize Sketchfab Viewer API via official script with full UI hiding params
   useEffect(() => {
     let isCancelled = false;
 
@@ -135,8 +129,16 @@ export default function Project3DExperience() {
             api.addEventListener("viewerready", () => {
               if (isCancelled) return;
               setIs3dLoaded(true);
-              // Camera framing: locks to the ideal architectural perspective so the villa fills the card stage
-              api.setCameraLookAt(selectedProject.cameraPos, selectedProject.cameraTarget, 0);
+              // Dynamic camera zoom out: scales camera away from target so the entire villa is framed cleanly
+              api.getCameraLookAt((err: any, cam: any) => {
+                if (err || !cam || !cam.position || !cam.target) return;
+                const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+                const F = isMobile ? 2.0 : 1.6; // Responsive zoom factor so full villa with courtyard/pergola is visible
+                const pos = cam.target.map(
+                  (t: number, i: number) => t + (cam.position[i] - t) * F
+                );
+                api.setCameraLookAt(pos, cam.target, 0);
+              });
             });
           },
           error: () => {
@@ -159,6 +161,7 @@ export default function Project3DExperience() {
           ui_annotations: 0,
           ui_ar: 0,
           ui_inspector: 0,
+          ui_theme: "dark",
         });
       } catch (err) {
         console.error("Sketchfab client error:", err);
@@ -234,7 +237,15 @@ export default function Project3DExperience() {
   const resetCamera = () => {
     if (apiRef.current) {
       try {
-        apiRef.current.setCameraLookAt(selectedProject.cameraPos, selectedProject.cameraTarget, 0.4);
+        apiRef.current.getCameraLookAt((err: any, cam: any) => {
+          if (err || !cam || !cam.position || !cam.target) return;
+          const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+          const F = isMobile ? 2.0 : 1.6;
+          const pos = cam.target.map(
+            (t: number, i: number) => t + (cam.position[i] - t) * F
+          );
+          apiRef.current.setCameraLookAt(pos, cam.target, 0.4);
+        });
       } catch (e) {
         console.warn("Reset camera error:", e);
       }
@@ -323,7 +334,7 @@ export default function Project3DExperience() {
 
         {/* Main Showcase Container */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left / Center: Interactive 3D Viewer (Clean Framed 3D Card with White Background) */}
+          {/* Left / Center: Interactive 3D Viewer (Clean Framed 3D Card with Dark Architectural Theme) */}
           <div className="lg:col-span-7 bg-[#0a0a0d] border border-white/10 rounded-[22px] overflow-hidden shadow-2xl flex flex-col">
             {/* Viewer Stage: Clean Luxury 3D Card with Architectural Corner Accents */}
             <div className="relative w-full bg-[#0a0a0d] transition-all duration-300 overflow-hidden h-[340px] sm:h-[400px] lg:h-[460px]">
@@ -336,16 +347,16 @@ export default function Project3DExperience() {
               {activeView === "3d" && (
                 <div className="relative w-full h-full bg-[#0a0a0d] overflow-hidden flex items-center justify-center">
 
-                  {/* Top Status & Zoom Controls */}
-                  <div className="absolute top-3 left-6 z-20 pointer-events-none select-none">
-                    <div className="bg-black/80 backdrop-blur-md border border-white/15 px-2.5 sm:px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
+                  {/* Top Status Badge */}
+                  <div className="absolute top-3 left-5 z-20 pointer-events-none select-none">
+                    <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 px-2.5 sm:px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
                       <Rotate3D className="w-3.5 h-3.5 text-[#C5A880] animate-spin-slow" />
                       <span>3D Villa Tour</span>
                     </div>
                   </div>
 
-                  {/* Clean Interactive Zoom Controls in Top-Right */}
-                  <div className="absolute top-3 right-6 z-20 flex items-center gap-1.5 bg-black/80 backdrop-blur-md border border-white/15 p-1 rounded-xl shadow-lg pointer-events-auto select-none">
+                  {/* Clean Interactive Zoom Controls in Top-Right - also seamlessly conceals top-right download icon */}
+                  <div className="absolute top-2.5 right-3 z-25 flex items-center gap-1 bg-[#0a0a0d]/95 backdrop-blur-md border border-white/15 p-1 rounded-xl shadow-xl pointer-events-auto select-none">
                     <button
                       onClick={zoomCameraOut}
                       className="px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer flex items-center gap-1"
@@ -363,6 +374,9 @@ export default function Project3DExperience() {
                       <span className="text-[10px] uppercase hidden sm:inline">Zoom In</span>
                     </button>
                   </div>
+
+                  {/* Dedicated background overlay seamlessly concealing top-right download icon */}
+                  <div className="absolute top-0 right-0 w-16 h-14 bg-[#0a0a0d] z-15 pointer-events-none" />
 
                   {/* Exact White Pointer Hand & Arrows (Dismisses immediately when touched or clicked) */}
                   {showGestureHint && (
@@ -514,10 +528,10 @@ export default function Project3DExperience() {
               )}
               {/* Sub-bar: Instructions & Direct Fullscreen/Reset View */}
               <div className="bg-[#0e0e12] px-4 py-2.5 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs font-ui">
-                <div className="flex items-center gap-2 text-[#8D8A83] text-[11px] sm:text-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-[#8D8A83] text-[11px] sm:text-xs">
                   <span>Drag to rotate · Pinch to zoom</span>
                   <span className="hidden sm:inline text-white/20">|</span>
-                  <span className="hidden sm:inline text-[#706E68]">3D Model by {selectedProject.author}</span>
+                  <span className="text-[#8D8A83]/80">Model by {selectedProject.author}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
