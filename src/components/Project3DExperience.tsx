@@ -47,7 +47,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Kamarajar Salai / KK Nagar, Madurai",
     builtUpArea: "4,650 Sq.Ft (G+2)",
     sketchfabId: "d8e6be2601474f7d8cb7d06f8566f01a",
-    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&ui_theme=dark&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&transparent=0",
+    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=1",
     directUrl: "https://sketchfab.com/3d-models/modern-luxury-villa-house-building-d8e6be2601474f7d8cb7d06f8566f01a",
     thumbnail: "/images/danam/about-villa.webp",
     specs: {
@@ -73,7 +73,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Anna Nagar / Iyer Bungalow, Madurai",
     builtUpArea: "3,800 Sq.Ft (G+1)",
     sketchfabId: "2b9e6717a0ef457685dc41ce994ffabf",
-    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&ui_theme=dark&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&transparent=0",
+    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=1",
     directUrl: "https://sketchfab.com/3d-models/modern-house-2b9e6717a0ef457685dc41ce994ffabf",
     thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
     specs: {
@@ -97,7 +97,7 @@ export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(false);
-  const zoomScale = 1.04; // 104% Zoom
+  const zoomScale = 0.72; // Zoomed out perspective matching client's desired framing
 
   const realProjects = [
     { name: "Rajmahal Aishvaryam", loc: "Madurai", img: "/images/danam/ddhvrktrjjjln58schqk.webp", tag: "Turnkey EPC" },
@@ -181,25 +181,25 @@ export default function Project3DExperience() {
 
         {/* Main Showcase Container */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left / Center: Interactive 3D Viewer (Pure Black 3D Model Box) */}
-          <div className="lg:col-span-7 bg-black border border-stone-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
-            {/* Viewer Stage: Clean Pure Black Edge-to-Edge */}
-            <div className="relative w-full bg-black transition-all duration-300 overflow-hidden h-[340px] sm:h-[400px]">
+          {/* Left / Center: Interactive 3D Viewer (Clean Framed 3D Card with White Background) */}
+          <div className="lg:col-span-7 bg-white border-[1.5px] border-neutral-900 rounded-[22px] overflow-hidden shadow-md flex flex-col">
+            {/* Viewer Stage: Clean Pure White Canvas Edge-to-Edge */}
+            <div className="relative w-full bg-white transition-all duration-300 overflow-hidden h-[340px] sm:h-[400px]">
               {activeView === "3d" && (
-                <div className="relative w-full h-full bg-black overflow-hidden flex items-center justify-center">
+                <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center">
                   {/* Loading Overlay */}
                   {!is3dLoaded && (
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/95 backdrop-blur-sm text-center p-6">
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm text-center p-6">
                       <div className="relative w-14 h-14 mb-3 flex items-center justify-center">
                         <div className="absolute inset-0 rounded-full border-2 border-brand-leaf/20 animate-ping" />
                         <div className="w-10 h-10 rounded-full border-2 border-brand-forest border-t-brand-leaf animate-spin flex items-center justify-center">
-                          <Rotate3D className="w-4 h-4 text-brand-leaf-light animate-pulse" />
+                          <Rotate3D className="w-4 h-4 text-brand-forest animate-pulse" />
                         </div>
                       </div>
-                      <h4 className="text-white font-ui text-sm font-bold tracking-wide mb-1">
+                      <h4 className="text-neutral-900 font-ui text-sm font-bold tracking-wide mb-1">
                         Loading Interactive 3D Model...
                       </h4>
-                      <p className="text-white/60 text-xs max-w-sm mb-3 font-ui">
+                      <p className="text-neutral-600 text-xs max-w-sm mb-3 font-ui">
                         Downloading 3D geometry & structural textures for {selectedProject.title}.
                       </p>
                       <button
@@ -211,9 +211,9 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Sketchfab 3D Embed Iframe with 104% Zoom Scale */}
+                  {/* Sketchfab 3D Embed Iframe with Transparent/White Sky and Framing */}
                   <div
-                    className="w-full h-full flex items-center justify-center overflow-hidden bg-black"
+                    className="w-full h-full flex items-center justify-center overflow-hidden bg-white"
                     style={{
                       transform: `scale(${zoomScale})`,
                       transformOrigin: "center center",
@@ -224,13 +224,13 @@ export default function Project3DExperience() {
                       key={selectedProject.id}
                       title={selectedProject.title}
                       src={selectedProject.embedUrl}
-                      className="border-0 bg-black"
+                      className="border-0 bg-white"
                       style={{
                         width: `${(1 / zoomScale) * 100}%`,
                         height: `${(1 / zoomScale) * 100}%`,
                         maxWidth: "none",
                         maxHeight: "none",
-                        backgroundColor: "#000000",
+                        backgroundColor: "#ffffff",
                       }}
                       allow="autoplay; fullscreen; xr-spatial-tracking; execution-while-out-of-viewport; execution-while-not-rendered; web-share"
                       allowFullScreen
@@ -241,7 +241,7 @@ export default function Project3DExperience() {
               )}
 
               {activeView === "photos" && (
-                <div className="w-full h-full p-4 grid grid-cols-2 gap-3 overflow-y-auto bg-stone-950">
+                <div className="w-full h-full p-4 grid grid-cols-2 gap-3 overflow-y-auto bg-stone-900">
                   {realProjects.map((p, idx) => (
                     <div
                       key={idx}
