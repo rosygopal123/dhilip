@@ -211,7 +211,7 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Sketchfab 3D Embed Iframe with Transparent/White Sky and Framing */}
+                  {/* Sketchfab 3D Embed Iframe with Top Header Bar Clipped & Clean Framing */}
                   <div
                     className="w-full h-full flex items-center justify-center overflow-hidden bg-white"
                     style={{
@@ -227,7 +227,8 @@ export default function Project3DExperience() {
                       className="border-0 bg-white"
                       style={{
                         width: `${(1 / zoomScale) * 100}%`,
-                        height: `${(1 / zoomScale) * 100}%`,
+                        height: `calc(${(1 / zoomScale) * 100}% + 56px)`,
+                        marginTop: "-54px",
                         maxWidth: "none",
                         maxHeight: "none",
                         backgroundColor: "#ffffff",
