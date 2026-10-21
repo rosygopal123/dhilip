@@ -12,7 +12,10 @@ import {
   ExternalLink,
   Info,
   Camera,
-  FileText
+  FileText,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw
 } from "lucide-react";
 
 export interface Project3DItem {
@@ -47,7 +50,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Kamarajar Salai / KK Nagar, Madurai",
     builtUpArea: "4,650 Sq.Ft (G+2)",
     sketchfabId: "d8e6be2601474f7d8cb7d06f8566f01a",
-    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=1",
+    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0",
     directUrl: "https://sketchfab.com/3d-models/modern-luxury-villa-house-building-d8e6be2601474f7d8cb7d06f8566f01a",
     thumbnail: "/images/danam/about-villa.webp",
     specs: {
@@ -73,7 +76,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Anna Nagar / Iyer Bungalow, Madurai",
     builtUpArea: "3,800 Sq.Ft (G+1)",
     sketchfabId: "2b9e6717a0ef457685dc41ce994ffabf",
-    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=1",
+    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0",
     directUrl: "https://sketchfab.com/3d-models/modern-house-2b9e6717a0ef457685dc41ce994ffabf",
     thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
     specs: {
@@ -97,7 +100,12 @@ export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(false);
-  const zoomScale = 1.0; // 1.0 Zoom to fill white outer card layer flush
+  // Default zoomed out (0.80) so the full property, elevation, compound, and garden are clearly visible
+  const [zoomLevel, setZoomLevel] = useState<number>(0.80);
+
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(1.15, Number((prev + 0.08).toFixed(2))));
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(0.60, Number((prev - 0.08).toFixed(2))));
+  const handleResetZoom = () => setZoomLevel(0.80);
 
   const realProjects = [
     { name: "Rajmahal Aishvaryam", loc: "Madurai", img: "/images/danam/ddhvrktrjjjln58schqk.webp", tag: "Turnkey EPC" },
@@ -140,10 +148,10 @@ export default function Project3DExperience() {
           </div>
 
           {/* Mode Switcher Tabs */}
-          <div className="flex items-center bg-surface-0 border border-border-medium p-1 rounded-xl shadow-xs self-stretch md:self-auto justify-center">
+          <div className="flex items-center bg-surface-0 border border-border-medium p-1 rounded-xl shadow-xs self-stretch md:self-auto justify-between sm:justify-center overflow-x-auto gap-1">
             <button
               onClick={() => setActiveView("3d")}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
                 activeView === "3d"
                   ? "bg-brand-forest text-white shadow-sm"
                   : "text-text-secondary hover:text-text-primary"
@@ -155,7 +163,7 @@ export default function Project3DExperience() {
 
             <button
               onClick={() => setActiveView("photos")}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
                 activeView === "photos"
                   ? "bg-brand-forest text-white shadow-sm"
                   : "text-text-secondary hover:text-text-primary"
@@ -167,7 +175,7 @@ export default function Project3DExperience() {
 
             <button
               onClick={() => setActiveView("specs")}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
                 activeView === "specs"
                   ? "bg-brand-forest text-white shadow-sm"
                   : "text-text-secondary hover:text-text-primary"
@@ -184,7 +192,7 @@ export default function Project3DExperience() {
           {/* Left / Center: Interactive 3D Viewer (Clean Framed 3D Card with White Background) */}
           <div className="lg:col-span-7 bg-white border-[1.5px] border-neutral-900 rounded-[22px] overflow-hidden shadow-md flex flex-col">
             {/* Viewer Stage: Clean Pure White Canvas Edge-to-Edge */}
-            <div className="relative w-full bg-white transition-all duration-300 overflow-hidden h-[380px] sm:h-[450px] lg:h-[485px]">
+            <div className="relative w-full bg-white transition-all duration-300 overflow-hidden h-[320px] sm:h-[420px] lg:h-[485px]">
               {activeView === "3d" && (
                 <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center">
                   {/* Loading Overlay */}
@@ -211,11 +219,49 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Sketchfab 3D Embed Iframe with Top Header Bar Clipped & Clean Framing */}
+                  {/* Interaction badges & Floating Controls */}
+                  {/* Orbit 360 Hint */}
+                  <div className="absolute top-3 left-3 z-20 pointer-events-none bg-black/75 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
+                    <Rotate3D className="w-3.5 h-3.5 text-brand-forest animate-spin-slow" />
+                    <span>Orbit 360°</span>
+                  </div>
+
+                  {/* Clean Glassmorphic Zoom In / Zoom Out / Reset Controls */}
+                  <div className="absolute top-3 right-3 z-20 flex items-center gap-1 bg-black/75 backdrop-blur-md border border-white/20 p-1 rounded-xl shadow-lg pointer-events-auto">
+                    <button
+                      onClick={handleZoomOut}
+                      className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
+                      title="Zoom Out (Full View)"
+                      aria-label="Zoom Out"
+                    >
+                      <ZoomOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    </button>
+                    <span className="font-mono text-[10px] sm:text-xs text-white/90 px-1 font-semibold select-none">
+                      {Math.round(zoomLevel * 100)}%
+                    </span>
+                    <button
+                      onClick={handleZoomIn}
+                      className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
+                      title="Zoom In"
+                      aria-label="Zoom In"
+                    >
+                      <ZoomIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    </button>
+                    <button
+                      onClick={handleResetZoom}
+                      className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors cursor-pointer border-l border-white/15 pl-1.5"
+                      title="Reset Zoom"
+                      aria-label="Reset Zoom"
+                    >
+                      <RotateCcw className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Sketchfab 3D Embed Iframe with BOTH Top Title Bar AND Bottom Settings/Sketchfab Icon Clipped */}
                   <div
                     className="w-full h-full flex items-center justify-center overflow-hidden bg-white"
                     style={{
-                      transform: `scale(${zoomScale})`,
+                      transform: `scale(${zoomLevel})`,
                       transformOrigin: "center center",
                       transition: "transform 0.25s ease-out",
                     }}
@@ -226,9 +272,10 @@ export default function Project3DExperience() {
                       src={selectedProject.embedUrl}
                       className="border-0 bg-white"
                       style={{
-                        width: `${(1 / zoomScale) * 100}%`,
-                        height: `calc(${(1 / zoomScale) * 100}% + 56px)`,
+                        width: `${(1 / zoomLevel) * 100}%`,
+                        height: `calc(${(1 / zoomLevel) * 100}% + 112px)`,
                         marginTop: "-54px",
+                        marginBottom: "-58px",
                         maxWidth: "none",
                         maxHeight: "none",
                         backgroundColor: "#ffffff",
