@@ -103,74 +103,32 @@ export default function Project3DExperience() {
   const [is3dLoaded, setIs3dLoaded] = useState(true);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
 
-  // Auto-hide hand hint after 5 seconds or upon user interaction
+  // Show gesture hint when section is in view, hide on 3D card interaction or after 7s in view
+  const sectionRef = React.useRef<HTMLDivElement>(null);
+
   React.useEffect(() => {
-    const timer = setTimeout(() => setShowGestureHint(false), 5000);
-    const handleUserInteraction = () => setShowGestureHint(false);
-    window.addEventListener("mousedown", handleUserInteraction, { once: true });
-    window.addEventListener("touchstart", handleUserInteraction, { once: true });
+    let dismissTimer: NodeJS.Timeout;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setShowGestureHint(true);
+          dismissTimer = setTimeout(() => {
+            setShowGestureHint(false);
+          }, 8000);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener("mousedown", handleUserInteraction);
-      window.removeEventListener("touchstart", handleUserInteraction);
+      observer.disconnect();
+      if (dismissTimer) clearTimeout(dismissTimer);
     };
   }, []);
-
-  // Initialize Sketchfab Viewer API on load to zoom out to the exact full compound view (~35-40% zoom out)
-  React.useEffect(() => {
-    const scriptId = "sketchfab-viewer-api-script";
-    let script = document.getElementById(scriptId) as HTMLScriptElement;
-
-    const setupCameraZoom = () => {
-      if (!iframeRef.current || !(window as any).Sketchfab) return;
-      try {
-        const client = new (window as any).Sketchfab(iframeRef.current);
-        client.init(selectedProject.sketchfabId, {
-          autostart: 1,
-          preload: 1,
-          transparent: 1,
-          ui_hint: 0,
-          ui_infos: 0,
-          ui_controls: 0,
-          ui_watermark: 0,
-          ui_settings: 0,
-          ui_inspector: 0,
-          success: (api: any) => {
-            api.start();
-            api.addEventListener("viewerready", () => {
-              api.getCamera((err: any, camera: any) => {
-                if (!err && camera && camera.position && camera.target) {
-                  const p = camera.position;
-                  const t = camera.target;
-                  const dir = [p[0] - t[0], p[1] - t[1], p[2] - t[2]];
-                  const dist = Math.sqrt(dir[0]*dir[0] + dir[1]*dir[1] + dir[2]*dir[2]);
-                  if (dist > 0) {
-                    const norm = [dir[0]/dist, dir[1]/dist, dir[2]/dist];
-                    // 1.58x distance zooms out by ~37% matching user screenshot
-                    const newDist = dist * 1.58;
-                    const newPos = [t[0] + norm[0] * newDist, t[1] + norm[1] * newDist, t[2] + norm[2] * newDist];
-                    api.setCameraLookAt(newPos, t, 0);
-                  }
-                }
-              });
-            });
-          },
-          error: () => {}
-        });
-      } catch (e) {}
-    };
-
-    if (!script) {
-      script = document.createElement("script");
-      script.id = scriptId;
-      script.src = "https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js";
-      script.async = true;
-      script.onload = setupCameraZoom;
-      document.body.appendChild(script);
-    } else if ((window as any).Sketchfab) {
-      setupCameraZoom();
-    }
-  }, [selectedProject.id]);
 
   const realProjects = [
     { name: "Rajmahal Aishvaryam", loc: "Madurai", img: "/images/danam/ddhvrktrjjjln58schqk.webp", tag: "Turnkey EPC" },
@@ -191,7 +149,7 @@ export default function Project3DExperience() {
   };
 
   return (
-    <section id="project-3d-experience" className="py-12 sm:py-16 bg-surface-1 border-y border-border-subtle relative overflow-hidden">
+    <section ref={sectionRef} id="project-3d-experience" className="py-12 sm:py-16 bg-surface-1 border-y border-border-subtle relative overflow-hidden">
       {/* Background radial glow */}
       <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-brand-forest/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-10 w-[350px] h-[350px] bg-brand-amber/5 rounded-full blur-3xl pointer-events-none" />
@@ -273,17 +231,17 @@ export default function Project3DExperience() {
                   {/* Exact White Pointer Hand & Arrows (User Reference media_1792568252760_50054305.png) */}
                   {showGestureHint && (
                     <div
-                      className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none select-none transition-opacity duration-300"
+                      className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none select-none transition-all duration-500"
                     >
                       <div
-                        className="flex items-center gap-2 opacity-95"
+                        className="flex items-center gap-3 bg-black/40 backdrop-blur-xs px-4 py-2.5 rounded-full border border-white/20 shadow-2xl"
                         style={{
-                          animation: "handPointerSway 2.2s ease-in-out infinite",
+                          animation: "handPointerSway 2.4s ease-in-out infinite",
                         }}
                       >
                         {/* Left Arrow */}
                         <svg
-                          className="w-4 h-4 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)] fill-white"
+                          className="w-5 h-5 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] fill-white"
                           viewBox="0 0 24 24"
                         >
                           <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
@@ -291,7 +249,7 @@ export default function Project3DExperience() {
 
                         {/* Crisp White Hand Pointer Icon */}
                         <svg
-                          className="w-10 h-10 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] fill-white"
+                          className="w-8 h-8 text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)] fill-white"
                           viewBox="0 0 24 24"
                         >
                           <path d="M9 11.24V7.5a2.5 2.5 0 0 1 5 0v3.74c1.21-.81 2-2.18 2-3.74a4.5 4.5 0 0 0-9 0c0 1.56.79 2.93 2 3.74zm9.84 4.63-4.54-2.26a1.98 1.98 0 0 0-1.92.1l-.88.58V7.5a1.5 1.5 0 0 0-3 0v10.74l-3.44-.72a1.53 1.53 0 0 0-1.48.43l-.78.79 4.93 4.93c.38.38.89.59 1.42.59H17c1.02 0 1.88-.77 1.98-1.78l.48-4.8c.07-.68-.21-1.35-.62-1.81z" />
@@ -299,7 +257,7 @@ export default function Project3DExperience() {
 
                         {/* Right Arrow */}
                         <svg
-                          className="w-4 h-4 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)] fill-white"
+                          className="w-5 h-5 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] fill-white"
                           viewBox="0 0 24 24"
                         >
                           <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
@@ -308,19 +266,24 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Sketchfab 3D Embed Iframe - Edge-to-Edge Flush Full View (Zero Inner Square) */}
-                  <div className="w-full h-full flex items-center justify-center overflow-hidden bg-white">
+                  {/* Sketchfab 3D Embed Iframe - Natively Zoomed Out 38% (Full Compound & Roof View), Edge-to-Edge Flush */}
+                  <div
+                    onMouseDown={() => setShowGestureHint(false)}
+                    onTouchStart={() => setShowGestureHint(false)}
+                    className="w-full h-full flex items-center justify-center overflow-hidden bg-white relative"
+                  >
                     <iframe
-                      ref={iframeRef}
-                      id="sketchfab-viewport-iframe"
                       key={selectedProject.id}
                       title={selectedProject.title}
                       src={selectedProject.embedUrl}
-                      className="w-full border-0 bg-white"
+                      className="border-0 bg-white"
                       style={{
-                        height: "calc(100% + 112px)",
-                        marginTop: "-54px",
-                        marginBottom: "-58px",
+                        width: "142%",
+                        height: "calc(142% + 130px)",
+                        transform: "scale(0.704)",
+                        transformOrigin: "center center",
+                        marginTop: "-60px",
+                        marginBottom: "-70px",
                         maxWidth: "none",
                         maxHeight: "none",
                         backgroundColor: "#ffffff",
