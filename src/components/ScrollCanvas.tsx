@@ -17,6 +17,78 @@ const VIDEO_FRAMES = {
 const STEP = 2; // load every 2nd frame
 const TOTAL_FRAMES = (VIDEO_FRAMES[1] / STEP) + (VIDEO_FRAMES[2] / STEP) + (VIDEO_FRAMES[3] / STEP); // 120 + 100 + 120 = 340
 
+// Helper function to render a frame:
+// - On Mobile: Draws blurred ambient background to fill viewport without black bars,
+//   and cleanly centers the foreground 16:9 frame so the full building & architecture is 100% visible (zoomed out).
+// - On Desktop: Full-bleed cinematic cover mode.
+function renderFrameToCanvas(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  width: number,
+  height: number
+) {
+  ctx.clearRect(0, 0, width, height);
+
+  const imgWidth = img.naturalWidth || 1920;
+  const imgHeight = img.naturalHeight || 1080;
+  const imgRatio = imgWidth / imgHeight;
+  const canvasRatio = width / height;
+
+  // Mobile portrait / tall viewport (aspect ratio < 0.95)
+  if (canvasRatio < 0.95) {
+    // 1. Draw blurred ambient background from the same image to eliminate blank voids
+    ctx.save();
+    if ("filter" in ctx) {
+      ctx.filter = "blur(28px) brightness(0.6)";
+    }
+    const bgScale = Math.max(width / imgWidth, height / imgHeight);
+    const bgW = imgWidth * bgScale;
+    const bgH = imgHeight * bgScale;
+    const bgX = (width - bgW) / 2;
+    const bgY = (height - bgH) / 2;
+    // Oversize slightly by 40px to eliminate any edge blur artifacts
+    ctx.drawImage(img, bgX - 20, bgY - 20, bgW + 40, bgH + 40);
+    ctx.restore();
+
+    // 2. Subtle dark ambient scrim for high contrast and readability
+    ctx.save();
+    ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+    ctx.fillRect(0, 0, width, height);
+    ctx.restore();
+
+    // 3. Zoom-out Foreground: Shows 100% full width and full building in view, perfectly centered vertically
+    const drawWidth = width;
+    const drawHeight = width / imgRatio;
+    const offsetX = 0;
+    const offsetY = Math.round((height - drawHeight) / 2); // Exact vertical center!
+
+    // Soft ambient drop-shadow behind sharp foreground image
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.7)";
+    ctx.shadowBlur = 24;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 6;
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+    ctx.restore();
+  } else {
+    // Desktop / Landscape: Cinematic cover mode
+    let drawWidth = width;
+    let drawHeight = height;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (canvasRatio > imgRatio) {
+      drawHeight = width / imgRatio;
+      offsetY = (height - drawHeight) / 2;
+    } else {
+      drawWidth = height * imgRatio;
+      offsetX = (width - drawWidth) / 2;
+    }
+
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+  }
+}
+
 export default function ScrollCanvas() {
   const { locale, t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -66,20 +138,7 @@ export default function ScrollCanvas() {
         if (ctx) {
           canvas.width = window.innerWidth;
           canvas.height = window.innerHeight;
-          const imgRatio = 16 / 9;
-          const canvasRatio = canvas.width / canvas.height;
-          let drawWidth = canvas.width;
-          let drawHeight = canvas.height;
-          let offsetX = 0;
-          let offsetY = 0;
-          if (canvasRatio > imgRatio) {
-            drawHeight = canvas.width / imgRatio;
-            offsetY = (canvas.height - drawHeight) / 2;
-          } else {
-            drawWidth = canvas.height * imgRatio;
-            offsetX = (canvas.width - drawWidth) / 2;
-          }
-          ctx.drawImage(tempImg, offsetX, offsetY, drawWidth, drawHeight);
+          renderFrameToCanvas(ctx, tempImg, canvas.width, canvas.height);
         }
       }
     };
@@ -146,32 +205,7 @@ export default function ScrollCanvas() {
         if (!found) return;
       }
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Cover scaling
-      const imgWidth = img.naturalWidth || 1920;
-      const imgHeight = img.naturalHeight || 1080;
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
-
-      const imgRatio = imgWidth / imgHeight;
-      const canvasRatio = canvasWidth / canvasHeight;
-
-      let drawWidth = canvasWidth;
-      let drawHeight = canvasHeight;
-      let offsetX = 0;
-      let offsetY = 0;
-
-      // Full-bleed cover mode (matches ABC Builders exactly on both mobile & desktop)
-      if (canvasRatio > imgRatio) {
-        drawHeight = canvasWidth / imgRatio;
-        offsetY = (canvasHeight - drawHeight) / 2;
-      } else {
-        drawWidth = canvasHeight * imgRatio;
-        offsetX = (canvasWidth - drawWidth) / 2;
-      }
-
-      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+      renderFrameToCanvas(ctx, img, canvas.width, canvas.height);
     };
 
     window.addEventListener("resize", resizeCanvas);
