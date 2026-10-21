@@ -101,16 +101,32 @@ export default function Project3DExperience() {
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(true);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
-  const [zoomFactor, setZoomFactor] = useState<number>(0.92); // 0.92 = Perfectly framed without any white gaps, showing full house, compound wall & roof pergola
+  const [zoomFactor, setZoomFactor] = useState<number>(0.72); // 0.72 = Wide zoom-out showing full building, compound walls, gates, and trees with generous margins
   const sectionRef = React.useRef<HTMLDivElement>(null);
+
+  // Dismiss gesture hint immediately when user touches/clicks anywhere or focuses into iframe
+  React.useEffect(() => {
+    const handleWindowBlur = () => {
+      setShowGestureHint(false);
+    };
+    const timer = setTimeout(() => {
+      setShowGestureHint(false);
+    }, 4500);
+
+    window.addEventListener("blur", handleWindowBlur);
+    return () => {
+      window.removeEventListener("blur", handleWindowBlur);
+      clearTimeout(timer);
+    };
+  }, []);
 
   // Pure client-side zoom controls (Edge-to-edge full bleed, 0 white margins, 0 console errors)
   const zoomCameraOut = () => {
-    setZoomFactor((prev) => Math.max(0.78, Number((prev - 0.06).toFixed(2))));
+    setZoomFactor((prev) => Math.max(0.50, Number((prev - 0.08).toFixed(2))));
   };
 
   const zoomCameraIn = () => {
-    setZoomFactor((prev) => Math.min(1.20, Number((prev + 0.06).toFixed(2))));
+    setZoomFactor((prev) => Math.min(1.15, Number((prev + 0.08).toFixed(2))));
   };
 
   const realProjects = [
@@ -231,10 +247,13 @@ export default function Project3DExperience() {
                     </button>
                   </div>
 
-                  {/* Exact White Pointer Hand & Arrows (Canvas Center, Pure Left-Right Motion) */}
+                  {/* Exact White Pointer Hand & Arrows (Dismisses immediately when touched or clicked) */}
                   {showGestureHint && (
                     <div
-                      className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none select-none transition-opacity duration-500"
+                      onMouseDown={() => setShowGestureHint(false)}
+                      onTouchStart={() => setShowGestureHint(false)}
+                      onClick={() => setShowGestureHint(false)}
+                      className="absolute inset-0 z-30 flex items-center justify-center pointer-events-auto cursor-grab active:cursor-grabbing select-none transition-opacity duration-500"
                     >
                       <div
                         className="flex items-center gap-2.5 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] filter"
