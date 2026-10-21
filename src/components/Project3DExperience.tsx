@@ -50,7 +50,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Kamarajar Salai / KK Nagar, Madurai",
     builtUpArea: "4,650 Sq.Ft (G+2)",
     sketchfabId: "d8e6be2601474f7d8cb7d06f8566f01a",
-    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0&dnt=1",
+    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&ui_infos=0&ui_watermark=0&ui_hint=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_stop=0&ui_ar=0&ui_vr=0&ui_annotations=0&dnt=1",
     directUrl: "https://sketchfab.com/3d-models/modern-luxury-villa-house-building-d8e6be2601474f7d8cb7d06f8566f01a",
     thumbnail: "/images/danam/about-villa.webp",
     specs: {
@@ -76,7 +76,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Anna Nagar / Iyer Bungalow, Madurai",
     builtUpArea: "3,800 Sq.Ft (G+1)",
     sketchfabId: "2b9e6717a0ef457685dc41ce994ffabf",
-    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0&dnt=1",
+    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&ui_infos=0&ui_watermark=0&ui_hint=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_stop=0&ui_ar=0&ui_vr=0&ui_annotations=0&dnt=1",
     directUrl: "https://sketchfab.com/3d-models/modern-house-2b9e6717a0ef457685dc41ce994ffabf",
     thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
     specs: {
@@ -101,7 +101,7 @@ export default function Project3DExperience() {
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(true);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
-  const [modelZoom, setModelZoom] = useState<number>(0.92); // 0.65x scale: wide view showing full building, pergola, steps, compound walls
+  const [modelZoom, setModelZoom] = useState<number>(1.16); // 0.65x scale: wide view showing full building, pergola, steps, compound walls
   const sectionRef = React.useRef<HTMLDivElement>(null);
 
   // Hand gesture hint remains visible on screen until user touches or clicks the model
@@ -404,7 +404,7 @@ export default function Project3DExperience() {
                 </span>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setModelZoom(0.92)}
+                    onClick={() => setModelZoom(1.16)}
                     className="text-[#C5A880] hover:text-[#F3EFEA] text-[11px] sm:text-xs font-semibold tracking-wider uppercase transition-colors cursor-pointer"
                   >
                     Reset view
