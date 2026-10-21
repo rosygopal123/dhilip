@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <base href="https://skylinevillas-puce.vercel.app/">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skyline Villas | Contemporary Private Residences</title>
+    <meta name="description" content="Discover Skyline Villas, a concept collection of contemporary private residences shaped by architecture, landscape and light in Hyderabad." />
+    <meta property="og:title" content="Skyline Villas | Contemporary Private Residences" />
+    <meta property="og:description" content="A quiet architectural world of private residences, natural materials and considered landscapes." />
+    <meta property="og:image" content="https://skylinevillas-puce.vercel.app/images/skyline-facade.jpg" />
+    <meta property="og:url" content="https://skylinevillas-puce.vercel.app/" />
+    <link rel="canonical" href="https://skylinevillas-puce.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Skyline Villas | Contemporary Private Residences" />
+    <meta name="twitter:description" content="A quiet architectural world of private residences, natural materials and considered landscapes." />
+    <meta name="twitter:image" content="https://skylinevillas-puce.vercel.app/images/skyline-facade.jpg" />
+    <!-- Without these the site served no icon at all, so browsers and search
+         engines fell back to whatever they had cached for the origin. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" as="image" href="/images/skyline-hero.jpg" fetchpriority="high" media="(min-width: 768px)" />
+    <link rel="preload" as="image" href="/images/skyline-hero-mobile.jpg" fetchpriority="high" media="(max-width: 767px)" />
+    <style>#root:empty{background-color:#000;min-height:100svh}</style>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "Skyline Villas",
+      "url": "https://skylinevillas-puce.vercel.app/",
+      "description": "A concept collection of contemporary private residences in the Financial District corridor of Hyderabad, with an interactive 3D villa and an AI assistant."
+    },
+    {
+      "@type": "SingleFamilyResidence",
+      "name": "Skyline One",
+      "description": "Contemporary family residence with private gardens and a double-height lounge.",
+      "numberOfBedrooms": 4,
+      "numberOfBathroomsTotal": 5,
+      "floorSize": {
+        "@type": "QuantitativeValue",
+        "value": 4200,
+        "unitCode": "FTK"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Hyderabad",
+        "addressRegion": "Telangana",
+        "addressCountry": "IN"
+      }
+    },
+    {
+      "@type": "SingleFamilyResidence",
+      "name": "Skyline Two",
+      "description": "Private courtyard residence with a wellness wing and plunge pool.",
+      "numberOfBedrooms": 4,
+      "numberOfBathroomsTotal": 5,
+      "floorSize": {
+        "@type": "QuantitativeValue",
+        "value": 3800,
+        "unitCode": "FTK"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Hyderabad",
+        "addressRegion": "Telangana",
+        "addressCountry": "IN"
+      }
+    },
+    {
+      "@type": "SingleFamilyResidence",
+      "name": "Skyline Three",
+      "description": "Signature residence with a private lift, lap pool, cinema and wine cellar.",
+      "numberOfBedrooms": 5,
+      "numberOfBathroomsTotal": 6,
+      "floorSize": {
+        "@type": "QuantitativeValue",
+        "value": 5000,
+        "unitCode": "FTK"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Hyderabad",
+        "addressRegion": "Telangana",
+        "addressCountry": "IN"
+      }
+    }
+  ]
+}
+    </script>
+    <script type="module" crossorigin src="/assets/index-C6E6J_BU.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Psa3uNJl.css">
+  
+<style>
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #070709 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+  header, footer, nav {
+    display: none !important;
+  }
+  #root {
+    width: 100% !important;
+    height: 100% !important;
+    background: #070709 !important;
+  }
+</style>
+<script>
+  window.addEventListener('load', function() {
+    // Hide everything outside the 3D tour section once rendered
+    const interval = setInterval(function() {
+      const canvas = document.querySelector('canvas');
+      if (canvas) {
+        let parent = canvas.parentElement;
+        while (parent && parent !== document.body && parent.id !== 'root') {
+          // Hide siblings
+          if (parent.parentElement) {
+            Array.from(parent.parentElement.children).forEach(function(child) {
+              if (child !== parent && child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE') {
+                child.style.display = 'none';
+              }
+            });
+          }
+          parent = parent.parentElement;
+        }
+        // Force the canvas wrapper to fill 100%
+        const canvasWrapper = canvas.closest('.relative');
+        if (canvasWrapper) {
+          canvasWrapper.style.height = '100vh';
+          canvasWrapper.style.maxHeight = '100vh';
+          canvasWrapper.style.borderRadius = '0px';
+          canvasWrapper.style.border = 'none';
+        }
+        clearInterval(interval);
+      }
+    }, 200);
+    setTimeout(function() { clearInterval(interval); }, 8000);
+  });
+</script>
+</head>
+  <body class="bg-[#FCFAF6] text-[#191715] font-sans antialiased selection:bg-black selection:text-white">
+    <div id="root"></div>
+  </body>
+</html>
+

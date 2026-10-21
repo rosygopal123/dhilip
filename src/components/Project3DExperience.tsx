@@ -43,6 +43,32 @@ export interface Project3DItem {
 // Config array: easily swap or add more models as client provides them!
 export const PROJECT_3D_LIST: Project3DItem[] = [
   {
+    id: "skyline-estate-01",
+    title: "Signature Skyline Luxury Villa & Estate",
+    tagline: "Ultra-contemporary luxury residence with private landscaped gardens, swimming pool deck & boundary estate",
+    category: "Residential Villa",
+    location: "Kamarajar Salai / KK Nagar, Madurai",
+    builtUpArea: "4,650 Sq.Ft (G+2)",
+    sketchfabId: "skyline-site",
+    embedUrl: "/skyline-embed.html",
+    directUrl: "/skyline-villas.html",
+    thumbnail: "/images/skyline-hero.jpg",
+    specs: {
+      structure: "Seismic Zone-III Earthquake Resistant Monolithic RCC Frame",
+      steel: "Fe550D High-Ductility TMT Rebars",
+      concrete: "M30 Ready-Mix Concrete Matrix with Lab Cube Audits",
+      vastu: "100% Vastu-Compliant East Entrance & Agni Kitchen",
+      floors: "G+2 Floors with Double-Height Living Room & Sunken Deck",
+      handoverTime: "150 Days Handover Guarantee"
+    },
+    highlights: [
+      "Full 3D estate model with landscaped courtyards and driveway",
+      "Touch model to rotate 360° · Pinch to zoom in & out smoothly",
+      "Thermal-break acoustic glass envelopes with solar heat cutoff",
+      "Private swimming pool deck with tropical privacy hedgerow"
+    ]
+  },
+  {
     id: "luxury-villa-01",
     title: "Modern Luxury Villa Elevation",
     tagline: "Contemporary 4BHK architectural design with Burma teak louvers and terrace deck",
@@ -66,32 +92,6 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
       "Acoustic UPVC double-glazed panoramic windows (35dB noise cutoff)",
       "Dedicated Pooja Room in Ishanya (North-East) corner",
       "Rooftop terrace garden ready for 5kW Solar array & waterproof membrane"
-    ]
-  },
-  {
-    id: "contemporary-residence-02",
-    title: "Architectural Contemporary Home",
-    tagline: "Ultra-modern open plan residence with cantilevered balcony & landscaped courtyard",
-    category: "Residential Villa",
-    location: "Anna Nagar / Iyer Bungalow, Madurai",
-    builtUpArea: "3,800 Sq.Ft (G+1)",
-    sketchfabId: "2b9e6717a0ef457685dc41ce994ffabf",
-    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0&dnt=1",
-    directUrl: "https://sketchfab.com/3d-models/modern-house-2b9e6717a0ef457685dc41ce994ffabf",
-    thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
-    specs: {
-      structure: "Engineered Monolithic Shear Wall + Column RCC",
-      steel: "TATA Tiscon 550D Super Ductile",
-      concrete: "Ultratech M30 High-Strength Concrete",
-      vastu: "North-Facing Auspicious Main Door Layout",
-      floors: "G+1 with Skylight Central Atrium",
-      handoverTime: "180 Days Turnkey Handover"
-    },
-    highlights: [
-      "Thermal-break aluminum sliding glass envelopes",
-      "Rainwater harvesting & groundwater recharge pit integrated",
-      "Concealed copper electrical conduit with surge protection",
-      "Anti-skid Italian marble finish in common living zones"
     ]
   }
 ];
@@ -294,7 +294,7 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Sketchfab 3D Embed Iframe - Scaled cleanly via CSS transform for full view without any JS errors */}
+                  {/* 3D Embed Iframe - Supports both Skyline Villas Three.js engine and Sketchfab */}
                   <div
                     onMouseDown={() => setShowGestureHint(false)}
                     onTouchStart={() => setShowGestureHint(false)}
@@ -305,13 +305,11 @@ export default function Project3DExperience() {
                       key={selectedProject.id}
                       title={selectedProject.title}
                       src={selectedProject.embedUrl}
-                      className="w-full h-full border-0 bg-transparent transition-transform duration-300 ease-out"
+                      className="w-full h-full border-0 bg-transparent"
                       style={{
                         maxWidth: "none",
                         maxHeight: "none",
                         backgroundColor: "transparent",
-                        transform: `scale(${modelZoom})`,
-                        transformOrigin: "center center",
                       }}
                       allow="autoplay; fullscreen; xr-spatial-tracking; accelerometer; gyroscope"
                       loading="lazy"
