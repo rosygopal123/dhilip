@@ -228,20 +228,20 @@ export default function Project3DExperience() {
                     </div>
                   </div>
 
-                  {/* Exact White Pointer Hand & Arrows (User Reference media_1792568252760_50054305.png) */}
+                  {/* Exact White Pointer Hand & Arrows (Canvas Center, Pure Left-Right Motion) */}
                   {showGestureHint && (
                     <div
-                      className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none select-none transition-all duration-500"
+                      className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none select-none transition-opacity duration-500"
                     >
                       <div
-                        className="flex items-center gap-3 bg-black/40 backdrop-blur-xs px-4 py-2.5 rounded-full border border-white/20 shadow-2xl"
+                        className="flex items-center gap-2.5 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] filter"
                         style={{
-                          animation: "handPointerSway 2.4s ease-in-out infinite",
+                          animation: "handPointerSway 2s ease-in-out infinite",
                         }}
                       >
                         {/* Left Arrow */}
                         <svg
-                          className="w-5 h-5 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] fill-white"
+                          className="w-5 h-5 text-white fill-white"
                           viewBox="0 0 24 24"
                         >
                           <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
@@ -249,7 +249,7 @@ export default function Project3DExperience() {
 
                         {/* Crisp White Hand Pointer Icon */}
                         <svg
-                          className="w-8 h-8 text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)] fill-white"
+                          className="w-10 h-10 text-white fill-white"
                           viewBox="0 0 24 24"
                         >
                           <path d="M9 11.24V7.5a2.5 2.5 0 0 1 5 0v3.74c1.21-.81 2-2.18 2-3.74a4.5 4.5 0 0 0-9 0c0 1.56.79 2.93 2 3.74zm9.84 4.63-4.54-2.26a1.98 1.98 0 0 0-1.92.1l-.88.58V7.5a1.5 1.5 0 0 0-3 0v10.74l-3.44-.72a1.53 1.53 0 0 0-1.48.43l-.78.79 4.93 4.93c.38.38.89.59 1.42.59H17c1.02 0 1.88-.77 1.98-1.78l.48-4.8c.07-.68-.21-1.35-.62-1.81z" />
@@ -257,7 +257,7 @@ export default function Project3DExperience() {
 
                         {/* Right Arrow */}
                         <svg
-                          className="w-5 h-5 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] fill-white"
+                          className="w-5 h-5 text-white fill-white"
                           viewBox="0 0 24 24"
                         >
                           <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
