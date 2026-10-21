@@ -25,9 +25,7 @@ export interface Project3DItem {
   category: "Residential Villa" | "Commercial Complex" | "Turnkey EPC";
   location: string;
   builtUpArea: string;
-  sketchfabId: string;
-  embedUrl: string;
-  directUrl: string;
+  glbModel: string;
   thumbnail: string;
   author: string;
   specs: {
@@ -41,7 +39,7 @@ export interface Project3DItem {
   highlights: string[];
 }
 
-// Config array: easily swap or add more models as client provides them!
+// Config array: standalone .glb models loaded via @google/model-viewer (100% white-label, zero Sketchfab overlays)
 export const PROJECT_3D_LIST: Project3DItem[] = [
   {
     id: "luxury-villa-01",
@@ -50,9 +48,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     category: "Residential Villa",
     location: "Kamarajar Salai / KK Nagar, Madurai",
     builtUpArea: "4,650 Sq.Ft (G+2)",
-    sketchfabId: "d8e6be2601474f7d8cb7d06f8566f01a",
-    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&camera=0&ui_infos=0&ui_controls=0&ui_stop=0&ui_watermark=0&ui_hint=0&ui_help=0&ui_settings=0&ui_vr=0&ui_fullscreen=0&ui_annotations=0&ui_ar=0&ui_inspector=0&ui_theme=dark&dnt=1",
-    directUrl: "https://sketchfab.com/3d-models/modern-luxury-villa-house-building-d8e6be2601474f7d8cb7d06f8566f01a",
+    glbModel: "/models/villa.glb",
     thumbnail: "/images/danam/about-villa.webp",
     author: "Zigurat Architecture Studio",
     specs: {
@@ -77,9 +73,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     category: "Residential Villa",
     location: "Anna Nagar / Iyer Bungalow, Madurai",
     builtUpArea: "3,800 Sq.Ft (G+1)",
-    sketchfabId: "2b9e6717a0ef457685dc41ce994ffabf",
-    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&camera=0&ui_infos=0&ui_controls=0&ui_stop=0&ui_watermark=0&ui_hint=0&ui_help=0&ui_settings=0&ui_vr=0&ui_fullscreen=0&ui_annotations=0&ui_ar=0&ui_inspector=0&ui_theme=dark&dnt=1",
-    directUrl: "https://sketchfab.com/3d-models/modern-house-2b9e6717a0ef457685dc41ce994ffabf",
+    glbModel: "/models/LuxuryVilla_site_draco.glb",
     thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
     author: "Zigurat Architecture Studio",
     specs: {
@@ -105,150 +99,58 @@ export default function Project3DExperience() {
   const [is3dLoaded, setIs3dLoaded] = useState(false);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const apiRef = useRef<any>(null);
+  const modelViewerRef = useRef<any>(null);
 
-  // Initialize Sketchfab Viewer API via official script with full UI hiding params
+  // Dynamically load Google <model-viewer> official standalone bundle on client mount
   useEffect(() => {
-    let isCancelled = false;
-
-    const initViewer = () => {
-      const el = iframeRef.current;
-      if (!el || isCancelled) return;
-
-      const SketchfabClass = (window as any).Sketchfab;
-      if (!SketchfabClass) return;
-
-      try {
-        const client = new SketchfabClass("1.12.1", el);
-        client.init(selectedProject.sketchfabId, {
-          success: (api: any) => {
-            if (isCancelled) return;
-            apiRef.current = api;
-            api.start();
-            api.addEventListener("viewerready", () => {
-              if (isCancelled) return;
-              setIs3dLoaded(true);
-              // Dynamic camera zoom out: scales camera away from target so the entire villa is framed cleanly
-              api.getCameraLookAt((err: any, cam: any) => {
-                if (err || !cam || !cam.position || !cam.target) return;
-                const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-                const F = isMobile ? 2.0 : 1.6; // Responsive zoom factor so full villa with courtyard/pergola is visible
-                const pos = cam.target.map(
-                  (t: number, i: number) => t + (cam.position[i] - t) * F
-                );
-                api.setCameraLookAt(pos, cam.target, 0);
-              });
-            });
-          },
-          error: () => {
-            console.error("Sketchfab init failed");
-          },
-          autostart: 1,
-          preload: 1,
-          camera: 0,
-          dnt: 1,
-          transparent: 1,
-          ui_infos: 0,
-          ui_controls: 0,
-          ui_stop: 0,
-          ui_watermark: 0,
-          ui_hint: 0,
-          ui_help: 0,
-          ui_settings: 0,
-          ui_vr: 0,
-          ui_fullscreen: 0,
-          ui_annotations: 0,
-          ui_ar: 0,
-          ui_inspector: 0,
-          ui_theme: "dark",
-        });
-      } catch (err) {
-        console.error("Sketchfab client error:", err);
-      }
-    };
-
-    if ((window as any).Sketchfab) {
-      initViewer();
-    } else {
-      const existing = document.getElementById("sketchfab-viewer-script");
-      if (!existing) {
-        const s = document.createElement("script");
-        s.id = "sketchfab-viewer-script";
-        s.src = "https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js";
-        s.async = true;
-        s.onload = () => initViewer();
-        document.body.appendChild(s);
-      } else {
-        existing.addEventListener("load", () => initViewer(), { once: true });
-      }
+    if (typeof window !== "undefined" && customElements.get("model-viewer")) {
+      setIs3dLoaded(true);
+      return;
     }
-
-    return () => {
-      isCancelled = true;
-      apiRef.current = null;
-    };
-  }, [selectedProject.sketchfabId]);
-
-  // Dismiss gesture hint when window loses focus (user clicked inside iframe)
-  useEffect(() => {
-    const handleBlur = () => {
-      setShowGestureHint(false);
-    };
-    window.addEventListener("blur", handleBlur);
-    return () => window.removeEventListener("blur", handleBlur);
+    const s = document.createElement("script");
+    s.type = "module";
+    s.src = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js";
+    s.onload = () => setIs3dLoaded(true);
+    document.body.appendChild(s);
   }, []);
 
   const dismissGestureHint = () => {
     setShowGestureHint(false);
   };
 
-  // Zoom controls using Sketchfab Viewer API
+  // Zoom In / Zoom Out via cameraOrbit
   const zoomCameraIn = () => {
-    if (!apiRef.current) return;
+    const mv = modelViewerRef.current;
+    if (!mv) return;
     try {
-      apiRef.current.getCameraLookAt((err: any, c: any) => {
-        if (err || !c || !c.position || !c.target) return;
-        const newPos = c.target.map(
-          (t: number, i: number) => t + (c.position[i] - t) * 0.8
-        );
-        apiRef.current.setCameraLookAt(newPos, c.target, 0.3);
-      });
+      const orbit = mv.getCameraOrbit();
+      if (!orbit) return;
+      mv.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius * 0.8}m`;
     } catch (e) {
       console.warn("Zoom in error:", e);
     }
   };
 
   const zoomCameraOut = () => {
-    if (!apiRef.current) return;
+    const mv = modelViewerRef.current;
+    if (!mv) return;
     try {
-      apiRef.current.getCameraLookAt((err: any, c: any) => {
-        if (err || !c || !c.position || !c.target) return;
-        const newPos = c.target.map(
-          (t: number, i: number) => t + (c.position[i] - t) * 1.25
-        );
-        apiRef.current.setCameraLookAt(newPos, c.target, 0.3);
-      });
+      const orbit = mv.getCameraOrbit();
+      if (!orbit) return;
+      mv.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius * 1.25}m`;
     } catch (e) {
       console.warn("Zoom out error:", e);
     }
   };
 
   const resetCamera = () => {
-    if (apiRef.current) {
-      try {
-        apiRef.current.getCameraLookAt((err: any, cam: any) => {
-          if (err || !cam || !cam.position || !cam.target) return;
-          const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-          const F = isMobile ? 2.0 : 1.6;
-          const pos = cam.target.map(
-            (t: number, i: number) => t + (cam.position[i] - t) * F
-          );
-          apiRef.current.setCameraLookAt(pos, cam.target, 0.4);
-        });
-      } catch (e) {
-        console.warn("Reset camera error:", e);
-      }
+    const mv = modelViewerRef.current;
+    if (!mv) return;
+    try {
+      mv.cameraOrbit = "35deg 70deg 180%";
+      mv.fieldOfView = "auto";
+    } catch (e) {
+      console.warn("Reset camera error:", e);
     }
   };
 
@@ -355,7 +257,7 @@ export default function Project3DExperience() {
                     </div>
                   </div>
 
-                  {/* Clean Interactive Zoom Controls in Top-Right - also seamlessly conceals top-right download icon */}
+                  {/* Clean Interactive Zoom Controls in Top-Right */}
                   <div className="absolute top-2.5 right-3 z-25 flex items-center gap-1 bg-[#0a0a0d]/95 backdrop-blur-md border border-white/15 p-1 rounded-xl shadow-xl pointer-events-auto select-none">
                     <button
                       onClick={zoomCameraOut}
@@ -375,15 +277,12 @@ export default function Project3DExperience() {
                     </button>
                   </div>
 
-                  {/* Dedicated background overlay seamlessly concealing top-right download icon */}
-                  <div className="absolute top-0 right-0 w-16 h-14 bg-[#0a0a0d] z-15 pointer-events-none" />
-
                   {/* Exact White Pointer Hand & Arrows (Dismisses immediately when touched or clicked) */}
                   {showGestureHint && (
                     <div
-                      onMouseDown={() => dismissGestureHint()}
-                      onTouchStart={() => dismissGestureHint()}
-                      onClick={() => dismissGestureHint()}
+                      onMouseDown={dismissGestureHint}
+                      onTouchStart={dismissGestureHint}
+                      onClick={dismissGestureHint}
                       className="absolute inset-0 z-30 flex items-center justify-center pointer-events-auto cursor-grab active:cursor-grabbing select-none transition-opacity duration-500"
                     >
                       <div
@@ -419,20 +318,36 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Sketchfab 3D Embed Iframe - Initialized via Sketchfab Viewer API */}
+                  {/* Google <model-viewer>: 100% Native WebGL 3D, Zero External Iframes, Zero Overlays */}
                   <div
-                    onMouseDown={() => dismissGestureHint()}
-                    onTouchStart={() => dismissGestureHint()}
+                    onMouseDown={dismissGestureHint}
+                    onTouchStart={dismissGestureHint}
+                    onClick={dismissGestureHint}
                     className="w-full h-full flex items-center justify-center overflow-hidden bg-[#0a0a0d] relative cursor-grab active:cursor-grabbing"
                   >
-                    <iframe
-                      ref={iframeRef}
-                      id="sketchfab-viewport-iframe"
-                      key={selectedProject.sketchfabId}
-                      title={selectedProject.title}
-                      src={selectedProject.embedUrl}
-                      className="w-full h-full border-0 bg-transparent"
-                      allow="autoplay; fullscreen; xr-spatial-tracking; accelerometer; gyroscope"
+                    <model-viewer
+                      ref={modelViewerRef}
+                      key={selectedProject.id}
+                      src={selectedProject.glbModel}
+                      alt={selectedProject.title}
+                      camera-controls
+                      auto-rotate
+                      rotation-per-second="18deg"
+                      camera-orbit="35deg 70deg 180%"
+                      min-camera-orbit="auto auto 90%"
+                      max-camera-orbit="auto auto 320%"
+                      shadow-intensity="1.2"
+                      shadow-softness="0.8"
+                      exposure="1.0"
+                      loading="lazy"
+                      reveal="auto"
+                      interaction-prompt="none"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "#0a0a0d",
+                        outline: "none"
+                      }}
                     />
                   </div>
                 </div>
@@ -531,7 +446,7 @@ export default function Project3DExperience() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-[#8D8A83] text-[11px] sm:text-xs">
                   <span>Drag to rotate · Pinch to zoom</span>
                   <span className="hidden sm:inline text-white/20">|</span>
-                  <span className="text-[#8D8A83]/80">Model by {selectedProject.author}</span>
+                  <span className="text-[#8D8A83]/80">Model by {selectedProject.author} (CC-BY 4.0)</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
