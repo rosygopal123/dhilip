@@ -104,21 +104,10 @@ export default function Project3DExperience() {
   const [modelZoom, setModelZoom] = useState<number>(0.92); // 0.65x scale: wide view showing full building, pergola, steps, compound walls
   const sectionRef = React.useRef<HTMLDivElement>(null);
 
-  // Dismiss gesture hint immediately when user touches/clicks anywhere or focuses into iframe
-  React.useEffect(() => {
-    const handleWindowBlur = () => {
-      setShowGestureHint(false);
-    };
-    const timer = setTimeout(() => {
-      setShowGestureHint(false);
-    }, 4500);
-
-    window.addEventListener("blur", handleWindowBlur);
-    return () => {
-      window.removeEventListener("blur", handleWindowBlur);
-      clearTimeout(timer);
-    };
-  }, []);
+  // Hand gesture hint remains visible on screen until user touches or clicks the model
+  const dismissGestureHint = () => {
+    setShowGestureHint(false);
+  };
 
   // Pure client-side zoom controls (Zero console errors, zero CSP issues, smoothly scalable)
   const zoomCameraOut = () => {
@@ -256,13 +245,13 @@ export default function Project3DExperience() {
                   {/* Exact White Pointer Hand & Arrows (Dismisses immediately when touched or clicked) */}
                   {showGestureHint && (
                     <div
-                      onMouseDown={() => setShowGestureHint(false)}
-                      onTouchStart={() => setShowGestureHint(false)}
-                      onClick={() => setShowGestureHint(false)}
+                      onMouseDown={() => dismissGestureHint()}
+                      onTouchStart={() => dismissGestureHint()}
+                      onClick={() => dismissGestureHint()}
                       className="absolute inset-0 z-30 flex items-center justify-center pointer-events-auto cursor-grab active:cursor-grabbing select-none transition-opacity duration-500"
                     >
                       <div
-                        className="flex items-center gap-2.5 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] filter"
+                        className="flex items-center gap-3 drop-shadow-[0_6px_20px_rgba(0,0,0,1)] filter pointer-events-none"
                         style={{
                           animation: "handPointerSway 2s ease-in-out infinite",
                         }}
@@ -296,8 +285,8 @@ export default function Project3DExperience() {
 
                   {/* Sketchfab 3D Embed Iframe - Scaled cleanly via CSS transform for full view without any JS errors */}
                   <div
-                    onMouseDown={() => setShowGestureHint(false)}
-                    onTouchStart={() => setShowGestureHint(false)}
+                    onMouseDown={() => dismissGestureHint()}
+                    onTouchStart={() => dismissGestureHint()}
                     className="w-full h-full flex items-center justify-center overflow-hidden bg-[#0a0a0d] relative cursor-grab active:cursor-grabbing"
                   >
                     <iframe
