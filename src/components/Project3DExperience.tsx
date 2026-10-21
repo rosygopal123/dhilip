@@ -14,7 +14,10 @@ import {
   ExternalLink,
   Info,
   Camera,
-  FileText
+  FileText,
+  ZoomIn,
+  ZoomOut,
+  SlidersHorizontal
 } from "lucide-react";
 
 export interface Project3DItem {
@@ -49,7 +52,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Kamarajar Salai / KK Nagar, Madurai",
     builtUpArea: "4,650 Sq.Ft (G+2)",
     sketchfabId: "d8e6be2601474f7d8cb7d06f8566f01a",
-    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&ui_theme=dark&ui_controls=1&ui_infos=0&ui_inspector=0&ui_stop=0&ui_watermark=0",
+    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&ui_theme=dark&ui_hint=2&transparent=0",
     directUrl: "https://sketchfab.com/3d-models/modern-luxury-villa-house-building-d8e6be2601474f7d8cb7d06f8566f01a",
     thumbnail: "/images/danam/about-villa.webp",
     specs: {
@@ -66,6 +69,32 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
       "Dedicated Pooja Room in Ishanya (North-East) corner",
       "Rooftop terrace garden ready for 5kW Solar array & waterproof membrane"
     ]
+  },
+  {
+    id: "contemporary-residence-02",
+    title: "Architectural Contemporary Home",
+    tagline: "Ultra-modern open plan residence with cantilevered balcony & landscaped courtyard",
+    category: "Residential Villa",
+    location: "Anna Nagar / Iyer Bungalow, Madurai",
+    builtUpArea: "3,800 Sq.Ft (G+1)",
+    sketchfabId: "2b9e6717a0ef457685dc41ce994ffabf",
+    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&ui_theme=dark&ui_hint=2",
+    directUrl: "https://sketchfab.com/3d-models/modern-house-2b9e6717a0ef457685dc41ce994ffabf",
+    thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
+    specs: {
+      structure: "Engineered Monolithic Shear Wall + Column RCC",
+      steel: "TATA Tiscon 550D Super Ductile",
+      concrete: "Ultratech M30 High-Strength Concrete",
+      vastu: "North-Facing Auspicious Main Door Layout",
+      floors: "G+1 with Skylight Central Atrium",
+      handoverTime: "180 Days Turnkey Handover"
+    },
+    highlights: [
+      "Thermal-break aluminum sliding glass envelopes",
+      "Rainwater harvesting & groundwater recharge pit integrated",
+      "Concealed copper electrical conduit with surge protection",
+      "Anti-skid Italian marble finish in common living zones"
+    ]
   }
 ];
 
@@ -73,6 +102,9 @@ export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [is3dLoaded, setIs3dLoaded] = useState(false);
+  const [zoomScale, setZoomScale] = useState<number>(0.80); // Default zoomed out to show full villa
+  const [isCompactCanvas, setIsCompactCanvas] = useState<boolean>(true); // Default shrunk canvas
   const [activeHotspot, setActiveHotspot] = useState<number | null>(0);
 
   const realProjects = [
@@ -160,7 +192,7 @@ export default function Project3DExperience() {
           {/* Left / Center: Interactive 3D Viewer or Photos View */}
           <div className="lg:col-span-8 bg-surface-0 border border-border-medium rounded-2xl overflow-hidden shadow-xl flex flex-col">
             {/* Viewer Top Toolbar */}
-            <div className="bg-[#0B190E] text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-white/10">
+            <div className="bg-[#0B190E] text-white px-4 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-white/10">
               <div className="flex items-center gap-2.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="font-ui text-xs font-bold uppercase tracking-wider text-white">
@@ -172,10 +204,40 @@ export default function Project3DExperience() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] font-ui text-white/60 hidden md:inline">
-                  Drag to orbit • Scroll to zoom
-                </span>
+              <div className="flex items-center gap-2">
+                {/* Zoom Controls */}
+                {activeView === "3d" && (
+                  <div className="flex items-center gap-1 bg-white/10 rounded-lg p-0.5 text-xs">
+                    <button
+                      onClick={() => setZoomScale((prev) => Math.max(0.60, Number((prev - 0.08).toFixed(2))))}
+                      className="p-1 hover:bg-white/20 rounded text-white/90 transition-colors cursor-pointer"
+                      title="Zoom Out (Expand View)"
+                    >
+                      <ZoomOut className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-[10px] text-white/70 px-1 font-mono select-none">
+                      {Math.round(zoomScale * 100)}%
+                    </span>
+                    <button
+                      onClick={() => setZoomScale((prev) => Math.min(1.20, Number((prev + 0.08).toFixed(2))))}
+                      className="p-1 hover:bg-white/20 rounded text-white/90 transition-colors cursor-pointer"
+                      title="Zoom In"
+                    >
+                      <ZoomIn className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Canvas Shrink / Expand Toggle */}
+                <button
+                  onClick={() => setIsCompactCanvas(!isCompactCanvas)}
+                  className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition-colors cursor-pointer"
+                  title="Toggle Canvas Size"
+                >
+                  <SlidersHorizontal className="w-3 h-3 text-brand-leaf-light" />
+                  <span className="text-[11px]">{isCompactCanvas ? "Shrunk Canvas" : "Expand"}</span>
+                </button>
+
                 <button
                   onClick={() => setIsFullscreen(!isFullscreen)}
                   className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition-colors cursor-pointer"
@@ -196,31 +258,110 @@ export default function Project3DExperience() {
               </div>
             </div>
 
+            {/* Model Selector Bar */}
+            {activeView === "3d" && (
+              <div className="flex items-center gap-2 px-5 py-2 bg-[#0E1F12] border-b border-white/10 overflow-x-auto text-xs">
+                <span className="text-white/60 font-ui text-[11px] uppercase tracking-wider shrink-0">
+                  Select 3D Model:
+                </span>
+                {PROJECT_3D_LIST.map((proj) => (
+                  <button
+                    key={proj.id}
+                    onClick={() => {
+                      setSelectedProject(proj);
+                      setIs3dLoaded(false);
+                    }}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer ${
+                      selectedProject.id === proj.id
+                        ? "bg-brand-forest text-white shadow-xs font-semibold"
+                        : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
+                    }`}
+                  >
+                    {proj.title}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {/* Viewer Stage */}
             <div
-              className={`relative w-full bg-[#060E08] transition-all duration-300 ${
+              className={`relative w-full bg-[#060E08] transition-all duration-300 overflow-hidden ${
                 isFullscreen
                   ? "fixed inset-0 z-50 h-screen w-screen rounded-none"
-                  : "h-[450px] sm:h-[540px]"
+                  : isCompactCanvas
+                  ? "h-[330px] sm:h-[380px]"
+                  : "h-[440px] sm:h-[500px]"
               }`}
             >
               {activeView === "3d" && (
-                <div className="relative w-full h-full">
-                  {/* Sketchfab 3D Embed Iframe */}
-                  <iframe
-                    title={selectedProject.title}
-                    src={selectedProject.embedUrl}
-                    className="w-full h-full border-0"
-                    allow="autoplay; fullscreen; xr-spatial-tracking"
-                    loading="lazy"
-                  />
+                <div className="relative w-full h-full bg-[#0d1610] overflow-hidden flex items-center justify-center">
+                  {/* Loading & Fallback Poster Overlay */}
+                  {!is3dLoaded && (
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#060E08]/95 backdrop-blur-sm text-center p-6">
+                      <div className="relative w-14 h-14 mb-3 flex items-center justify-center">
+                        <div className="absolute inset-0 rounded-full border-2 border-brand-leaf/20 animate-ping" />
+                        <div className="w-10 h-10 rounded-full border-2 border-brand-forest border-t-brand-leaf animate-spin flex items-center justify-center">
+                          <Rotate3D className="w-4 h-4 text-brand-leaf-light animate-pulse" />
+                        </div>
+                      </div>
+                      <h4 className="text-white font-ui text-sm font-bold tracking-wide mb-1">
+                        Loading Interactive 3D Model...
+                      </h4>
+                      <p className="text-white/60 text-xs max-w-sm mb-3 font-ui">
+                        Downloading 3D geometry & structural textures for {selectedProject.title}.
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => setIs3dLoaded(true)}
+                          className="px-4 py-1.5 bg-brand-forest hover:bg-brand-forest-dark text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+                        >
+                          Show Viewport
+                        </button>
+                        <a
+                          href={selectedProject.directUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
+                        >
+                          <span>Open in 3D</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Sketchfab 3D Embed Iframe with Zoomed Out Camera Scale */}
+                  <div
+                    className="w-full h-full flex items-center justify-center overflow-hidden"
+                    style={{
+                      transform: `scale(${zoomScale})`,
+                      transformOrigin: "center center",
+                      transition: "transform 0.25s ease-out",
+                    }}
+                  >
+                    <iframe
+                      key={selectedProject.id}
+                      title={selectedProject.title}
+                      src={selectedProject.embedUrl}
+                      className="border-0"
+                      style={{
+                        width: `${(1 / zoomScale) * 100}%`,
+                        height: `${(1 / zoomScale) * 100}%`,
+                        maxWidth: "none",
+                        maxHeight: "none",
+                      }}
+                      allow="autoplay; fullscreen; xr-spatial-tracking; execution-while-out-of-viewport; execution-while-not-rendered; web-share"
+                      allowFullScreen
+                      onLoad={() => setIs3dLoaded(true)}
+                    />
+                  </div>
 
                   {/* Onscreen Controls Overlay Hint */}
-                  <div className="pointer-events-none absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                    <div className="pointer-events-auto bg-black/75 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/15 text-white flex items-center gap-2.5 text-xs shadow-lg">
-                      <Rotate3D className="w-4 h-4 text-brand-leaf-light animate-spin-slow" />
+                  <div className="pointer-events-none absolute bottom-3 left-3 right-3 flex items-center justify-between z-20">
+                    <div className="pointer-events-auto bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/15 text-white flex items-center gap-2 text-[11px] shadow-lg">
+                      <Rotate3D className="w-3.5 h-3.5 text-brand-leaf-light animate-spin-slow" />
                       <span className="font-ui font-medium">
-                        360° Real-time 3D Viewport
+                        360° Orbit • Scroll mouse to zoom
                       </span>
                     </div>
 
@@ -228,7 +369,7 @@ export default function Project3DExperience() {
                       href={selectedProject.directUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="pointer-events-auto bg-black/75 hover:bg-brand-forest backdrop-blur-md px-3 py-2 rounded-xl border border-white/15 text-white/90 hover:text-white flex items-center gap-1.5 text-xs transition-colors shadow-lg"
+                      className="pointer-events-auto bg-black/80 hover:bg-brand-forest backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/15 text-white/90 hover:text-white flex items-center gap-1.5 text-[11px] transition-colors shadow-lg"
                     >
                       <span>Open in Full 3D</span>
                       <ExternalLink className="w-3 h-3" />
