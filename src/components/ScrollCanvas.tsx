@@ -72,18 +72,12 @@ export default function ScrollCanvas() {
           let drawHeight = canvas.height;
           let offsetX = 0;
           let offsetY = 0;
-          if (canvasRatio < 0.85) {
-            drawWidth = canvas.width;
+          if (canvasRatio > imgRatio) {
             drawHeight = canvas.width / imgRatio;
-            offsetY = Math.max(68, Math.floor((canvas.height * 0.35) - (drawHeight / 2)));
+            offsetY = (canvas.height - drawHeight) / 2;
           } else {
-            if (canvasRatio > imgRatio) {
-              drawHeight = canvas.width / imgRatio;
-              offsetY = (canvas.height - drawHeight) / 2;
-            } else {
-              drawWidth = canvas.height * imgRatio;
-              offsetX = (canvas.width - drawWidth) / 2;
-            }
+            drawWidth = canvas.height * imgRatio;
+            offsetX = (canvas.width - drawWidth) / 2;
           }
           ctx.drawImage(tempImg, offsetX, offsetY, drawWidth, drawHeight);
         }
@@ -168,24 +162,13 @@ export default function ScrollCanvas() {
       let offsetX = 0;
       let offsetY = 0;
 
-      const isMobilePortrait = canvasRatio < 0.85;
-
-      if (isMobilePortrait) {
-        // Mobile portrait: Show full 16:9 width without cropping edges
-        drawWidth = canvasWidth;
+      // Full-bleed cover mode (matches ABC Builders exactly on both mobile & desktop)
+      if (canvasRatio > imgRatio) {
         drawHeight = canvasWidth / imgRatio;
-        offsetX = 0;
-        // Vertically place building comfortably in upper-mid viewport
-        offsetY = Math.max(68, Math.floor((canvasHeight * 0.35) - (drawHeight / 2)));
+        offsetY = (canvasHeight - drawHeight) / 2;
       } else {
-        // Desktop / Landscape: Cinematic cover mode
-        if (canvasRatio > imgRatio) {
-          drawHeight = canvasWidth / imgRatio;
-          offsetY = (canvasHeight - drawHeight) / 2;
-        } else {
-          drawWidth = canvasHeight * imgRatio;
-          offsetX = (canvasWidth - drawWidth) / 2;
-        }
+        drawWidth = canvasHeight * imgRatio;
+        offsetX = (canvasWidth - drawWidth) / 2;
       }
 
       ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
