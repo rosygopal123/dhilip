@@ -101,7 +101,7 @@ export default function Project3DExperience() {
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(true);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
-  const [modelZoom, setModelZoom] = useState<number>(0.65); // 0.65x scale: wide view showing full building, pergola, steps, compound walls
+  const [modelZoom, setModelZoom] = useState<number>(0.92); // 0.65x scale: wide view showing full building, pergola, steps, compound walls
   const sectionRef = React.useRef<HTMLDivElement>(null);
 
   // Dismiss gesture hint immediately when user touches/clicks anywhere or focuses into iframe
@@ -212,9 +212,9 @@ export default function Project3DExperience() {
         {/* Main Showcase Container */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left / Center: Interactive 3D Viewer (Clean Framed 3D Card with White Background) */}
-          <div className="lg:col-span-7 bg-white border-[1.5px] border-neutral-900 rounded-[22px] overflow-hidden shadow-md flex flex-col">
+          <div className="lg:col-span-7 bg-[#0a0a0d] border border-white/10 rounded-[22px] overflow-hidden shadow-2xl flex flex-col">
             {/* Viewer Stage: Clean Luxury 3D Card with Architectural Corner Accents */}
-            <div className="relative w-full bg-[#0a0a0d] transition-all duration-300 overflow-hidden h-[420px] sm:h-[480px] lg:h-[540px]">
+            <div className="relative w-full bg-[#0a0a0d] transition-all duration-300 overflow-hidden h-[340px] sm:h-[400px] lg:h-[460px]">
               {/* Luxury Architectural Viewfinder Corner Reticles */}
               <span className="pointer-events-none absolute left-4 top-4 z-20 h-4 w-4 border-l border-t border-white/40" />
               <span className="pointer-events-none absolute right-4 top-4 z-20 h-4 w-4 border-r border-t border-white/40" />
@@ -415,7 +415,7 @@ export default function Project3DExperience() {
                 </span>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setModelZoom(0.65)}
+                    onClick={() => setModelZoom(0.92)}
                     className="text-[#C5A880] hover:text-[#F3EFEA] text-[11px] sm:text-xs font-semibold tracking-wider uppercase transition-colors cursor-pointer"
                   >
                     Reset view
