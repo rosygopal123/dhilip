@@ -125,7 +125,7 @@ export default function Project3DExperience() {
     try {
       const orbit = mv.getCameraOrbit();
       if (!orbit) return;
-      mv.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius * 0.8}m`;
+      mv.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius * 0.82}m`;
     } catch (e) {
       console.warn("Zoom in error:", e);
     }
@@ -137,7 +137,7 @@ export default function Project3DExperience() {
     try {
       const orbit = mv.getCameraOrbit();
       if (!orbit) return;
-      mv.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius * 1.25}m`;
+      mv.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius * 1.2}m`;
     } catch (e) {
       console.warn("Zoom out error:", e);
     }
@@ -147,7 +147,7 @@ export default function Project3DExperience() {
     const mv = modelViewerRef.current;
     if (!mv) return;
     try {
-      mv.cameraOrbit = "35deg 70deg 180%";
+      mv.cameraOrbit = "35deg 72deg 105%";
       mv.fieldOfView = "auto";
     } catch (e) {
       console.warn("Reset camera error:", e);
@@ -333,9 +333,9 @@ export default function Project3DExperience() {
                       camera-controls
                       auto-rotate
                       rotation-per-second="18deg"
-                      camera-orbit="35deg 70deg 180%"
-                      min-camera-orbit="auto auto 90%"
-                      max-camera-orbit="auto auto 320%"
+                      camera-orbit="35deg 72deg 105%"
+                      min-camera-orbit="auto auto 50%"
+                      max-camera-orbit="auto auto 220%"
                       shadow-intensity="1.2"
                       shadow-softness="0.8"
                       exposure="1.0"
