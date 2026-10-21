@@ -101,16 +101,16 @@ export default function Project3DExperience() {
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(true);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
-  const [modelZoom, setModelZoom] = useState<number>(0.65); // 0.65x scale: wide cinematic view showing full house, compound walls & roof pergola
+  const [zoomFactor, setZoomFactor] = useState<number>(0.92); // 0.92 = Perfectly framed without any white gaps, showing full house, compound wall & roof pergola
   const sectionRef = React.useRef<HTMLDivElement>(null);
 
-  // Pure client-side zoom controls (No external script injection, 100% CSP-safe & zero console errors)
+  // Pure client-side zoom controls (Edge-to-edge full bleed, 0 white margins, 0 console errors)
   const zoomCameraOut = () => {
-    setModelZoom((prev) => Math.max(0.45, Number((prev - 0.10).toFixed(2))));
+    setZoomFactor((prev) => Math.max(0.78, Number((prev - 0.06).toFixed(2))));
   };
 
   const zoomCameraIn = () => {
-    setModelZoom((prev) => Math.min(1.20, Number((prev + 0.10).toFixed(2))));
+    setZoomFactor((prev) => Math.min(1.20, Number((prev + 0.06).toFixed(2))));
   };
 
   const realProjects = [
@@ -198,7 +198,7 @@ export default function Project3DExperience() {
           {/* Left / Center: Interactive 3D Viewer (Clean Framed 3D Card with White Background) */}
           <div className="lg:col-span-7 bg-white border-[1.5px] border-neutral-900 rounded-[22px] overflow-hidden shadow-md flex flex-col">
             {/* Viewer Stage: Clean Pure White Canvas Edge-to-Edge */}
-            <div className="relative w-full bg-white transition-all duration-300 overflow-hidden h-[350px] sm:h-[440px] lg:h-[510px]">
+            <div className="relative w-full bg-white transition-all duration-300 overflow-hidden h-[340px] sm:h-[420px] lg:h-[480px]">
               {activeView === "3d" && (
                 <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center">
 
@@ -280,12 +280,14 @@ export default function Project3DExperience() {
                       key={selectedProject.id}
                       title={selectedProject.title}
                       src={selectedProject.embedUrl}
-                      className="w-full h-full border-0 bg-white transition-transform duration-300 ease-out"
+                      className="border-0 bg-white transition-all duration-300 ease-out"
                       style={{
+                        width: `${(100 / zoomFactor).toFixed(1)}%`,
+                        height: `${(100 / zoomFactor).toFixed(1)}%`,
                         maxWidth: "none",
                         maxHeight: "none",
                         backgroundColor: "#ffffff",
-                        transform: `scale(${modelZoom})`,
+                        transform: `scale(${zoomFactor})`,
                         transformOrigin: "center center",
                       }}
                       allow="autoplay; fullscreen; xr-spatial-tracking; accelerometer; gyroscope"
