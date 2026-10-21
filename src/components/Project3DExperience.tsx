@@ -50,7 +50,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Kamarajar Salai / KK Nagar, Madurai",
     builtUpArea: "4,650 Sq.Ft (G+2)",
     sketchfabId: "d8e6be2601474f7d8cb7d06f8566f01a",
-    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0",
+    embedUrl: "https://sketchfab.com/models/d8e6be2601474f7d8cb7d06f8566f01a/embed?autostart=1&preload=1&transparent=1&autospin=0.35&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0",
     directUrl: "https://sketchfab.com/3d-models/modern-luxury-villa-house-building-d8e6be2601474f7d8cb7d06f8566f01a",
     thumbnail: "/images/danam/about-villa.webp",
     specs: {
@@ -76,7 +76,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     location: "Anna Nagar / Iyer Bungalow, Madurai",
     builtUpArea: "3,800 Sq.Ft (G+1)",
     sketchfabId: "2b9e6717a0ef457685dc41ce994ffabf",
-    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0",
+    embedUrl: "https://sketchfab.com/models/2b9e6717a0ef457685dc41ce994ffabf/embed?autostart=1&preload=1&transparent=1&autospin=0.35&ui_hint=0&ui_infos=0&ui_controls=0&ui_help=0&ui_settings=0&ui_inspector=0&ui_watermark=0&ui_ar=0&ui_vr=0&ui_annotations=0",
     directUrl: "https://sketchfab.com/3d-models/modern-house-2b9e6717a0ef457685dc41ce994ffabf",
     thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
     specs: {
@@ -100,12 +100,12 @@ export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(true);
-  // Default zoomed out (0.80) so the full property, elevation, compound, and garden are clearly visible
-  const [zoomLevel, setZoomLevel] = useState<number>(0.80);
+  const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
 
-  const handleZoomIn = () => setZoomLevel((prev) => Math.min(1.15, Number((prev + 0.08).toFixed(2))));
-  const handleZoomOut = () => setZoomLevel((prev) => Math.max(0.60, Number((prev - 0.08).toFixed(2))));
-  const handleResetZoom = () => setZoomLevel(0.80);
+  React.useEffect(() => {
+    const timer = setTimeout(() => setShowGestureHint(false), 6000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const realProjects = [
     { name: "Rajmahal Aishvaryam", loc: "Madurai", img: "/images/danam/ddhvrktrjjjln58schqk.webp", tag: "Turnkey EPC" },
@@ -197,61 +197,93 @@ export default function Project3DExperience() {
                 <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center">
 
 
-                  {/* Interaction badges & Floating Controls */}
-                  {/* Orbit 360 Hint */}
-                  <div className="absolute top-3 left-3 z-20 pointer-events-none bg-black/75 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
-                    <Rotate3D className="w-3.5 h-3.5 text-brand-forest animate-spin-slow" />
-                    <span>Orbit 360°</span>
+                  {/* Top Floating Orbit Badge & Gesture Toggle */}
+                  <div className="absolute top-3.5 left-3.5 z-20 flex items-center gap-2 pointer-events-auto">
+                    <div className="bg-black/75 backdrop-blur-md border border-white/20 px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md select-none">
+                      <Rotate3D className="w-3.5 h-3.5 text-brand-forest animate-spin-slow" />
+                      <span>Live 3D • Auto-Orbit</span>
+                    </div>
+
+                    {!showGestureHint && (
+                      <button
+                        onClick={() => setShowGestureHint(true)}
+                        className="bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white/80 hover:text-white px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider transition-all cursor-pointer shadow-sm"
+                        title="Show Interaction Guide"
+                      >
+                        Gesture Guide 🖐️
+                      </button>
+                    )}
                   </div>
 
-                  {/* Clean Glassmorphic Zoom In / Zoom Out / Reset Controls */}
-                  <div className="absolute top-3 right-3 z-20 flex items-center gap-1 bg-black/75 backdrop-blur-md border border-white/20 p-1 rounded-xl shadow-lg pointer-events-auto">
-                    <button
-                      onClick={handleZoomOut}
-                      className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
-                      title="Zoom Out (Full View)"
-                      aria-label="Zoom Out"
+                  {/* Animated Hand Interaction Gesture Overlay for Mobile & PC */}
+                  {showGestureHint && (
+                    <div
+                      onClick={() => setShowGestureHint(false)}
+                      onTouchStart={() => setShowGestureHint(false)}
+                      className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] transition-all duration-500 cursor-pointer p-4 select-none"
                     >
-                      <ZoomOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    </button>
-                    <span className="font-mono text-[10px] sm:text-xs text-white/90 px-1 font-semibold select-none">
-                      {Math.round(zoomLevel * 100)}%
-                    </span>
-                    <button
-                      onClick={handleZoomIn}
-                      className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
-                      title="Zoom In"
-                      aria-label="Zoom In"
-                    >
-                      <ZoomIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    </button>
-                    <button
-                      onClick={handleResetZoom}
-                      className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors cursor-pointer border-l border-white/15 pl-1.5"
-                      title="Reset Zoom"
-                      aria-label="Reset Zoom"
-                    >
-                      <RotateCcw className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-                    </button>
-                  </div>
+                      <div className="relative flex flex-col items-center justify-center pointer-events-none">
+                        {/* Orbital Motion Wave Rings */}
+                        <div className="absolute w-28 h-28 rounded-full border border-white/30 animate-ping opacity-30" />
+                        <div className="absolute w-20 h-20 rounded-full border border-brand-forest/60 animate-pulse" />
 
-                  {/* Sketchfab 3D Embed Iframe with BOTH Top Title Bar AND Bottom Settings/Sketchfab Icon Clipped */}
-                  <div
-                    className="w-full h-full flex items-center justify-center overflow-hidden bg-white"
-                    style={{
-                      transform: `scale(${zoomLevel})`,
-                      transformOrigin: "center center",
-                      transition: "transform 0.25s ease-out",
-                    }}
-                  >
+                        {/* Orbit Motion Track Arrows */}
+                        <div className="flex items-center justify-between w-40 mb-2">
+                          <span className="text-white/80 text-xs font-mono animate-pulse">◀◀</span>
+                          <span className="text-[10px] uppercase font-mono tracking-widest text-brand-leaf-light font-bold bg-black/50 px-2 py-0.5 rounded-full border border-white/10">
+                            Drag / Swipe 360°
+                          </span>
+                          <span className="text-white/80 text-xs font-mono animate-pulse">▶▶</span>
+                        </div>
+
+                        {/* Swaying & Rotating Hand Icon */}
+                        <div
+                          className="relative mb-3.5"
+                          style={{
+                            animation: "handOrbitSway 2.5s ease-in-out infinite",
+                          }}
+                        >
+                          <svg
+                            className="w-14 h-14 text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v4m0 0V11m0-2.5a1.5 1.5 0 013 0V13"
+                            />
+                          </svg>
+                        </div>
+
+                        {/* Instruction Pill */}
+                        <div className="bg-black/90 border border-white/25 px-4 py-2.5 rounded-xl text-center shadow-2xl flex flex-col items-center gap-1 max-w-[280px]">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-white uppercase tracking-wider">
+                            <Rotate3D className="w-3.5 h-3.5 text-brand-forest" />
+                            <span>Touch & Orbit 360°</span>
+                          </div>
+                          <span className="text-[10px] text-white/80 font-ui leading-tight">
+                            Drag to rotate • Pinch / Scroll to zoom out
+                          </span>
+                          <span className="text-[9px] text-brand-leaf-light font-mono mt-1 opacity-90">
+                            [ Tap anywhere to start ]
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Sketchfab 3D Embed Iframe - Edge-to-Edge Flush Full View (Zero Inner Square) */}
+                  <div className="w-full h-full flex items-center justify-center overflow-hidden bg-white">
                     <iframe
                       key={selectedProject.id}
                       title={selectedProject.title}
                       src={selectedProject.embedUrl}
-                      className="border-0 bg-white"
+                      className="w-full border-0 bg-white"
                       style={{
-                        width: `${(1 / zoomLevel) * 100}%`,
-                        height: `calc(${(1 / zoomLevel) * 100}% + 112px)`,
+                        height: "calc(100% + 112px)",
                         marginTop: "-54px",
                         marginBottom: "-58px",
                         maxWidth: "none",

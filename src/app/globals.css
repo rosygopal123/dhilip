@@ -161,3 +161,16 @@ body {
   overflow: hidden !important;
   height: 100vh;
 }
+
+/* Animated 3D Hand Orbit Gesture Sway */
+@keyframes handOrbitSway {
+  0% {
+    transform: translateX(-26px) rotate(-16deg) scale(0.96);
+  }
+  50% {
+    transform: translateX(26px) rotate(16deg) scale(1.04);
+  }
+  100% {
+    transform: translateX(-26px) rotate(-16deg) scale(0.96);
+  }
+}
