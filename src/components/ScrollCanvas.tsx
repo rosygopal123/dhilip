@@ -56,10 +56,11 @@ function renderFrameToCanvas(
     ctx.fillRect(0, 0, width, height);
     ctx.restore();
 
-    // 3. Zoom-out Foreground: Shows 100% full width and full building in view, perfectly centered vertically
-    const drawWidth = width;
-    const drawHeight = width / imgRatio;
-    const offsetX = 0;
+    // 3. Foreground building: Scaled by 1.36x so it is nicely zoomed in (matching ABC Builders reference) while staying perfectly centered
+    const zoomScale = 1.36;
+    const drawWidth = width * zoomScale;
+    const drawHeight = drawWidth / imgRatio;
+    const offsetX = Math.round((width - drawWidth) / 2);
     const offsetY = Math.round((height - drawHeight) / 2); // Exact vertical center!
 
     // Soft ambient drop-shadow behind sharp foreground image

@@ -171,13 +171,13 @@ export default function ServicesPage() {
     
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
-    doc.setTextColor(200, 146, 74); // teak color
-    doc.text("ABC BUILDERS, MADURAI", 14, 20);
+    doc.setTextColor(45, 89, 17); // emerald forest
+    doc.text("DANAM HOLDINGS, MADURAI", 14, 20);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
-    doc.text("TNRERA Reg: TN/20/Building/0129/2022 | www.abcbuildersmadurai.com", 14, 27);
+    doc.text("TNRERA Reg: TN/20/Building/0129/2022 | Kamarajar Salai, Madurai", 14, 27);
     doc.line(14, 30, 196, 30);
 
     doc.setFont("helvetica", "bold");
@@ -235,7 +235,7 @@ export default function ServicesPage() {
     doc.text("This calculation is an automated preliminary estimate based on 2026 regional indexes.", 14, 176);
     doc.text("Actual site quotation will be drafted after physical soil examination and structural drawings.", 14, 182);
 
-    doc.save(`ABC_Builders_Estimate_${district}.pdf`);
+    doc.save(`Danam_Holdings_Estimate_${district}.pdf`);
   };
 
   // WhatsApp Send Action
