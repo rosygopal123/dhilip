@@ -99,36 +99,80 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
 export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
   const iframeRef = React.useRef<HTMLIFrameElement>(null);
+  const apiRef = React.useRef<any>(null);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(true);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
-
-  // Show gesture hint when section is in view, hide on 3D card interaction or after 7s in view
   const sectionRef = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    let dismissTimer: NodeJS.Timeout;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setShowGestureHint(true);
-          dismissTimer = setTimeout(() => {
-            setShowGestureHint(false);
-          }, 8000);
+  // Function to programmatically zoom out camera via Sketchfab WebGL API
+  const zoomCameraOut = (factor = 2.4) => {
+    if (!apiRef.current) return;
+    try {
+      apiRef.current.getCamera((err: any, camera: any) => {
+        if (!err && camera && camera.position && camera.target) {
+          const p = camera.position;
+          const t = camera.target;
+          const dir = [p[0] - t[0], p[1] - t[1], p[2] - t[2]];
+          const dist = Math.sqrt(dir[0]*dir[0] + dir[1]*dir[1] + dir[2]*dir[2]);
+          if (dist > 0) {
+            const norm = [dir[0]/dist, dir[1]/dist, dir[2]/dist];
+            const newDist = dist * factor;
+            const newPos = [t[0] + norm[0] * newDist, t[1] + norm[1] * newDist, t[2] + norm[2] * newDist];
+            apiRef.current.setCameraLookAt(newPos, t, 0.4);
+          }
         }
-      },
-      { threshold: 0.2 }
-    );
+      });
+    } catch (e) {}
+  };
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
+  const zoomCameraIn = () => {
+    zoomCameraOut(0.75);
+  };
 
-    return () => {
-      observer.disconnect();
-      if (dismissTimer) clearTimeout(dismissTimer);
+  // Initialize Sketchfab WebGL Viewer API to programmatically control camera zoom on load
+  React.useEffect(() => {
+    const scriptId = "sketchfab-viewer-api-script";
+    let script = document.getElementById(scriptId) as HTMLScriptElement;
+
+    const initViewer = () => {
+      if (!iframeRef.current || !(window as any).Sketchfab) return;
+      try {
+        const client = new (window as any).Sketchfab(iframeRef.current);
+        client.init(selectedProject.sketchfabId, {
+          autostart: 1,
+          preload: 1,
+          transparent: 1,
+          ui_hint: 0,
+          ui_infos: 0,
+          ui_controls: 0,
+          ui_watermark: 0,
+          ui_settings: 0,
+          ui_inspector: 0,
+          success: (api: any) => {
+            apiRef.current = api;
+            api.start();
+            api.addEventListener("viewerready", () => {
+              // Immediately zoom out 2.4x so the whole building, compound walls, gate, and roof deck are in view
+              zoomCameraOut(2.4);
+            });
+          },
+          error: () => {}
+        });
+      } catch (e) {}
     };
-  }, []);
+
+    if (!script) {
+      script = document.createElement("script");
+      script.id = scriptId;
+      script.src = "https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js";
+      script.async = true;
+      script.onload = initViewer;
+      document.body.appendChild(script);
+    } else if ((window as any).Sketchfab) {
+      initViewer();
+    }
+  }, [selectedProject.id]);
 
   const realProjects = [
     { name: "Rajmahal Aishvaryam", loc: "Madurai", img: "/images/danam/ddhvrktrjjjln58schqk.webp", tag: "Turnkey EPC" },
@@ -220,12 +264,32 @@ export default function Project3DExperience() {
                 <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center">
 
 
-                  {/* Top Clean Status Indicator */}
-                  <div className="absolute top-3.5 left-3.5 z-20 pointer-events-none select-none">
-                    <div className="bg-black/70 backdrop-blur-md border border-white/20 px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
-                      <Rotate3D className="w-3.5 h-3.5 text-brand-forest" />
-                      <span>3D Elevation View</span>
+                  {/* Top Status & Zoom Controls */}
+                  <div className="absolute top-3 left-3 z-20 pointer-events-none select-none">
+                    <div className="bg-black/75 backdrop-blur-md border border-white/20 px-2.5 sm:px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
+                      <Rotate3D className="w-3.5 h-3.5 text-brand-forest animate-spin-slow" />
+                      <span>3D Elevation</span>
                     </div>
+                  </div>
+
+                  {/* Clean Interactive Zoom Controls in Top-Right */}
+                  <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/75 backdrop-blur-md border border-white/20 p-1 rounded-xl shadow-lg pointer-events-auto select-none">
+                    <button
+                      onClick={() => zoomCameraOut(1.35)}
+                      className="px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer flex items-center gap-1"
+                      title="Zoom Out (Full View)"
+                    >
+                      <ZoomOut className="w-3.5 h-3.5" />
+                      <span className="text-[10px] uppercase hidden sm:inline">Zoom Out</span>
+                    </button>
+                    <button
+                      onClick={zoomCameraIn}
+                      className="px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer border-l border-white/20 flex items-center gap-1"
+                      title="Zoom In"
+                    >
+                      <ZoomIn className="w-3.5 h-3.5" />
+                      <span className="text-[10px] uppercase hidden sm:inline">Zoom In</span>
+                    </button>
                   </div>
 
                   {/* Exact White Pointer Hand & Arrows (Canvas Center, Pure Left-Right Motion) */}
@@ -266,31 +330,34 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Sketchfab 3D Embed Iframe - Natively Zoomed Out 38% (Full Compound & Roof View), Edge-to-Edge Flush */}
+                  {/* Sketchfab 3D Embed Iframe - Connected with WebGL API for Real Camera Zoom Out */}
                   <div
                     onMouseDown={() => setShowGestureHint(false)}
                     onTouchStart={() => setShowGestureHint(false)}
-                    className="w-full h-full flex items-center justify-center overflow-hidden bg-white relative"
+                    className="w-full h-full flex items-center justify-center overflow-hidden bg-white relative cursor-grab active:cursor-grabbing"
                   >
                     <iframe
+                      ref={iframeRef}
+                      id="sketchfab-viewport-iframe"
                       key={selectedProject.id}
                       title={selectedProject.title}
                       src={selectedProject.embedUrl}
-                      className="border-0 bg-white"
+                      className="w-full border-0 bg-white"
                       style={{
-                        width: "142%",
-                        height: "calc(142% + 130px)",
-                        transform: "scale(0.704)",
-                        transformOrigin: "center center",
-                        marginTop: "-60px",
-                        marginBottom: "-70px",
+                        height: "calc(100% + 112px)",
+                        marginTop: "-54px",
+                        marginBottom: "-58px",
                         maxWidth: "none",
                         maxHeight: "none",
                         backgroundColor: "#ffffff",
                       }}
                       allow="autoplay; fullscreen; xr-spatial-tracking; web-share"
                       allowFullScreen
-                      onLoad={() => setIs3dLoaded(true)}
+                      onLoad={() => {
+                        setIs3dLoaded(true);
+                        // Trigger WebGL camera zoom out once loaded
+                        setTimeout(() => zoomCameraOut(2.4), 600);
+                      }}
                     />
                   </div>
                 </div>
