@@ -99,7 +99,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
 export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
-  const [is3dLoaded, setIs3dLoaded] = useState(false);
+  const [is3dLoaded, setIs3dLoaded] = useState(true);
   // Default zoomed out (0.80) so the full property, elevation, compound, and garden are clearly visible
   const [zoomLevel, setZoomLevel] = useState<number>(0.80);
 
@@ -195,29 +195,7 @@ export default function Project3DExperience() {
             <div className="relative w-full bg-white transition-all duration-300 overflow-hidden h-[320px] sm:h-[420px] lg:h-[485px]">
               {activeView === "3d" && (
                 <div className="relative w-full h-full bg-white overflow-hidden flex items-center justify-center">
-                  {/* Loading Overlay */}
-                  {!is3dLoaded && (
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm text-center p-6">
-                      <div className="relative w-14 h-14 mb-3 flex items-center justify-center">
-                        <div className="absolute inset-0 rounded-full border-2 border-brand-leaf/20 animate-ping" />
-                        <div className="w-10 h-10 rounded-full border-2 border-brand-forest border-t-brand-leaf animate-spin flex items-center justify-center">
-                          <Rotate3D className="w-4 h-4 text-brand-forest animate-pulse" />
-                        </div>
-                      </div>
-                      <h4 className="text-neutral-900 font-ui text-sm font-bold tracking-wide mb-1">
-                        Loading Interactive 3D Model...
-                      </h4>
-                      <p className="text-neutral-600 text-xs max-w-sm mb-3 font-ui">
-                        Downloading 3D geometry & structural textures for {selectedProject.title}.
-                      </p>
-                      <button
-                        onClick={() => setIs3dLoaded(true)}
-                        className="px-4 py-1.5 bg-brand-forest hover:bg-brand-forest-dark text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
-                      >
-                        Show Viewport
-                      </button>
-                    </div>
-                  )}
+
 
                   {/* Interaction badges & Floating Controls */}
                   {/* Orbit 360 Hint */}
@@ -280,7 +258,7 @@ export default function Project3DExperience() {
                         maxHeight: "none",
                         backgroundColor: "#ffffff",
                       }}
-                      allow="autoplay; fullscreen; xr-spatial-tracking; execution-while-out-of-viewport; execution-while-not-rendered; web-share"
+                      allow="autoplay; fullscreen; xr-spatial-tracking; web-share"
                       allowFullScreen
                       onLoad={() => setIs3dLoaded(true)}
                     />
