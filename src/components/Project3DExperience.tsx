@@ -103,8 +103,8 @@ export default function Project3DExperience() {
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [is3dLoaded, setIs3dLoaded] = useState(false);
-  const [zoomScale, setZoomScale] = useState<number>(0.80); // Default zoomed out to show full villa
-  const [isCompactCanvas, setIsCompactCanvas] = useState<boolean>(true); // Default shrunk canvas
+  const [zoomScale, setZoomScale] = useState<number>(0.72); // Default zoomed out wide view
+  const [isCompactCanvas, setIsCompactCanvas] = useState<boolean>(true); // Default shrunk compact outer canvas
   const [activeHotspot, setActiveHotspot] = useState<number | null>(0);
 
   const realProjects = [
@@ -126,23 +126,23 @@ export default function Project3DExperience() {
   };
 
   return (
-    <section id="project-3d-experience" className="py-20 bg-surface-1 border-y border-border-subtle relative overflow-hidden">
+    <section id="project-3d-experience" className="py-12 sm:py-16 bg-surface-1 border-y border-border-subtle relative overflow-hidden">
       {/* Background radial glow */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-brand-forest/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-10 w-[400px] h-[400px] bg-brand-amber/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-brand-forest/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-10 w-[350px] h-[350px] bg-brand-amber/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 relative z-10">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-5 mb-8">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brand-forest/10 border border-brand-forest/20 text-brand-forest text-xs font-bold uppercase tracking-wider mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-brand-forest/10 border border-brand-forest/20 text-brand-forest text-xs font-bold uppercase tracking-wider mb-2.5">
               <Rotate3D className="w-3.5 h-3.5 animate-spin-slow" />
               <span>Interactive 3D Experience</span>
             </div>
-            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight text-text-primary">
+            <h2 className="font-display text-2xl md:text-4xl font-bold tracking-tight text-text-primary">
               Experience Your Building in 3D
             </h2>
-            <p className="font-ui text-sm md:text-base text-text-secondary max-w-2xl mt-2 leading-relaxed">
+            <p className="font-ui text-xs md:text-sm text-text-secondary max-w-2xl mt-1.5 leading-relaxed">
               Don’t settle for flat 2D blueprints. Walk around, orbit 360°, inspect structural elevations, and verify architectural finishes before laying a single brick.
             </p>
           </div>
@@ -151,51 +151,51 @@ export default function Project3DExperience() {
           <div className="flex items-center bg-surface-0 border border-border-medium p-1 rounded-xl shadow-xs self-stretch md:self-auto justify-center">
             <button
               onClick={() => setActiveView("3d")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                 activeView === "3d"
                   ? "bg-brand-forest text-white shadow-sm"
                   : "text-text-secondary hover:text-text-primary"
               }`}
             >
-              <Rotate3D className="w-4 h-4" />
+              <Rotate3D className="w-3.5 h-3.5" />
               <span>Live 3D Walkaround</span>
             </button>
 
             <button
               onClick={() => setActiveView("photos")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                 activeView === "photos"
                   ? "bg-brand-forest text-white shadow-sm"
                   : "text-text-secondary hover:text-text-primary"
               }`}
             >
-              <Camera className="w-4 h-4" />
+              <Camera className="w-3.5 h-3.5" />
               <span>Project Photos</span>
             </button>
 
             <button
               onClick={() => setActiveView("specs")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-ui text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                 activeView === "specs"
                   ? "bg-brand-forest text-white shadow-sm"
                   : "text-text-secondary hover:text-text-primary"
               }`}
             >
-              <Layers className="w-4 h-4" />
+              <Layers className="w-3.5 h-3.5" />
               <span>Civil Specs</span>
             </button>
           </div>
         </div>
 
-        {/* Main Showcase Container */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left / Center: Interactive 3D Viewer or Photos View */}
-          <div className="lg:col-span-8 bg-surface-0 border border-border-medium rounded-2xl overflow-hidden shadow-xl flex flex-col">
+        {/* Main Showcase Container: Shrunk & Balanced Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left / Center: Interactive 3D Viewer (Shrunk 7-column card) */}
+          <div className="lg:col-span-7 bg-surface-0 border border-border-medium rounded-2xl overflow-hidden shadow-lg flex flex-col">
             {/* Viewer Top Toolbar */}
-            <div className="bg-[#0B190E] text-white px-4 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-white/10">
-              <div className="flex items-center gap-2.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-ui text-xs font-bold uppercase tracking-wider text-white">
+            <div className="bg-[#0B190E] text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-ui text-xs font-bold uppercase tracking-wider text-white truncate max-w-[180px] sm:max-w-none">
                   {selectedProject.title}
                 </span>
                 <span className="hidden sm:inline text-xs text-white/50">•</span>
@@ -207,9 +207,9 @@ export default function Project3DExperience() {
               <div className="flex items-center gap-2">
                 {/* Zoom Controls */}
                 {activeView === "3d" && (
-                  <div className="flex items-center gap-1 bg-white/10 rounded-lg p-0.5 text-xs">
+                  <div className="flex items-center gap-0.5 bg-white/10 rounded-lg p-0.5 text-xs">
                     <button
-                      onClick={() => setZoomScale((prev) => Math.max(0.60, Number((prev - 0.08).toFixed(2))))}
+                      onClick={() => setZoomScale((prev) => Math.max(0.55, Number((prev - 0.08).toFixed(2))))}
                       className="p-1 hover:bg-white/20 rounded text-white/90 transition-colors cursor-pointer"
                       title="Zoom Out (Expand View)"
                     >
@@ -231,27 +231,27 @@ export default function Project3DExperience() {
                 {/* Canvas Shrink / Expand Toggle */}
                 <button
                   onClick={() => setIsCompactCanvas(!isCompactCanvas)}
-                  className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition-colors cursor-pointer"
+                  className="hidden sm:flex items-center gap-1 px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition-colors cursor-pointer"
                   title="Toggle Canvas Size"
                 >
                   <SlidersHorizontal className="w-3 h-3 text-brand-leaf-light" />
-                  <span className="text-[11px]">{isCompactCanvas ? "Shrunk Canvas" : "Expand"}</span>
+                  <span className="text-[10px]">{isCompactCanvas ? "Compact" : "Expanded"}</span>
                 </button>
 
                 <button
                   onClick={() => setIsFullscreen(!isFullscreen)}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition-colors cursor-pointer"
+                  className="flex items-center gap-1 px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition-colors cursor-pointer"
                   title="Toggle Fullscreen"
                 >
                   {isFullscreen ? (
                     <>
-                      <Minimize2 className="w-3.5 h-3.5" />
-                      <span className="text-[11px]">Exit</span>
+                      <Minimize2 className="w-3 h-3" />
+                      <span className="text-[10px]">Exit</span>
                     </>
                   ) : (
                     <>
-                      <Maximize2 className="w-3.5 h-3.5" />
-                      <span className="text-[11px]">Fullscreen</span>
+                      <Maximize2 className="w-3 h-3" />
+                      <span className="text-[10px]">Full</span>
                     </>
                   )}
                 </button>
@@ -260,9 +260,9 @@ export default function Project3DExperience() {
 
             {/* Model Selector Bar */}
             {activeView === "3d" && (
-              <div className="flex items-center gap-2 px-5 py-2 bg-[#0E1F12] border-b border-white/10 overflow-x-auto text-xs">
-                <span className="text-white/60 font-ui text-[11px] uppercase tracking-wider shrink-0">
-                  Select 3D Model:
+              <div className="flex items-center gap-2 px-4 py-2 bg-[#0E1F12] border-b border-white/10 overflow-x-auto text-xs">
+                <span className="text-white/60 font-ui text-[10px] uppercase tracking-wider shrink-0">
+                  Model:
                 </span>
                 {PROJECT_3D_LIST.map((proj) => (
                   <button
@@ -271,7 +271,7 @@ export default function Project3DExperience() {
                       setSelectedProject(proj);
                       setIs3dLoaded(false);
                     }}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer ${
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all shrink-0 cursor-pointer ${
                       selectedProject.id === proj.id
                         ? "bg-brand-forest text-white shadow-xs font-semibold"
                         : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
@@ -283,14 +283,14 @@ export default function Project3DExperience() {
               </div>
             )}
 
-            {/* Viewer Stage */}
+            {/* Viewer Stage: Shrunk Height */}
             <div
               className={`relative w-full bg-[#060E08] transition-all duration-300 overflow-hidden ${
                 isFullscreen
                   ? "fixed inset-0 z-50 h-screen w-screen rounded-none"
                   : isCompactCanvas
-                  ? "h-[330px] sm:h-[380px]"
-                  : "h-[440px] sm:h-[500px]"
+                  ? "h-[290px] sm:h-[340px]"
+                  : "h-[380px] sm:h-[440px]"
               }`}
             >
               {activeView === "3d" && (
@@ -486,9 +486,9 @@ export default function Project3DExperience() {
           </div>
 
           {/* Right Column: Key Architectural Highlights & Direct Consultation */}
-          <div className="lg:col-span-4 flex flex-col gap-6">
+          <div className="lg:col-span-5 flex flex-col gap-5">
             {/* Quick Details Card */}
-            <div className="bg-surface-0 border border-border-medium rounded-2xl p-6 shadow-sm">
+            <div className="bg-surface-0 border border-border-medium rounded-2xl p-5 shadow-sm">
               <span className="inline-block px-2.5 py-0.5 rounded-full bg-brand-amber/10 border border-brand-amber/30 text-brand-gold text-[10px] font-extrabold uppercase tracking-wider mb-2">
                 Featured 3D Concept
               </span>
