@@ -10,7 +10,9 @@ import TrustedClients from "@/components/TrustedClients";
 import ClientTestimonials from "@/components/ClientTestimonials";
 import HomeFAQ from "@/components/HomeFAQ";
 import MobileQuickBar from "@/components/MobileQuickBar";
-import { ChevronRight, Star, ShieldCheck, Award, Building2, CheckCircle2 } from "lucide-react";
+import ProjectInteractiveModal from "@/components/ProjectInteractiveModal";
+import { ALL_PROJECTS, ProjectItem } from "@/data/projectsData";
+import { ChevronRight, Star, ShieldCheck, Award, Building2, CheckCircle2, Rotate3D, Compass, Eye } from "lucide-react";
 
 // Custom Stat Counter Component
 function StatCard({ number, label, suffix = "" }: { number: number; label: string; suffix?: string }) {
@@ -73,36 +75,10 @@ export default function HomePage() {
     window.dispatchEvent(new CustomEvent("open-lead-modal"));
   };
 
-  const danamFeaturedProjects = [
-    {
-      title: "Rajmahal Aishvaryam",
-      img: "/images/danam/ddhvrktrjjjln58schqk.webp",
-      location: "Madurai",
-      type: "Turnkey EPC Showroom",
-      scope: "Landmark Commercial"
-    },
-    {
-      title: "Theni Anandham",
-      img: "/images/danam/l3s2jgqoz98xoktjyzvk.webp",
-      location: "Aruppukottai",
-      type: "Commercial Complex",
-      scope: "Retail Flagship"
-    },
-    {
-      title: "SACS Landmark",
-      img: "/images/danam/rvxn271huf5gcqqtdb46.webp",
-      location: "K.Pudhur, Madurai",
-      type: "Civil Infrastructure",
-      scope: "Turnkey Civil"
-    },
-    {
-      title: "Ocean Peacock SR",
-      img: "/images/danam/FFLiving-002.webp",
-      location: "Madurai",
-      type: "Luxury Residential Villa",
-      scope: "Contemporary Architecture"
-    }
-  ];
+  const [modalProject, setModalProject] = useState<ProjectItem | null>(null);
+  const [modalTab, setModalTab] = useState<"3d" | "360" | "specs" | "before-after">("3d");
+
+  const danamFeaturedProjects = ALL_PROJECTS.slice(0, 4);
 
   return (
     <div className="relative w-full">
@@ -274,33 +250,81 @@ export default function HomePage() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {danamFeaturedProjects.map((p, idx) => (
-              <div key={idx} className="flex flex-col text-left group">
-                <div className="relative aspect-[3/2] w-full overflow-hidden mb-4 bg-stone-900 rounded-2xl shadow-md border border-border-subtle">
+            {danamFeaturedProjects.map((p) => (
+              <div key={p.id} className="flex flex-col text-left group bg-surface-0 border border-border-subtle hover:border-brand-forest/40 rounded-3xl p-3 sm:p-4 shadow-sm hover:shadow-xl transition-all duration-300">
+                <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl bg-stone-900 border border-border-subtle group">
                   <img
                     src={p.img}
                     alt={p.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute top-4 left-4 bg-black/75 backdrop-blur-sm text-white font-mono text-[9px] px-3 py-1 uppercase tracking-widest rounded-full border border-white/20">
-                    {p.type}
+                  <div className="absolute top-3.5 left-3.5 bg-black/80 backdrop-blur-md text-white font-mono text-[9px] px-3 py-1 uppercase tracking-widest rounded-full border border-white/20">
+                    {p.badge}
+                  </div>
+
+                  {/* Hover Quick Action Buttons */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => { setModalProject(p); setModalTab("3d"); }}
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-brand-forest hover:bg-brand-forest-dark text-white text-xs font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
+                      >
+                        <Rotate3D className="w-3.5 h-3.5 text-amber-300" />
+                        <span>3D Exterior</span>
+                      </button>
+
+                      <button
+                        onClick={() => { setModalProject(p); setModalTab("360"); }}
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#0b0e14]/95 hover:bg-[#0b0e14] border border-emerald-400/60 text-emerald-300 text-xs font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
+                      >
+                        <Compass className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>360° VR Tour</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex justify-between items-start px-1">
-                  <div>
-                    <h4 className="font-display text-lg md:text-xl font-bold text-text-primary group-hover:text-brand-forest transition-colors">
-                      {p.title}
-                    </h4>
-                    <span className="font-ui text-xs text-text-secondary">
-                      {p.location} • {p.scope}
+
+                <div className="flex flex-col justify-between mt-3 px-1">
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <h4 className="font-display text-lg md:text-xl font-bold text-text-primary group-hover:text-brand-forest transition-colors">
+                        {p.title}
+                      </h4>
+                      <span className="font-ui text-xs text-text-secondary">
+                        {p.location} • {p.area}
+                      </span>
+                    </div>
+
+                    <span className="text-[10px] font-mono text-emerald-600 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 whitespace-nowrap">
+                      IS-456 Certified
                     </span>
                   </div>
-                  <Link
-                    href={`/${locale}/projects`}
-                    className="text-xs text-brand-forest border-b border-transparent group-hover:border-brand-forest transition-all duration-300 font-bold tracking-wider uppercase flex items-center gap-1"
-                  >
-                    View Project
-                  </Link>
+
+                  {/* Card Direct Launch Action Bar */}
+                  <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-border-subtle">
+                    <button
+                      onClick={() => { setModalProject(p); setModalTab("3d"); }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-brand-forest hover:text-white text-text-primary text-xs font-semibold transition-all cursor-pointer border border-border-subtle"
+                    >
+                      <Rotate3D className="w-3.5 h-3.5 text-amber-500" />
+                      <span>3D Model</span>
+                    </button>
+
+                    <button
+                      onClick={() => { setModalProject(p); setModalTab("360"); }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-brand-forest hover:text-white text-text-primary text-xs font-semibold transition-all cursor-pointer border border-border-subtle"
+                    >
+                      <Compass className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>360° Tour</span>
+                    </button>
+
+                    <button
+                      onClick={() => { setModalProject(p); setModalTab("specs"); }}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-brand-forest hover:bg-brand-forest/10 text-xs font-bold transition-all cursor-pointer ml-auto"
+                    >
+                      <span>Specs & BOQ →</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -389,6 +413,13 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Universal Project Interactive 3D & 360 Modal */}
+      <ProjectInteractiveModal
+        project={modalProject}
+        initialTab={modalTab}
+        onClose={() => setModalProject(null)}
+      />
 
       {/* 12. Floating Mobile Quick-Action Bar (Call + WhatsApp + Free BOQ) */}
       <MobileQuickBar />
