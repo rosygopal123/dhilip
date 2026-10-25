@@ -323,8 +323,8 @@ void main() {
   float lat = asin(clamp(rYaw.y, -0.9999, 0.9999));
 
   vec2 texCoord = vec2(
-    lon / (2.0 * PI) + 0.5,
-    lat / PI + 0.5
+    fract(lon / (2.0 * PI) + 0.5),
+    clamp(lat / PI + 0.5, 0.001, 0.999)
   );
 
   gl_FragColor = texture2D(u_image, texCoord);
@@ -478,7 +478,7 @@ export default function InteriorTour360() {
     // Initial placeholder texture
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -553,8 +553,20 @@ export default function InteriorTour360() {
       if (!glRef.current || !textureRef.current) return;
       const g = glRef.current;
       g.bindTexture(g.TEXTURE_2D, textureRef.current);
-      g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE, source);
-      g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.REPEAT);
+
+      // WebGL 1.0 mandates Power-of-Two dimensions to prevent black textures on NPOT images
+      const potCanvas = document.createElement("canvas");
+      potCanvas.width = 2048;
+      potCanvas.height = 1024;
+      const ctx = potCanvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(source, 0, 0, 2048, 1024);
+        g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE, potCanvas);
+      } else {
+        g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE, source);
+      }
+
+      g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE);
       g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);
       g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.LINEAR);
       g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.LINEAR);
