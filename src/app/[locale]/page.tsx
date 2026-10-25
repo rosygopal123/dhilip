@@ -5,6 +5,11 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import ScrollCanvas from "@/components/ScrollCanvas";
 import Project3DExperience from "@/components/Project3DExperience";
 import InteriorTour360 from "@/components/InteriorTour360";
+import StandardsCommitment from "@/components/StandardsCommitment";
+import TrustedClients from "@/components/TrustedClients";
+import ClientTestimonials from "@/components/ClientTestimonials";
+import HomeFAQ from "@/components/HomeFAQ";
+import MobileQuickBar from "@/components/MobileQuickBar";
 import { ChevronRight, Star, ShieldCheck, Award, Building2, CheckCircle2 } from "lucide-react";
 
 // Custom Stat Counter Component
@@ -252,7 +257,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. Landmark Completed Projects */}
+      {/* 5. The Standards We Work By (IS-456, BOQ, On-Time Handover) */}
+      <StandardsCommitment />
+
+      {/* 6. Landmark Completed Projects */}
       <section className="py-24 bg-surface-1 text-center">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <span className="text-brand-forest font-mono text-xs uppercase tracking-widest mb-2 block font-bold">
@@ -310,7 +318,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Affiliations & Certifications Marquee */}
+      {/* 7. Trusted By Respected Names (Client Brand Logos Grid & Affiliations) */}
+      <TrustedClients />
+
+      {/* 8. What Our Clients Say (Verified Client Reviews & 4.9★ Rating) */}
+      <ClientTestimonials />
+
+      {/* 9. Frequently Asked Questions (FAQ Accordion with Search) */}
+      <HomeFAQ />
+
+      {/* 10. Affiliations & Certifications Marquee */}
       <section className="py-7 bg-[#060E08] overflow-hidden select-none border-y border-white/10">
         <div className="flex animate-[marquee_35s_linear_infinite] whitespace-nowrap gap-12 text-white/85 items-center text-xs font-mono tracking-widest uppercase">
           {[...Array(3)].map((_, listIdx) => (
@@ -372,6 +389,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* 12. Floating Mobile Quick-Action Bar (Call + WhatsApp + Free BOQ) */}
+      <MobileQuickBar />
     </div>
   );
 }
