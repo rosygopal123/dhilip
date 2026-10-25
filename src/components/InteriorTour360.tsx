@@ -451,6 +451,9 @@ void main() {
 }
 `;
 
+// Shared in-memory cache for pre-rasterized 2048x1024 power-of-two canvas textures
+const textureCanvasCache: Record<string, HTMLCanvasElement> = {};
+
 export default function InteriorTour360() {
   const [activeRoomIndex, setActiveRoomIndex] = useState<number>(0);
   const [yaw, setYaw] = useState<number>(0); // radians
@@ -460,7 +463,7 @@ export default function InteriorTour360() {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
-  const [isLoadingTexture, setIsLoadingTexture] = useState<boolean>(true);
+  const [isLoadingTexture, setIsLoadingTexture] = useState<boolean>(false);
   const [showGestureGuide, setShowGestureGuide] = useState<boolean>(true);
 
   // Tour Pro 360 Feature States
@@ -482,6 +485,7 @@ export default function InteriorTour360() {
   const autoRotateRef = useRef<boolean>(true);
   const isDraggingRef = useRef<boolean>(false);
   const nightFactorRef = useRef<number>(0);
+  const activeRoomIndexRef = useRef<number>(0);
 
   // Keep refs in sync for 60fps render loop
   useEffect(() => {
@@ -502,6 +506,9 @@ export default function InteriorTour360() {
   useEffect(() => {
     nightFactorRef.current = isNightMode ? 0.75 : 0.0;
   }, [isNightMode]);
+  useEffect(() => {
+    activeRoomIndexRef.current = activeRoomIndex;
+  }, [activeRoomIndex]);
 
   const activeRoom = ROOMS_DATA[activeRoomIndex];
 
@@ -545,6 +552,132 @@ export default function InteriorTour360() {
 
     return c;
   }, []);
+
+  // Helper: Upload canvas or image to WebGL texture
+  const uploadCanvasTexture = useCallback((source: HTMLCanvasElement | HTMLImageElement) => {
+    const gl = glRef.current;
+    const tex = textureRef.current;
+    if (!gl || !tex) return;
+
+    try {
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        source
+      );
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    } catch (err) {
+      console.warn("Texture upload error:", err);
+    }
+    setIsLoadingTexture(false);
+  }, []);
+
+  // Helper: Convert any loaded image to a 2048x1024 power-of-two canvas
+  const rasterizeImageToPotCanvas = useCallback((source: HTMLImageElement): HTMLCanvasElement => {
+    const pot = document.createElement("canvas");
+    pot.width = 2048;
+    pot.height = 1024;
+    const ctx = pot.getContext("2d");
+    if (ctx) {
+      ctx.drawImage(source, 0, 0, 2048, 1024);
+    }
+    return pot;
+  }, []);
+
+  // Robust texture loader for any room
+  const loadRoomTexture = useCallback((targetRoom: Room360) => {
+    const gl = glRef.current;
+    const tex = textureRef.current;
+    if (!gl || !tex) return;
+
+    setIsLoadingTexture(true);
+
+    // 1. Check in-memory cache first (instant 0ms switch)
+    const cachedCanvas = textureCanvasCache[targetRoom.id];
+    if (cachedCanvas) {
+      uploadCanvasTexture(cachedCanvas);
+      return;
+    }
+
+    // 2. Load primary panorama
+    const img = new Image();
+    if (targetRoom.panoramaUrl.startsWith("http://") || targetRoom.panoramaUrl.startsWith("https://")) {
+      img.crossOrigin = "anonymous";
+    }
+
+    const handleSuccess = () => {
+      try {
+        const potCanvas = rasterizeImageToPotCanvas(img);
+        textureCanvasCache[targetRoom.id] = potCanvas;
+        uploadCanvasTexture(potCanvas);
+      } catch {
+        uploadCanvasTexture(img);
+      }
+    };
+
+    const handleError = () => {
+      console.warn("Primary panorama failed, trying fallback:", targetRoom.fallbackImage);
+      const fallbackImg = new Image();
+      if (targetRoom.fallbackImage.startsWith("http://") || targetRoom.fallbackImage.startsWith("https://")) {
+        fallbackImg.crossOrigin = "anonymous";
+      }
+
+      fallbackImg.onload = () => {
+        try {
+          const potCanvas = rasterizeImageToPotCanvas(fallbackImg);
+          textureCanvasCache[targetRoom.id] = potCanvas;
+          uploadCanvasTexture(potCanvas);
+        } catch {
+          uploadCanvasTexture(createFallbackTexture());
+        }
+      };
+
+      fallbackImg.onerror = () => {
+        uploadCanvasTexture(createFallbackTexture());
+      };
+
+      fallbackImg.src = targetRoom.fallbackImage;
+      if (fallbackImg.complete && fallbackImg.naturalWidth > 0) {
+        fallbackImg.onload(new Event("load"));
+      }
+    };
+
+    // Attach callbacks before setting src to catch synchronous cache hits
+    img.onload = handleSuccess;
+    img.onerror = handleError;
+    img.src = targetRoom.panoramaUrl;
+
+    if (img.complete && img.naturalWidth > 0) {
+      handleSuccess();
+    }
+  }, [createFallbackTexture, uploadCanvasTexture, rasterizeImageToPotCanvas]);
+
+  // Preload all 4 room panoramas in background on mount
+  useEffect(() => {
+    ROOMS_DATA.forEach((room) => {
+      if (textureCanvasCache[room.id]) return;
+      const img = new Image();
+      if (room.panoramaUrl.startsWith("http://") || room.panoramaUrl.startsWith("https://")) {
+        img.crossOrigin = "anonymous";
+      }
+      img.onload = () => {
+        try {
+          const pot = rasterizeImageToPotCanvas(img);
+          textureCanvasCache[room.id] = pot;
+        } catch {
+          // ignore background cache failure
+        }
+      };
+      img.src = room.panoramaUrl;
+    });
+  }, [rasterizeImageToPotCanvas]);
 
   // WebGL initialization
   useEffect(() => {
@@ -622,6 +755,9 @@ export default function InteriorTour360() {
     );
     textureRef.current = tex;
 
+    // Immediately trigger texture loading for current active room as soon as WebGL is ready
+    loadRoomTexture(ROOMS_DATA[activeRoomIndexRef.current]);
+
     // Render loop
     let lastTime = performance.now();
     const render = (time: number) => {
@@ -634,17 +770,19 @@ export default function InteriorTour360() {
         setYaw(yawRef.current);
       }
 
-      // Resize canvas to match display client size
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const displayW = Math.round(canvas.clientWidth * dpr);
-      const displayH = Math.round(canvas.clientHeight * dpr);
-      if (canvas.width !== displayW || canvas.height !== displayH) {
-        canvas.width = displayW;
-        canvas.height = displayH;
-        gl.viewport(0, 0, displayW, displayH);
+      // Safe resize canvas to match display client size
+      if (canvas.clientWidth > 0 && canvas.clientHeight > 0) {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const displayW = Math.round(canvas.clientWidth * dpr);
+        const displayH = Math.round(canvas.clientHeight * dpr);
+        if (canvas.width !== displayW || canvas.height !== displayH) {
+          canvas.width = displayW;
+          canvas.height = displayH;
+          gl.viewport(0, 0, displayW, displayH);
+        }
       }
 
-      const aspect = canvas.width / (canvas.height || 1);
+      const aspect = (canvas.width || 1) / (canvas.height || 1);
 
       gl.useProgram(prog);
       gl.uniform1f(gl.getUniformLocation(prog, "u_yaw"), yawRef.current);
@@ -666,61 +804,16 @@ export default function InteriorTour360() {
       if (tex) gl.deleteTexture(tex);
       if (quadBuffer) gl.deleteBuffer(quadBuffer);
       if (prog) gl.deleteProgram(prog);
+      glRef.current = null;
+      textureRef.current = null;
     };
-  }, [createFallbackTexture]);
+  }, [createFallbackTexture, loadRoomTexture]);
 
   // Load new room panorama texture when room changes
   useEffect(() => {
-    setIsLoadingTexture(true);
     setSelectedHotspot(null);
-    const gl = glRef.current;
-    if (!gl) return;
-
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = activeRoom.panoramaUrl;
-
-    const onTextureReady = (source: HTMLImageElement | HTMLCanvasElement) => {
-      if (!glRef.current || !textureRef.current) return;
-      const g = glRef.current;
-      g.bindTexture(g.TEXTURE_2D, textureRef.current);
-
-      // WebGL 1.0 mandates Power-of-Two dimensions to prevent black textures on NPOT images
-      const potCanvas = document.createElement("canvas");
-      potCanvas.width = 2048;
-      potCanvas.height = 1024;
-      const ctx = potCanvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(source, 0, 0, 2048, 1024);
-        g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE, potCanvas);
-      } else {
-        g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE, source);
-      }
-
-      g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE);
-      g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);
-      g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.LINEAR);
-      g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.LINEAR);
-      setIsLoadingTexture(false);
-    };
-
-    img.onload = () => {
-      onTextureReady(img);
-    };
-
-    img.onerror = () => {
-      // If generated panorama is still downloading, load fallback room image onto canvas
-      const fallbackImg = new Image();
-      fallbackImg.crossOrigin = "anonymous";
-      fallbackImg.src = activeRoom.fallbackImage;
-      fallbackImg.onload = () => {
-        onTextureReady(fallbackImg);
-      };
-      fallbackImg.onerror = () => {
-        onTextureReady(createFallbackTexture());
-      };
-    };
-  }, [activeRoomIndex, activeRoom.panoramaUrl, activeRoom.fallbackImage, createFallbackTexture]);
+    loadRoomTexture(ROOMS_DATA[activeRoomIndex]);
+  }, [activeRoomIndex, loadRoomTexture]);
 
   // Mouse & Touch Drag interactions
   const handlePointerDown = (clientX: number, clientY: number) => {

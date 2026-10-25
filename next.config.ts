@@ -4,6 +4,19 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: "/panoramas/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        source: "/images/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+        ],
+      },
+      {
         source: "/:path*",
         headers: [
           {
