@@ -21,7 +21,13 @@ import {
   BedDouble,
   Sofa,
   Utensils,
-  Sunset
+  Sunset,
+  Map,
+  Ruler,
+  Sun,
+  Moon,
+  Footprints,
+  LayoutGrid
 } from "lucide-react";
 
 export interface Hotspot {
@@ -34,6 +40,23 @@ export interface Hotspot {
   pitch: number; // in radians (-PI/2 to +PI/2)
 }
 
+export interface NavPortal {
+  id: string;
+  targetRoomIndex: number;
+  label: string;
+  sublabel: string;
+  yaw: number;
+  pitch: number;
+}
+
+export interface DimensionCallout {
+  id: string;
+  label: string;
+  value: string;
+  yaw: number;
+  pitch: number;
+}
+
 export interface Room360 {
   id: string;
   name: string;
@@ -43,6 +66,7 @@ export interface Room360 {
   subtitle: string;
   panoramaUrl: string;
   fallbackImage: string;
+  mapCoords: { x: number; y: number }; // percentage on floor plan (0-100)
   specs: {
     area: string;
     ceiling: string;
@@ -52,6 +76,8 @@ export interface Room360 {
   };
   highlights: string[];
   hotspots: Hotspot[];
+  portals: NavPortal[];
+  dimensions: DimensionCallout[];
 }
 
 const ROOMS_DATA: Room360[] = [
@@ -64,6 +90,7 @@ const ROOMS_DATA: Room360[] = [
     subtitle: "Expansive 480 sq.ft living lounge featuring a 14'6\" double-height ceiling, bookmatched Italian Statuario marble, and acoustic floor-to-ceiling glass envelopes.",
     panoramaUrl: "/panoramas/living-room.jpg",
     fallbackImage: "/images/danam/FFLiving-002.webp",
+    mapCoords: { x: 50, y: 65 },
     specs: {
       area: "480 Sq.Ft Double Volume",
       ceiling: "14'6\" Clear Atrium Height",
@@ -114,6 +141,37 @@ const ROOMS_DATA: Room360[] = [
         yaw: -1.35,
         pitch: 0.12
       }
+    ],
+    portals: [
+      {
+        id: "portal-master",
+        targetRoomIndex: 1,
+        label: "Walk to Master Suite",
+        sublabel: "King Sanctuary · 360 Sq.Ft",
+        yaw: 1.52,
+        pitch: -0.15
+      },
+      {
+        id: "portal-kitchen",
+        targetRoomIndex: 2,
+        label: "Step into Modular Kitchen",
+        sublabel: "German Blum · Quartz Island",
+        yaw: -1.45,
+        pitch: -0.18
+      },
+      {
+        id: "portal-terrace",
+        targetRoomIndex: 3,
+        label: "Take Stairs to Sky Terrace",
+        sublabel: "Rooftop Open Lounge",
+        yaw: -2.85,
+        pitch: 0.02
+      }
+    ],
+    dimensions: [
+      { id: "dim-1", label: "Clear Ceiling Height", value: "↕ 14' 6\"", yaw: 0.0, pitch: 0.38 },
+      { id: "dim-2", label: "Living Room Span", value: "↔ 24' 0\" x 20' 0\"", yaw: 0.0, pitch: -0.35 },
+      { id: "dim-3", label: "Acoustic Glazing Height", value: "↕ 10' 0\" Full Height", yaw: 1.15, pitch: -0.12 }
     ]
   },
   {
@@ -125,6 +183,7 @@ const ROOMS_DATA: Room360[] = [
     subtitle: "Private luxury retreat finished with fluted Burma teak accents, herringbone natural oak flooring, walk-in dressing portal, and a sunrise-facing terrace.",
     panoramaUrl: "/panoramas/master-bedroom.jpg",
     fallbackImage: "/images/danam/about-villa.webp",
+    mapCoords: { x: 25, y: 35 },
     specs: {
       area: "360 Sq.Ft + 90 Sq.Ft Balcony",
       ceiling: "10'6\" Flush Gypsum with Magnetic Tracks",
@@ -166,6 +225,28 @@ const ROOMS_DATA: Room360[] = [
         yaw: -1.25,
         pitch: 0.1
       }
+    ],
+    portals: [
+      {
+        id: "portal-living",
+        targetRoomIndex: 0,
+        label: "Return to Living Atrium",
+        sublabel: "Double-Height Lounge",
+        yaw: -1.65,
+        pitch: -0.15
+      },
+      {
+        id: "portal-terrace-2",
+        targetRoomIndex: 3,
+        label: "Go up to Sky Terrace",
+        sublabel: "Rooftop Open Lounge",
+        yaw: 2.7,
+        pitch: 0.05
+      }
+    ],
+    dimensions: [
+      { id: "dim-4", label: "Bedroom Span", value: "↔ 18' 0\" x 20' 0\"", yaw: 0.05, pitch: -0.32 },
+      { id: "dim-5", label: "Ceiling Clear", value: "↕ 10' 6\"", yaw: 0.05, pitch: 0.32 }
     ]
   },
   {
@@ -177,6 +258,7 @@ const ROOMS_DATA: Room360[] = [
     subtitle: "Precision-engineered German modular kitchen with seamless quartz waterfall island, built-in induction & gas burners, and Vastu-compliant Agni corner layout.",
     panoramaUrl: "/panoramas/modular-kitchen.jpg",
     fallbackImage: "/images/danam/hh1.webp",
+    mapCoords: { x: 75, y: 35 },
     specs: {
       area: "240 Sq.Ft Ergonomic Layout",
       ceiling: "10'0\" Moisture-Resistant POP Finish",
@@ -218,6 +300,20 @@ const ROOMS_DATA: Room360[] = [
         yaw: 1.25,
         pitch: -0.05
       }
+    ],
+    portals: [
+      {
+        id: "portal-living-from-kit",
+        targetRoomIndex: 0,
+        label: "Walk to Living & Dining",
+        sublabel: "Grand Atrium",
+        yaw: 1.45,
+        pitch: -0.15
+      }
+    ],
+    dimensions: [
+      { id: "dim-6", label: "Island Length", value: "↔ 9' 6\" Quartz Island", yaw: -0.05, pitch: -0.28 },
+      { id: "dim-7", label: "Aisle Clearance", value: "↔ 4' 0\" Ergonomic Aisle", yaw: -0.85, pitch: -0.3 }
     ]
   },
   {
@@ -229,6 +325,7 @@ const ROOMS_DATA: Room360[] = [
     subtitle: "Open-air luxury sky lounge equipped with weatherproof composite teak decking, frameless glass balustrades, ambient deck lighting, and panoramic skyline vistas.",
     panoramaUrl: "/panoramas/sky-terrace.jpg",
     fallbackImage: "/images/danam/hh4.webp",
+    mapCoords: { x: 50, y: 15 },
     specs: {
       area: "520 Sq.Ft Open Decking",
       ceiling: "Open Sky with Pergola Shading",
@@ -270,11 +367,25 @@ const ROOMS_DATA: Room360[] = [
         yaw: 1.35,
         pitch: 0.12
       }
+    ],
+    portals: [
+      {
+        id: "portal-down-to-living",
+        targetRoomIndex: 0,
+        label: "Take Stairs to Living Atrium",
+        sublabel: "Lower Level",
+        yaw: 1.85,
+        pitch: -0.22
+      }
+    ],
+    dimensions: [
+      { id: "dim-8", label: "Open Deck Area", value: "↔ 520 Sq.Ft Deck", yaw: -0.45, pitch: -0.35 },
+      { id: "dim-9", label: "Glass Railing Height", value: "↕ 3' 6\" Safety Glass", yaw: 0.22, pitch: -0.25 }
     ]
   }
 ];
 
-// WebGL Equirectangular Shader Sources
+// WebGL Equirectangular Shader Sources with fract wrapping and night mode grading
 const VS_SOURCE = `
 attribute vec2 a_position;
 varying vec2 v_uv;
@@ -291,6 +402,7 @@ uniform float u_yaw;
 uniform float u_pitch;
 uniform float u_fov;
 uniform float u_aspect;
+uniform float u_night_factor;
 varying vec2 v_uv;
 
 #define PI 3.14159265358979323846
@@ -327,7 +439,15 @@ void main() {
     clamp(lat / PI + 0.5, 0.001, 0.999)
   );
 
-  gl_FragColor = texture2D(u_image, texCoord);
+  vec4 col = texture2D(u_image, texCoord);
+
+  // Night Mode grading: Warm 2700K ambient luxury tint
+  if (u_night_factor > 0.0) {
+    vec3 nightTint = vec3(col.r * 1.05 + 0.02, col.g * 0.88, col.b * 0.72) * 0.85;
+    col.rgb = mix(col.rgb, nightTint, u_night_factor);
+  }
+
+  gl_FragColor = col;
 }
 `;
 
@@ -343,6 +463,12 @@ export default function InteriorTour360() {
   const [isLoadingTexture, setIsLoadingTexture] = useState<boolean>(true);
   const [showGestureGuide, setShowGestureGuide] = useState<boolean>(true);
 
+  // Tour Pro 360 Feature States
+  const [showFloorPlan, setShowFloorPlan] = useState<boolean>(true);
+  const [showSceneReel, setShowSceneReel] = useState<boolean>(true);
+  const [isNightMode, setIsNightMode] = useState<boolean>(false);
+  const [showDimensions, setShowDimensions] = useState<boolean>(false);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
@@ -355,6 +481,7 @@ export default function InteriorTour360() {
   const fovRef = useRef<number>(1.25);
   const autoRotateRef = useRef<boolean>(true);
   const isDraggingRef = useRef<boolean>(false);
+  const nightFactorRef = useRef<number>(0);
 
   // Keep refs in sync for 60fps render loop
   useEffect(() => {
@@ -372,6 +499,9 @@ export default function InteriorTour360() {
   useEffect(() => {
     isDraggingRef.current = isDragging;
   }, [isDragging]);
+  useEffect(() => {
+    nightFactorRef.current = isNightMode ? 0.75 : 0.0;
+  }, [isNightMode]);
 
   const activeRoom = ROOMS_DATA[activeRoomIndex];
 
@@ -475,7 +605,7 @@ export default function InteriorTour360() {
     gl.enableVertexAttribArray(posAttr);
     gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
 
-    // Initial placeholder texture
+    // Initial placeholder texture with CLAMP_TO_EDGE
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -521,6 +651,7 @@ export default function InteriorTour360() {
       gl.uniform1f(gl.getUniformLocation(prog, "u_pitch"), pitchRef.current);
       gl.uniform1f(gl.getUniformLocation(prog, "u_fov"), fovRef.current);
       gl.uniform1f(gl.getUniformLocation(prog, "u_aspect"), aspect);
+      gl.uniform1f(gl.getUniformLocation(prog, "u_night_factor"), nightFactorRef.current);
       gl.uniform1i(gl.getUniformLocation(prog, "u_image"), 0);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -583,15 +714,7 @@ export default function InteriorTour360() {
       fallbackImg.crossOrigin = "anonymous";
       fallbackImg.src = activeRoom.fallbackImage;
       fallbackImg.onload = () => {
-        // Draw onto a 2:1 canvas to format as panoramic texture
-        const c = document.createElement("canvas");
-        c.width = 1600;
-        c.height = 800;
-        const ctx = c.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(fallbackImg, 0, 0, 1600, 800);
-          onTextureReady(c);
-        }
+        onTextureReady(fallbackImg);
       };
       fallbackImg.onerror = () => {
         onTextureReady(createFallbackTexture());
@@ -662,8 +785,17 @@ export default function InteriorTour360() {
     }
   };
 
-  // Project Hotspot into screen coordinates
-  const getHotspotScreenPos = (hs: Hotspot) => {
+  // Switch room with smooth view reset
+  const switchRoom = (idx: number, targetYaw: number = 0) => {
+    setActiveRoomIndex(idx);
+    setYaw(targetYaw);
+    setPitch(0);
+    yawRef.current = targetYaw;
+    pitchRef.current = 0;
+  };
+
+  // Generic 3D-to-2D perspective projection for screen markers
+  const projectAngleToScreen = (targetYaw: number, targetPitch: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
 
@@ -676,16 +808,16 @@ export default function InteriorTour360() {
     const currentPitch = pitchRef.current;
     const currentFov = fovRef.current;
 
-    let deltaYaw = hs.yaw - currentYaw;
+    let deltaYaw = targetYaw - currentYaw;
     while (deltaYaw > Math.PI) deltaYaw -= 2 * Math.PI;
     while (deltaYaw < -Math.PI) deltaYaw += 2 * Math.PI;
 
-    const deltaPitch = hs.pitch - currentPitch;
+    const deltaPitch = targetPitch - currentPitch;
     const halfFovX = (currentFov * 0.5) * aspect;
     const halfFovY = currentFov * 0.5;
 
-    // Hotspot visible check
-    if (Math.abs(deltaYaw) > halfFovX + 0.15 || Math.abs(deltaPitch) > halfFovY + 0.15) {
+    // Visibility test
+    if (Math.abs(deltaYaw) > halfFovX + 0.18 || Math.abs(deltaPitch) > halfFovY + 0.18) {
       return null;
     }
 
@@ -695,7 +827,7 @@ export default function InteriorTour360() {
     const screenX = (width * 0.5) + (Math.tan(deltaYaw) / tanHalfFovX) * (width * 0.5);
     const screenY = (height * 0.5) - (Math.tan(deltaPitch) / tanHalfFov) * (height * 0.5);
 
-    if (screenX < 20 || screenX > width - 20 || screenY < 20 || screenY > height - 20) {
+    if (screenX < 24 || screenX > width - 24 || screenY < 24 || screenY > height - 24) {
       return null;
     }
 
@@ -703,8 +835,12 @@ export default function InteriorTour360() {
   };
 
   // Compass Heading calculation
+  const getCompassDegrees = () => {
+    return Math.round(((yawRef.current * 180) / Math.PI) % 360);
+  };
+
   const getCompassHeading = () => {
-    const degrees = Math.round(((yawRef.current * 180) / Math.PI) % 360);
+    const degrees = getCompassDegrees();
     const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
     const index = Math.round(degrees / 45) % 8;
     return `${dirs[index]} ${degrees}°`;
@@ -716,7 +852,7 @@ export default function InteriorTour360() {
 
   const handleOpenWhatsApp = () => {
     const text = encodeURIComponent(
-      `Hi Danam Holdings, I was exploring the 360° Interior Room Tour of the ${activeRoom.title} and would like to discuss interior fit-outs and structural planning for my project.`
+      `Hi Danam Holdings, I was exploring the Tour Pro 360° Walkthrough of the ${activeRoom.title} and would like to discuss interior fit-outs and structural planning for my project.`
     );
     window.open(`https://wa.me/918110006913?text=${text}`, "_blank");
   };
@@ -741,27 +877,24 @@ export default function InteriorTour360() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-brand-forest/15 border border-brand-forest/30 text-brand-leaf-light text-xs font-bold uppercase tracking-wider mb-2.5">
                 <Rotate3D className="w-3.5 h-3.5 animate-spin-slow text-amber-400" />
-                <span>360° Immersive Interior Walkthrough</span>
+                <span>Tour Pro 360° Architectural Walkthrough</span>
               </div>
               <h2 className="font-display text-2xl md:text-4xl font-bold tracking-tight text-white">
                 Step Inside Your Landmark Building
               </h2>
               <p className="font-ui text-xs md:text-sm text-white/70 max-w-2xl mt-1.5 leading-relaxed">
-                Walk through every key room before ground-break. Orbit 360° horizontally & vertically to inspect spatial volumes, natural light, and luxury civil finishes.
+                Tour Pro 360 experience: Interactive floor plan radar, door-to-door room portals, day & night mood lighting, and engineering specs.
               </p>
             </div>
 
-            {/* Room Selector Pills (Desktop & Mobile Horizontal Scroll) */}
+            {/* Room Selector Quick Pills */}
             <div className="flex items-center bg-[#0d1117] border border-white/15 p-1 rounded-2xl shadow-xl overflow-x-auto max-w-full gap-1">
               {ROOMS_DATA.map((room, idx) => {
                 const isActive = activeRoomIndex === idx;
                 return (
                   <button
                     key={room.id}
-                    onClick={() => {
-                      setActiveRoomIndex(idx);
-                      resetView();
-                    }}
+                    onClick={() => switchRoom(idx)}
                     className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl font-ui text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap ${
                       isActive
                         ? "bg-brand-forest text-white shadow-lg ring-1 ring-white/20"
@@ -802,7 +935,7 @@ export default function InteriorTour360() {
             }}
             onTouchEnd={handlePointerUp}
             className={`relative w-full overflow-hidden bg-black cursor-grab active:cursor-grabbing select-none ${
-              isFullscreen ? "h-[calc(100vh-140px)]" : "h-[380px] sm:h-[460px] lg:h-[520px]"
+              isFullscreen ? "h-[calc(100vh-140px)]" : "h-[400px] sm:h-[480px] lg:h-[540px]"
             }`}
             style={{ touchAction: "none" }}
           >
@@ -828,21 +961,58 @@ export default function InteriorTour360() {
               </div>
             </div>
 
-            {/* Top-Right: Quick Control HUD (Auto Cruise, Zoom, Fullscreen) */}
+            {/* Top-Right: Tour Pro HUD Controls Bar */}
             <div className="absolute top-4 right-4 z-25 flex items-center gap-1.5 bg-[#0b0e14]/90 backdrop-blur-md border border-white/20 p-1 rounded-2xl shadow-xl pointer-events-auto select-none">
+              
+              {/* Floor Plan Radar Toggle */}
+              <button
+                onClick={() => setShowFloorPlan(!showFloorPlan)}
+                className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-xs font-mono font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                  showFloorPlan ? "bg-amber-500/25 text-amber-300 border border-amber-400/40" : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+                title="Toggle Floor Plan Mini-Map"
+              >
+                <Map className="w-4 h-4 text-amber-400" />
+                <span className="text-[11px] uppercase hidden sm:inline">Map</span>
+              </button>
+
+              {/* Day / Night Mood Toggle */}
+              <button
+                onClick={() => setIsNightMode(!isNightMode)}
+                className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-xs font-mono font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                  isNightMode ? "bg-indigo-600/30 text-indigo-300 border border-indigo-400/40" : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+                title="Toggle Day / Night Architectural Lighting"
+              >
+                {isNightMode ? <Moon className="w-4 h-4 text-indigo-300" /> : <Sun className="w-4 h-4 text-amber-400" />}
+                <span className="text-[11px] uppercase hidden sm:inline">{isNightMode ? "Night" : "Day"}</span>
+              </button>
+
+              {/* Dimensions Tool Toggle */}
+              <button
+                onClick={() => setShowDimensions(!showDimensions)}
+                className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-xs font-mono font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                  showDimensions ? "bg-emerald-600/30 text-emerald-300 border border-emerald-400/40" : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+                title="Toggle Architectural Room Dimensions"
+              >
+                <Ruler className="w-4 h-4 text-emerald-400" />
+                <span className="text-[11px] uppercase hidden sm:inline">Ruler</span>
+              </button>
+
+              {/* Auto Cruise Toggle */}
               <button
                 onClick={() => setAutoRotate(!autoRotate)}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-mono font-semibold transition-all flex items-center gap-1 cursor-pointer ${
-                  autoRotate
-                    ? "bg-brand-forest text-white"
-                    : "text-white/70 hover:text-white hover:bg-white/10"
+                className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-xs font-mono font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                  autoRotate ? "bg-brand-forest text-white" : "text-white/70 hover:text-white hover:bg-white/10"
                 }`}
                 title="Toggle Auto Rotation Cruise"
               >
                 {autoRotate ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                <span className="text-[11px] uppercase hidden sm:inline">{autoRotate ? "Cruising" : "Cruise"}</span>
+                <span className="text-[11px] uppercase hidden sm:inline">{autoRotate ? "Cruise" : "Play"}</span>
               </button>
 
+              {/* Zoom Controls */}
               <button
                 onClick={zoomOut}
                 className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-xl transition-colors cursor-pointer"
@@ -859,6 +1029,7 @@ export default function InteriorTour360() {
                 <ZoomIn className="w-4 h-4" />
               </button>
 
+              {/* Reset View */}
               <button
                 onClick={resetView}
                 className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-xl transition-colors cursor-pointer"
@@ -867,6 +1038,7 @@ export default function InteriorTour360() {
                 <RotateCcw className="w-4 h-4" />
               </button>
 
+              {/* Fullscreen */}
               <button
                 onClick={toggleFullscreen}
                 className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-xl transition-colors cursor-pointer"
@@ -888,7 +1060,7 @@ export default function InteriorTour360() {
                   </div>
                   <div>
                     <h5 className="text-white text-xs font-bold uppercase tracking-wider">Drag to look 360° around the room</h5>
-                    <p className="text-white/60 text-[11px] mt-0.5">Horizontal 360° orbit · Vertical tilt · Tap pins for specs</p>
+                    <p className="text-white/60 text-[11px] mt-0.5">Use walk chevrons to move between rooms · Check floor plan</p>
                   </div>
                   <span className="text-[10px] text-amber-400 font-mono uppercase bg-amber-400/10 px-2 py-1 rounded-md border border-amber-400/20">
                     Tap to start
@@ -897,9 +1069,87 @@ export default function InteriorTour360() {
               </div>
             )}
 
+            {/* Tour Pro 360: Floor Walkthrough Navigation Chevrons ("Walk to Room") */}
+            {activeRoom.portals.map((portal) => {
+              const pos = projectAngleToScreen(portal.yaw, portal.pitch);
+              if (!pos) return null;
+
+              return (
+                <div
+                  key={portal.id}
+                  style={{
+                    position: "absolute",
+                    left: `${pos.x}px`,
+                    top: `${pos.y}px`,
+                    transform: "translate(-50%, -50%)",
+                    zIndex: 35
+                  }}
+                  className="pointer-events-auto"
+                >
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      switchRoom(portal.targetRoomIndex);
+                    }}
+                    className="group flex flex-col items-center cursor-pointer transition-transform duration-300 hover:scale-110"
+                    title={portal.label}
+                  >
+                    {/* Pulsing Floor Target Rings */}
+                    <div className="relative w-11 h-11 flex items-center justify-center">
+                      <span className="absolute inset-0 rounded-full border-2 border-emerald-400/50 animate-ping" />
+                      <span className="absolute inset-1 rounded-full bg-emerald-500/20 border border-emerald-400/80" />
+                      
+                      <div className="relative w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg group-hover:bg-emerald-400 transition-colors">
+                        <Footprints className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+
+                    {/* Portal Badge Card */}
+                    <div className="mt-1.5 bg-[#0b0e14]/95 backdrop-blur-md border border-emerald-500/40 px-3 py-1.5 rounded-xl shadow-2xl text-center group-hover:border-emerald-400 transition-colors whitespace-nowrap">
+                      <span className="text-xs font-bold text-emerald-300 block leading-tight">
+                        {portal.label}
+                      </span>
+                      <span className="text-[10px] font-mono text-white/50 block">
+                        {portal.sublabel}
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              );
+            })}
+
+            {/* Architectural Dimension Callouts (When Ruler tool is active) */}
+            {showDimensions && activeRoom.dimensions.map((dim) => {
+              const pos = projectAngleToScreen(dim.yaw, dim.pitch);
+              if (!pos) return null;
+
+              return (
+                <div
+                  key={dim.id}
+                  style={{
+                    position: "absolute",
+                    left: `${pos.x}px`,
+                    top: `${pos.y}px`,
+                    transform: "translate(-50%, -50%)",
+                    zIndex: 30
+                  }}
+                  className="pointer-events-none select-none animate-in fade-in zoom-in duration-300"
+                >
+                  <div className="bg-[#0b0e14]/90 backdrop-blur-md border border-emerald-400/60 px-3 py-1.5 rounded-lg shadow-xl text-center">
+                    <span className="text-[10px] font-mono text-white/60 block uppercase">
+                      {dim.label}
+                    </span>
+                    <span className="text-xs font-bold font-mono text-emerald-400 block">
+                      {dim.value}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+
             {/* Interactive Hotspot Pins Rendered on Top of Canvas */}
             {activeRoom.hotspots.map((hs) => {
-              const pos = getHotspotScreenPos(hs);
+              const pos = projectAngleToScreen(hs.yaw, hs.pitch);
               if (!pos) return null;
               const isSelected = selectedHotspot?.id === hs.id;
 
@@ -911,7 +1161,7 @@ export default function InteriorTour360() {
                     left: `${pos.x}px`,
                     top: `${pos.y}px`,
                     transform: "translate(-50%, -50%)",
-                    zIndex: isSelected ? 40 : 25
+                    zIndex: isSelected ? 45 : 25
                   }}
                   className="pointer-events-auto"
                 >
@@ -940,6 +1190,95 @@ export default function InteriorTour360() {
                 </div>
               );
             })}
+
+            {/* Tour Pro 360 Feature: Interactive 2D Floor Plan with Real-Time Rotating Radar Cone */}
+            {showFloorPlan && (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="absolute top-16 left-4 z-35 bg-[#0b0e14]/95 backdrop-blur-xl border border-white/20 rounded-2xl p-3 shadow-2xl w-[190px] sm:w-[220px] transition-all animate-in fade-in slide-in-from-top-2 duration-300 select-none"
+              >
+                <div className="flex justify-between items-center mb-2 pb-1.5 border-b border-white/10 text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <Map className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="font-mono text-[10px] font-bold text-white uppercase tracking-wider">Villa Floor Plan</span>
+                  </div>
+                  <button
+                    onClick={() => setShowFloorPlan(false)}
+                    className="text-white/40 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+
+                {/* Floor Plan Blueprint Layout Visualizer */}
+                <div className="relative w-full h-[140px] bg-[#07090d] border border-white/15 rounded-xl overflow-hidden p-2">
+                  {/* Grid Lines */}
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:10px_10px] pointer-events-none" />
+
+                  {/* Room Boundary Blocks */}
+                  {ROOMS_DATA.map((room, rIdx) => {
+                    const isCurrent = activeRoomIndex === rIdx;
+                    return (
+                      <button
+                        key={room.id}
+                        onClick={() => switchRoom(rIdx)}
+                        style={{
+                          left: `${room.mapCoords.x}%`,
+                          top: `${room.mapCoords.y}%`,
+                          transform: "translate(-50%, -50%)"
+                        }}
+                        className="absolute flex flex-col items-center cursor-pointer group z-10"
+                        title={`Jump to ${room.name}`}
+                      >
+                        {/* Radar Cone on Active Room Node */}
+                        {isCurrent && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              width: "70px",
+                              height: "70px",
+                              transform: `rotate(${getCompassDegrees() + 90}deg)`,
+                              pointerEvents: "none",
+                              zIndex: 5
+                            }}
+                          >
+                            <svg viewBox="0 0 100 100" className="w-full h-full filter drop-shadow">
+                              {/* 60-degree Field of view Radar light beam */}
+                              <path
+                                d="M 50 50 L 20 5 A 50 50 0 0 1 80 5 Z"
+                                fill="rgba(197, 168, 128, 0.4)"
+                                stroke="rgba(197, 168, 128, 0.8)"
+                                strokeWidth="1"
+                              />
+                            </svg>
+                          </div>
+                        )}
+
+                        {/* Node Beacon */}
+                        <div className={`relative w-4 h-4 rounded-full flex items-center justify-center transition-all ${
+                          isCurrent
+                            ? "bg-amber-400 ring-4 ring-amber-400/30 scale-125"
+                            : "bg-white/30 hover:bg-white hover:scale-110"
+                        }`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${isCurrent ? "bg-stone-950" : "bg-white"}`} />
+                        </div>
+
+                        <span className={`text-[8px] font-mono tracking-wider uppercase mt-1 px-1 py-0.2 rounded whitespace-nowrap ${
+                          isCurrent ? "bg-amber-400/20 text-amber-300 font-bold" : "text-white/50 group-hover:text-white"
+                        }`}>
+                          {room.name.split(" ")[0]}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-2 flex items-center justify-between text-[9px] font-mono text-white/50">
+                  <span>Golden cone = Radar FOV</span>
+                  <span className="text-amber-400">Click node to jump</span>
+                </div>
+              </div>
+            )}
 
             {/* Hotspot Detailed Popover Card */}
             {selectedHotspot && (
@@ -999,10 +1338,51 @@ export default function InteriorTour360() {
               </div>
             )}
 
-            {/* Bottom Floating Info Pill */}
-            <div className="absolute bottom-4 right-4 z-20 pointer-events-none select-none hidden sm:flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full text-white/60 text-[10px] font-mono">
+            {/* Tour Pro 360: Collapsible Bottom Thumbnail Scene Strip (Tour Reel) */}
+            {showSceneReel && (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="absolute bottom-4 left-4 right-4 z-25 flex justify-center pointer-events-auto"
+              >
+                <div className="flex items-center gap-2 bg-[#0b0e14]/90 backdrop-blur-xl border border-white/20 p-1.5 rounded-2xl shadow-2xl overflow-x-auto max-w-full">
+                  {ROOMS_DATA.map((room, rIdx) => {
+                    const isCurrent = activeRoomIndex === rIdx;
+                    return (
+                      <button
+                        key={room.id}
+                        onClick={() => switchRoom(rIdx)}
+                        className={`group relative flex items-center gap-2 px-2.5 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                          isCurrent
+                            ? "bg-brand-forest/60 border border-amber-400/80 shadow-md ring-1 ring-amber-400/40"
+                            : "hover:bg-white/10 border border-transparent"
+                        }`}
+                      >
+                        <div className="w-9 h-7 rounded-lg overflow-hidden bg-stone-900 shrink-0 border border-white/20">
+                          <img
+                            src={room.fallbackImage}
+                            alt={room.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                          />
+                        </div>
+                        <div className="text-left">
+                          <span className={`text-[11px] font-bold block leading-tight ${isCurrent ? "text-amber-300" : "text-white/80"}`}>
+                            {room.name}
+                          </span>
+                          <span className="text-[9px] font-mono text-white/40 block">
+                            {room.specs.area.split(" ")[0]} Sq.Ft
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Bottom Floating Info Pill (Desktop only) */}
+            <div className="absolute bottom-4 right-4 z-20 pointer-events-none select-none hidden lg:flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full text-white/60 text-[10px] font-mono">
               <Info className="w-3 h-3 text-amber-400" />
-              <span>FOV: {Math.round((fov * 180) / Math.PI)}° · Drag to Orbit · Click Golden Pins for Specs</span>
+              <span>Tour Pro 360 · Radar Floor Plan · Click Chevrons to Walk</span>
             </div>
           </div>
 
