@@ -268,6 +268,15 @@ export default function Project3DExperience() {
               <Layers className="w-3.5 h-3.5" />
               <span>Civil Specs</span>
             </button>
+
+            <a
+              href="#interior-360-tour"
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 border border-amber-500/30"
+              title="Step Inside Interior 360 Rooms"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+              <span>Step Inside 360°</span>
+            </a>
           </div>
         </div>
 
@@ -495,6 +504,14 @@ export default function Project3DExperience() {
                   >
                     Reset view
                   </button>
+                  <a
+                    href="#interior-360-tour"
+                    className="text-[#C5A880] hover:text-white text-[11px] flex items-center gap-1 transition-colors font-semibold uppercase tracking-wider"
+                    title="Step Inside 360 Rooms"
+                  >
+                    <span>Interior 360°</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </a>
                   <a
                     href="/skyline-villas.html"
                     target="_blank"

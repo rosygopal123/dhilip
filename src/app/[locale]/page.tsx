@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useLanguage } from "@/i18n/LanguageContext";
 import ScrollCanvas from "@/components/ScrollCanvas";
 import Project3DExperience from "@/components/Project3DExperience";
+import InteriorTour360 from "@/components/InteriorTour360";
 import { ChevronRight, Star, ShieldCheck, Award, Building2, CheckCircle2 } from "lucide-react";
 
 // Custom Stat Counter Component
@@ -144,8 +145,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. Interactive 3D Project Experience (User Requested) */}
+      {/* 3. Interactive 3D Project Experience (Exterior Walkaround) */}
       <Project3DExperience />
+
+      {/* 4. 360° Interior Room-by-Room Architectural Walkthrough */}
+      <InteriorTour360 />
 
       {/* 4. Core Offerings Grid */}
       <section className="py-24 bg-surface-0 border-b border-border-subtle text-center">
