@@ -24,6 +24,7 @@ export interface ProjectItem {
   glbModel: string;
   modelAuthor: string;
   cameraOrbit?: string;
+  cameraTarget?: string;
   fieldOfView?: string;
   rooms360: Project360Room[];
   civilSpecs: {

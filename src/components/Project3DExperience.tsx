@@ -28,6 +28,7 @@ export interface Project3DItem {
   glbModel: string;
   thumbnail: string;
   author: string;
+  cameraTarget?: string;
   specs: {
     structure: string;
     steel: string;
@@ -51,6 +52,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     glbModel: "/models/villa.glb",
     thumbnail: "/images/danam/about-villa.webp",
     author: "Zigurat Architecture Studio",
+    cameraTarget: "0m 4.5m -5m",
     specs: {
       structure: "Seismic Zone-III Earthquake Resistant RCC Frame",
       steel: "Fe550D High-Ductility TMT Rebars",
@@ -76,6 +78,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     glbModel: "/models/LuxuryVilla_site_draco.glb",
     thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
     author: "Zigurat Architecture Studio",
+    cameraTarget: "0m 4.5m -5m",
     specs: {
       structure: "Engineered Monolithic Shear Wall + Column RCC",
       steel: "TATA Tiscon 550D Super Ductile",
@@ -201,6 +204,7 @@ export default function Project3DExperience() {
     if (!mv) return;
     try {
       mv.cameraOrbit = `35deg 72deg ${isMobile ? 95 : 80}%`;
+      mv.cameraTarget = selectedProject.cameraTarget || "0m 4.5m -5m";
       mv.fieldOfView = "30deg";
       mv.setAttribute("auto-rotate", "");
     } catch (e) {
@@ -320,7 +324,7 @@ export default function Project3DExperience() {
                     </div>
                   </div>
 
-                  {/* Clean Interactive Zoom Controls in Top-Right */}
+                  {/* Clean Interactive Zoom & Reset Controls in Top-Right */}
                   <div className="absolute top-2.5 right-3 z-25 flex items-center gap-1 bg-[#0a0a0d]/95 backdrop-blur-md border border-white/15 p-1 rounded-xl shadow-xl pointer-events-auto select-none">
                     <button
                       onClick={zoomCameraOut}
@@ -337,6 +341,14 @@ export default function Project3DExperience() {
                     >
                       <ZoomIn className="w-3.5 h-3.5" />
                       <span className="text-[10px] uppercase hidden sm:inline">Zoom In</span>
+                    </button>
+                    <button
+                      onClick={resetCamera}
+                      className="px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer border-l border-white/20 flex items-center gap-1"
+                      title="Reset View to Center"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span className="text-[10px] uppercase hidden sm:inline">Reset</span>
                     </button>
                   </div>
 
@@ -406,6 +418,7 @@ export default function Project3DExperience() {
                       rotation-per-second="6deg"
                       auto-rotate-delay="0"
                       camera-orbit={`35deg 72deg ${isMobile ? 95 : 80}%`}
+                      camera-target={selectedProject.cameraTarget || "0m 4.5m -5m"}
                       min-camera-orbit="auto auto 40%"
                       max-camera-orbit="auto auto 200%"
                       field-of-view="30deg"
