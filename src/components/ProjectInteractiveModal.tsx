@@ -720,10 +720,12 @@ export default function ProjectInteractiveModal({
               {/* Gesture Hint overlay */}
               {showGestureGuide && (
                 <div
-                  onClick={() => setShowGestureGuide(false)}
-                  className="absolute inset-0 z-30 flex items-center justify-center pointer-events-auto cursor-grab bg-black/25 backdrop-blur-xs transition-opacity duration-500"
+                  className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none transition-opacity duration-500"
                 >
-                  <div className="bg-[#0b0e14]/95 border border-white/25 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-bounce">
+                  <div
+                    onClick={() => setShowGestureGuide(false)}
+                    className="bg-[#0b0e14]/95 border border-white/25 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-bounce pointer-events-auto cursor-pointer"
+                  >
                     <Rotate3D className="w-5 h-5 text-amber-400 animate-spin-slow" />
                     <div>
                       <h5 className="text-white text-xs font-bold uppercase tracking-wider">Drag to Orbit 360° Around Building</h5>

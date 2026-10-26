@@ -323,13 +323,10 @@ export default function Project3DExperience() {
                     </button>
                   </div>
 
-                  {/* Exact White Pointer Hand & Arrows (Dismisses immediately when touched or clicked) */}
+                  {/* Exact White Pointer Hand & Arrows (Non-blocking, dismisses on touch/interaction) */}
                   {showGestureHint && (
                     <div
-                      onMouseDown={dismissGestureHint}
-                      onTouchStart={dismissGestureHint}
-                      onClick={dismissGestureHint}
-                      className="absolute inset-0 z-30 flex items-center justify-center pointer-events-auto cursor-grab active:cursor-grabbing select-none transition-opacity duration-500"
+                      className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none select-none transition-opacity duration-500"
                     >
                       <div
                         className="flex items-center gap-3 drop-shadow-[0_6px_20px_rgba(0,0,0,1)] filter pointer-events-none"
@@ -364,10 +361,11 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Google <model-viewer>: 100% Native WebGL 3D, Zero External Iframes, Zero Overlays */}
+                  {/* Google <model-viewer>: 100% Native WebGL 3D, Eager load with poster so model/image is immediately visible */}
                   <div
                     onMouseDown={dismissGestureHint}
                     onTouchStart={dismissGestureHint}
+                    onPointerDown={dismissGestureHint}
                     onClick={dismissGestureHint}
                     className="w-full h-full flex items-center justify-center overflow-hidden bg-[#0a0a0d] relative cursor-grab active:cursor-grabbing"
                   >
@@ -375,6 +373,7 @@ export default function Project3DExperience() {
                       ref={modelViewerRef}
                       key={selectedProject.id}
                       src={selectedProject.glbModel}
+                      poster={selectedProject.thumbnail}
                       alt={selectedProject.title}
                       camera-controls
                       auto-rotate
@@ -387,7 +386,7 @@ export default function Project3DExperience() {
                       shadow-intensity="1.2"
                       shadow-softness="0.8"
                       exposure="1.0"
-                      loading="lazy"
+                      loading="eager"
                       reveal="auto"
                       interaction-prompt="none"
                       style={{
