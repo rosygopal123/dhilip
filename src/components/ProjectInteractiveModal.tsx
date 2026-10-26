@@ -643,7 +643,6 @@ export default function ProjectInteractiveModal({
                 <model-viewer
                   ref={modelViewerRef}
                   src={project.glbModel}
-                  poster={project.img}
                   alt={project.title}
                   auto-rotate
                   auto-rotate-delay="1000"

@@ -97,6 +97,7 @@ export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
   const [activeView, setActiveView] = useState<"3d" | "photos" | "specs">("3d");
   const [is3dLoaded, setIs3dLoaded] = useState(false);
+  const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -124,6 +125,22 @@ export default function Project3DExperience() {
     s.onload = () => setIs3dLoaded(true);
     document.body.appendChild(s);
   }, []);
+
+  // Track 3D model load completion to display gesture hint directly over the rendered 3D model
+  useEffect(() => {
+    setIsModelLoaded(false);
+    const mv = modelViewerRef.current;
+    if (!mv) return;
+
+    const handleModelLoad = () => {
+      setIsModelLoaded(true);
+    };
+
+    mv.addEventListener("load", handleModelLoad);
+    return () => {
+      mv.removeEventListener("load", handleModelLoad);
+    };
+  }, [selectedProject.id, is3dLoaded]);
 
   // Stop auto-rotation permanently when user touches, drags, or wheels over the model
   useEffect(() => {
@@ -323,8 +340,18 @@ export default function Project3DExperience() {
                     </button>
                   </div>
 
-                  {/* Exact White Pointer Hand & Arrows (Non-blocking, dismisses on touch/interaction) */}
-                  {showGestureHint && (
+                  {/* Architectural 3D Loading Spinner (Visible while GLB streams directly into WebGL) */}
+                  {!isModelLoaded && (
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0a0a0d] pointer-events-none">
+                      <div className="w-10 h-10 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
+                      <span className="mt-3 text-xs font-mono tracking-widest text-emerald-400/90 uppercase">
+                        Loading 3D Architectural Model...
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Exact White Pointer Hand & Arrows (Non-blocking, only visible once 3D model is active) */}
+                  {isModelLoaded && showGestureHint && (
                     <div
                       className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none select-none transition-opacity duration-500"
                     >
@@ -361,7 +388,7 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Google <model-viewer>: 100% Native WebGL 3D, Eager load with poster so model/image is immediately visible */}
+                  {/* Google <model-viewer>: 100% Native WebGL 3D (No static 2D poster image) */}
                   <div
                     onMouseDown={dismissGestureHint}
                     onTouchStart={dismissGestureHint}
@@ -373,7 +400,6 @@ export default function Project3DExperience() {
                       ref={modelViewerRef}
                       key={selectedProject.id}
                       src={selectedProject.glbModel}
-                      poster={selectedProject.thumbnail}
                       alt={selectedProject.title}
                       camera-controls
                       auto-rotate
@@ -396,7 +422,9 @@ export default function Project3DExperience() {
                         outline: "none",
                         touchAction: "pan-y",
                       }}
-                    />
+                    >
+                      <div slot="progress-bar" style={{ display: "none" }} />
+                    </model-viewer>
                   </div>
                 </div>
               )}
