@@ -182,7 +182,7 @@ export default function ProjectInteractiveModal({
     if (!mv) return;
 
     const stopRotate = () => {
-      mv.removeAttribute("auto-rotate");
+      mv.setAttribute("rotation-per-second", "0deg");
       setShowGestureGuide(false);
     };
 
@@ -507,6 +507,7 @@ export default function ProjectInteractiveModal({
       mv.cameraOrbit = project?.cameraOrbit || "35deg 72deg 80%";
       mv.cameraTarget = project?.cameraTarget || "0m 4.5m -5m";
       mv.fieldOfView = project?.fieldOfView || "30deg";
+      mv.setAttribute("rotation-per-second", "18deg");
       mv.setAttribute("auto-rotate", "");
     } catch (e) {
       console.warn("Reset camera error:", e);
@@ -646,7 +647,7 @@ export default function ProjectInteractiveModal({
                   src={project.glbModel}
                   alt={project.title}
                   auto-rotate
-                  auto-rotate-delay="1000"
+                  auto-rotate-delay="3000"
                   rotation-per-second="18deg"
                   camera-controls
                   interaction-prompt="auto"

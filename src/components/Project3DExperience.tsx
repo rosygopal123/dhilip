@@ -145,13 +145,13 @@ export default function Project3DExperience() {
     };
   }, [selectedProject.id, is3dLoaded]);
 
-  // Stop auto-rotation permanently when user touches, drags, or wheels over the model
+  // Stop auto-rotation smoothly without snapping when user interacts with the model
   useEffect(() => {
     const mv = modelViewerRef.current;
     if (!mv) return;
 
     const stopRotate = () => {
-      mv.removeAttribute("auto-rotate");
+      mv.setAttribute("rotation-per-second", "0deg");
       setShowGestureHint(false);
     };
 
@@ -170,7 +170,7 @@ export default function Project3DExperience() {
     setShowGestureHint(false);
     const mv = modelViewerRef.current;
     if (mv) {
-      mv.removeAttribute("auto-rotate");
+      mv.setAttribute("rotation-per-second", "0deg");
     }
   };
 
@@ -402,10 +402,7 @@ export default function Project3DExperience() {
 
                   {/* Google <model-viewer>: 100% Native WebGL 3D (No static 2D poster image) */}
                   <div
-                    onMouseDown={dismissGestureHint}
-                    onTouchStart={dismissGestureHint}
                     onPointerDown={dismissGestureHint}
-                    onClick={dismissGestureHint}
                     className="w-full h-full flex items-center justify-center overflow-hidden bg-[#0a0a0d] relative cursor-grab active:cursor-grabbing"
                   >
                     <model-viewer
@@ -416,7 +413,7 @@ export default function Project3DExperience() {
                       camera-controls
                       auto-rotate
                       rotation-per-second="6deg"
-                      auto-rotate-delay="0"
+                      auto-rotate-delay="3000"
                       camera-orbit={`35deg 72deg ${isMobile ? 95 : 80}%`}
                       camera-target={selectedProject.cameraTarget || "0m 4.5m -5m"}
                       min-camera-orbit="auto auto 40%"
