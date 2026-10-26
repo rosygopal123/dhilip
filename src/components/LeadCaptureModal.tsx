@@ -63,7 +63,7 @@ export default function LeadCaptureModal() {
 
   const handleWhatsAppRedirect = () => {
     if (!submittedLead) return;
-    const waNum = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918110006913";
+    const waNum = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918883332499";
     const waText = `Hi Danam Holdings, I just requested a quick estimate (ID: ${submittedLead.id}):
 - Name: ${submittedLead.name}
 - District: ${submittedLead.district}

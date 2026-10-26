@@ -947,7 +947,7 @@ export default function InteriorTour360() {
     const text = encodeURIComponent(
       `Hi Danam Holdings, I was exploring the Tour Pro 360° Walkthrough of the ${activeRoom.title} and would like to discuss interior fit-outs and structural planning for my project.`
     );
-    window.open(`https://wa.me/918110006913?text=${text}`, "_blank");
+    window.open(`https://wa.me/918883332499?text=${text}`, "_blank");
   };
 
   return (

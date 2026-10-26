@@ -256,7 +256,7 @@ export default function AboutPage() {
                     <p>{c.desc}</p>
                     <p className="font-semibold text-text-primary">Requirements: {c.requirements}</p>
                     <a
-                      href={`https://wa.me/918110006913?text=Hi%20Danam%20Holdings%2C%20I%20am%20applying%20for%20the%20${encodeURIComponent(c.title)}%20role.`}
+                      href={`https://wa.me/918883332499?text=Hi%20Danam%20Holdings%2C%20I%20am%20applying%20for%20the%20${encodeURIComponent(c.title)}%20role.`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center bg-brand-forest hover:bg-brand-forest-dark text-white font-bold py-2 px-4 uppercase tracking-wider font-mono text-[10px] rounded-lg self-start transition-colors"

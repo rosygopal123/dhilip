@@ -66,7 +66,7 @@ export default function HomeFAQ() {
         ? `Hi Danam Holdings, I have a question regarding: "${question}"`
         : `Hi Danam Holdings, I have a quick construction question about my upcoming building project.`
     );
-    window.open(`https://wa.me/918110006913?text=${text}`, "_blank");
+    window.open(`https://wa.me/918883332499?text=${text}`, "_blank");
   };
 
   return (
@@ -165,7 +165,7 @@ export default function HomeFAQ() {
               Get Free Consultation
             </button>
             <a
-              href="tel:+918110006913"
+              href="tel:+918883332499"
               className="p-2.5 rounded-xl border border-border-medium hover:border-brand-forest text-text-primary hover:text-brand-forest transition-colors"
               title="Call Us Directly"
             >

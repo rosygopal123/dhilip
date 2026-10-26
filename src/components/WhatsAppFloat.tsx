@@ -23,7 +23,7 @@ export default function WhatsAppFloat() {
   }, []);
 
   const handleLaunchWhatsApp = async (customText?: string) => {
-    const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918110006913";
+    const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918883332499";
     const textToSend =
       customText ||
       `Hi Danam Holdings, I would like to inquire about a civil construction / turnkey project in Madurai / South India. (Service: ${intent})`;

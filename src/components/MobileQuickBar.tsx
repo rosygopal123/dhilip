@@ -11,7 +11,7 @@ export default function MobileQuickBar() {
     const text = encodeURIComponent(
       "Hi Danam Holdings, I would like to consult with an engineer regarding my plot construction / renovation project."
     );
-    window.open(`https://wa.me/918110006913?text=${text}`, "_blank");
+    window.open(`https://wa.me/918883332499?text=${text}`, "_blank");
   };
 
   return (
@@ -19,7 +19,7 @@ export default function MobileQuickBar() {
       <div className="flex items-center justify-between gap-2">
         {/* Call Button */}
         <a
-          href="tel:+918110006913"
+          href="tel:+918883332499"
           className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-surface-1 border border-white/15 text-white text-xs font-semibold hover:bg-white/10 transition-colors"
         >
           <Phone className="w-3.5 h-3.5 text-amber-400" />

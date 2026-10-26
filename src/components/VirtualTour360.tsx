@@ -447,7 +447,7 @@ export default function VirtualTour360() {
             </div>
 
             <a
-              href={`https://wa.me/918110006913?text=Hi%20Danam%20Holdings%2C%20I'm%20interested%20in%20learning%20more%20about%20the%20${encodeURIComponent(selectedHotspot.title)}%20specification.`}
+              href={`https://wa.me/918883332499?text=Hi%20Danam%20Holdings%2C%20I'm%20interested%20in%20learning%20more%20about%20the%20${encodeURIComponent(selectedHotspot.title)}%20specification.`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-brand-forest hover:bg-brand-forest-dark text-white w-full py-3 rounded-xl text-xs font-semibold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 font-mono"
@@ -470,7 +470,7 @@ export default function VirtualTour360() {
         </div>
 
         <a
-          href="https://wa.me/918110006913?text=Hi%20Danam%20Holdings%2C%20I%20want%20to%20book%20a%203D%20Walkthrough%20Session%20at%20your%20Madurai%20office."
+          href="https://wa.me/918883332499?text=Hi%20Danam%20Holdings%2C%20I%20want%20to%20book%20a%203D%20Walkthrough%20Session%20at%20your%20Madurai%20office."
           target="_blank"
           rel="noopener noreferrer"
           className="bg-brand-forest hover:bg-brand-forest-dark text-white px-6 py-3 rounded-xl text-xs font-semibold uppercase tracking-widest transition-all duration-300 shrink-0 font-mono"

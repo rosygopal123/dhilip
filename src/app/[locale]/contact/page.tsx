@@ -51,7 +51,7 @@ export default function ContactPage() {
 - 100% Vastu: ${vastu ? "Yes" : "No"}
 - Details: ${message || "Please provide itemized BOQ and site inspection."}`;
 
-      const waNum = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918110006913";
+      const waNum = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918883332499";
       const whatsappUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(waText)}`;
 
       setTimeout(() => {
@@ -138,8 +138,8 @@ export default function ContactPage() {
                     Phone Inquiries
                   </span>
                   <div className="flex flex-col gap-1 text-sm font-bold text-text-primary">
-                    <a href="tel:+918110006913" className="hover:text-brand-forest transition-colors">
-                      +91 81100 06913
+                    <a href="tel:+918883332499" className="hover:text-brand-forest transition-colors">
+                      +91 88833 32499
                     </a>
                     <a href="tel:+919597402305" className="hover:text-brand-forest transition-colors">
                       +91 95974 02305

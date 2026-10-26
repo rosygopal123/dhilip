@@ -182,7 +182,6 @@ export default function ProjectInteractiveModal({
     if (!mv) return;
 
     const stopRotate = () => {
-      mv.setAttribute("rotation-per-second", "0deg");
       setShowGestureGuide(false);
     };
 
@@ -527,7 +526,7 @@ export default function ProjectInteractiveModal({
     const msg = encodeURIComponent(
       `Hi Danam Holdings, I am reviewing the 3D Elevation & 360° VR View for "${project.title}" (${project.location}) and would like to build a similar project.`
     );
-    window.open(`https://wa.me/918110006913?text=${msg}`, "_blank");
+    window.open(`https://wa.me/918883332499?text=${msg}`, "_blank");
   };
 
   return (
@@ -646,10 +645,12 @@ export default function ProjectInteractiveModal({
                   ref={modelViewerRef}
                   src={project.glbModel}
                   alt={project.title}
-                  auto-rotate
-                  auto-rotate-delay="3000"
-                  rotation-per-second="18deg"
                   camera-controls
+                  disable-tap
+                  disable-pan
+                  auto-rotate
+                  auto-rotate-delay="999999"
+                  rotation-per-second="18deg"
                   interaction-prompt="auto"
                   shadow-intensity="1.5"
                   shadow-softness="0.8"

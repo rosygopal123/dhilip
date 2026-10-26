@@ -112,7 +112,7 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-3 xl:gap-4 shrink-0">
           {/* Quick Call */}
           <a
-            href="tel:+918110006913"
+            href="tel:+918883332499"
             className={`flex items-center gap-1.5 font-ui text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${
               useWhiteText
                 ? "text-white/90 hover:text-brand-leaf-light bg-white/10 hover:bg-white/20"
@@ -120,7 +120,7 @@ export default function Navbar() {
             }`}
           >
             <PhoneCall className="w-3.5 h-3.5" />
-            <span>+91 81100 06913</span>
+            <span>+91 88833 32499</span>
           </a>
 
           {/* Theme Toggle */}
@@ -199,11 +199,11 @@ export default function Navbar() {
 
           <div className="flex flex-col gap-2.5 pt-3 border-t border-border-subtle">
             <a
-              href="tel:+918110006913"
+              href="tel:+918883332499"
               className="flex items-center justify-center gap-2 py-2.5 bg-surface-1 border border-border-subtle rounded-lg text-xs font-bold text-brand-forest"
             >
               <PhoneCall className="w-4 h-4" />
-              <span>Call +91 81100 06913</span>
+              <span>Call +91 88833 32499</span>
             </a>
 
             <button

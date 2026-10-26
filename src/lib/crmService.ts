@@ -252,7 +252,7 @@ export async function syncLeadToExternalCRMs(lead: Lead): Promise<{ hubspot: boo
 
   // 2. Send to Self-Hosted n8n / Open-WA / Zapier Webhook
   const openWaUrl = process.env.OPEN_WA_WEBHOOK_URL;
-  const ownerPhone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919361599097";
+  const ownerPhone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918883332499";
 
   // 3. Send Direct WhatsApp Notification via Open-WA API Server (http://localhost:8080/api/send-text)
   const openWaApiEndpoint = process.env.OPEN_WA_API_URL || "http://localhost:8080/api/send-text";

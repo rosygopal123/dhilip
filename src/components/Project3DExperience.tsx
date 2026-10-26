@@ -145,13 +145,12 @@ export default function Project3DExperience() {
     };
   }, [selectedProject.id, is3dLoaded]);
 
-  // Stop auto-rotation smoothly without snapping when user interacts with the model
+  // Hide gesture hint smoothly when user interacts with the model
   useEffect(() => {
     const mv = modelViewerRef.current;
     if (!mv) return;
 
     const stopRotate = () => {
-      mv.setAttribute("rotation-per-second", "0deg");
       setShowGestureHint(false);
     };
 
@@ -168,10 +167,6 @@ export default function Project3DExperience() {
 
   const dismissGestureHint = () => {
     setShowGestureHint(false);
-    const mv = modelViewerRef.current;
-    if (mv) {
-      mv.setAttribute("rotation-per-second", "0deg");
-    }
   };
 
   // Zoom In / Zoom Out via cameraOrbit
@@ -227,7 +222,7 @@ export default function Project3DExperience() {
     const text = encodeURIComponent(
       `Hi Danam Holdings, I was exploring the 3D Model of the ${selectedProject.title} and would like to consult on my land/plot construction.`
     );
-    window.open(`https://wa.me/918110006913?text=${text}`, "_blank");
+    window.open(`https://wa.me/918883332499?text=${text}`, "_blank");
   };
 
   return (
@@ -411,9 +406,11 @@ export default function Project3DExperience() {
                       src={selectedProject.glbModel}
                       alt={selectedProject.title}
                       camera-controls
+                      disable-tap
+                      disable-pan
                       auto-rotate
                       rotation-per-second="6deg"
-                      auto-rotate-delay="3000"
+                      auto-rotate-delay="999999"
                       camera-orbit={`35deg 72deg ${isMobile ? 95 : 80}%`}
                       camera-target={selectedProject.cameraTarget || "0m 4.5m -5m"}
                       min-camera-orbit="auto auto 40%"
