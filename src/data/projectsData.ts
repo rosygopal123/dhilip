@@ -56,7 +56,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     author: "Rajmahal Commercial Group",
     glbModel: "/models/LuxuryVilla_site_draco.glb",
     modelAuthor: "Zigurat Architecture Studio (CC-BY 4.0)",
-    cameraOrbit: "45deg 75deg 260%",
+    cameraOrbit: "45deg 75deg 140%",
     rooms360: [
       { id: "atrium", name: "Grand Retail Atrium", tag: "Double Volume", panoramaUrl: "/panoramas/living-room.jpg", specs: "14'6\" Height · Italian Statuario" },
       { id: "suite", name: "Executive Suite", tag: "Lounge", panoramaUrl: "/panoramas/master-bedroom.jpg", specs: "Burma Teak · Acoustic UPVC" },
@@ -96,7 +96,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     author: "Theni Anandham Management",
     glbModel: "/models/villa.glb",
     modelAuthor: "Zigurat Architecture Studio (CC-BY 4.0)",
-    cameraOrbit: "35deg 70deg 280%",
+    cameraOrbit: "35deg 70deg 140%",
     rooms360: [
       { id: "main-floor", name: "Retail Floor Plate", tag: "Clear Span", panoramaUrl: "/panoramas/living-room.jpg", specs: "Spans 24'0\" · Zero Intermediate Columns" },
       { id: "office", name: "Management Office", tag: "Acoustic", panoramaUrl: "/panoramas/master-bedroom.jpg", specs: "Sound Insulation · Teak Paneling" },
@@ -136,7 +136,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     author: "SACS Management",
     glbModel: "/models/LuxuryVilla_site_draco.glb",
     modelAuthor: "Zigurat Architecture Studio (CC-BY 4.0)",
-    cameraOrbit: "-40deg 75deg 270%",
+    cameraOrbit: "-40deg 75deg 140%",
     rooms360: [
       { id: "lobby", name: "Reception & Concourse", tag: "Institutional", panoramaUrl: "/panoramas/living-room.jpg", specs: "High Traffic · Polished Granite" },
       { id: "boardroom", name: "Executive Boardroom", tag: "Acoustic 40dB", panoramaUrl: "/panoramas/master-bedroom.jpg", specs: "Saint-Gobain Acoustic Baffles" },
@@ -176,7 +176,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     author: "SR Family, Madurai",
     glbModel: "/models/villa.glb",
     modelAuthor: "Zigurat Architecture Studio (CC-BY 4.0)",
-    cameraOrbit: "35deg 72deg 250%",
+    cameraOrbit: "35deg 72deg 135%",
     rooms360: [
       { id: "living", name: "Living & Atrium", tag: "Double Height", panoramaUrl: "/panoramas/living-room.jpg", specs: "14'6\" Height · Statuario Marble" },
       { id: "master", name: "Master Suite", tag: "King Sanctuary", panoramaUrl: "/panoramas/master-bedroom.jpg", specs: "Burma Teak · Walk-in Wardrobe" },
@@ -216,7 +216,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     author: "Vinoth BJV, Homeowner",
     glbModel: "/models/LuxuryVilla_site_draco.glb",
     modelAuthor: "Zigurat Architecture Studio (CC-BY 4.0)",
-    cameraOrbit: "25deg 70deg 270%",
+    cameraOrbit: "25deg 70deg 140%",
     rooms360: [
       { id: "living", name: "Family Living Hall", tag: "Open Plan", panoramaUrl: "/panoramas/living-room.jpg", specs: "Cross-Ventilation · Ambient Coves" },
       { id: "master", name: "Master Suite", tag: "Private Balcony", panoramaUrl: "/panoramas/master-bedroom.jpg", specs: "Wooden Flooring · Smart Dimming" },
@@ -256,7 +256,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     author: "Project Coordinator",
     glbModel: "/models/villa.glb",
     modelAuthor: "Zigurat Architecture Studio (CC-BY 4.0)",
-    cameraOrbit: "-30deg 75deg 290%",
+    cameraOrbit: "-30deg 75deg 140%",
     rooms360: [
       { id: "branch", name: "Banking Hall & Cash Counters", tag: "Secured", panoramaUrl: "/panoramas/living-room.jpg", specs: "Bullet-Resistant Glass · Heavy Tiles" },
       { id: "manager", name: "Branch Manager Cabin", tag: "Private", panoramaUrl: "/panoramas/master-bedroom.jpg", specs: "Acoustic Partition · Meeting Desk" },
@@ -296,7 +296,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     author: "Dr. Rickesh",
     glbModel: "/models/LuxuryVilla_site_draco.glb",
     modelAuthor: "Zigurat Architecture Studio (CC-BY 4.0)",
-    cameraOrbit: "40deg 70deg 260%",
+    cameraOrbit: "40deg 70deg 140%",
     rooms360: [
       { id: "clinic", name: "Consultation & Waiting Lounge", tag: "Clinical Wing", panoramaUrl: "/panoramas/living-room.jpg", specs: "Antibacterial Surfaces · Air Purified" },
       { id: "master", name: "Doctor's Master Retreat", tag: "Acoustic Calm", panoramaUrl: "/panoramas/master-bedroom.jpg", specs: "Sound Insulation · Teak Accents" },
@@ -336,7 +336,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     author: "Homeowner, Maruthupandiyar Nagar",
     glbModel: "/models/villa.glb",
     modelAuthor: "Zigurat Architecture Studio (CC-BY 4.0)",
-    cameraOrbit: "30deg 75deg 275%",
+    cameraOrbit: "30deg 75deg 140%",
     rooms360: [
       { id: "hall", name: "Main Hall & Dining", tag: "Natural Light", panoramaUrl: "/panoramas/living-room.jpg", specs: "Large Windows · 3000K Lighting" },
       { id: "bed", name: "Master Bedroom", tag: "Comfort Suite", panoramaUrl: "/panoramas/master-bedroom.jpg", specs: "Attached Bath · Wardrobe Provision" },
@@ -376,7 +376,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     author: "Project Committee",
     glbModel: "/models/LuxuryVilla_site_draco.glb",
     modelAuthor: "Zigurat Architecture Studio (CC-BY 4.0)",
-    cameraOrbit: "45deg 72deg 260%",
+    cameraOrbit: "45deg 72deg 140%",
     rooms360: [
       { id: "atrium", name: "Central Gathering Hall", tag: "Heritage View", panoramaUrl: "/panoramas/living-room.jpg", specs: "High Ceiling · Architectural Coves" },
       { id: "office", name: "Administration Suite", tag: "Executive", panoramaUrl: "/panoramas/master-bedroom.jpg", specs: "Timber Finishes · Smart Access" },

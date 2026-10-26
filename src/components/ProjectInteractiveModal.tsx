@@ -504,7 +504,7 @@ export default function ProjectInteractiveModal({
     const mv = modelViewerRef.current;
     if (!mv) return;
     try {
-      mv.cameraOrbit = project?.cameraOrbit || "35deg 72deg 280%";
+      mv.cameraOrbit = project?.cameraOrbit || "35deg 72deg 140%";
       mv.fieldOfView = project?.fieldOfView || "35deg";
       mv.setAttribute("auto-rotate", "");
     } catch (e) {
@@ -656,7 +656,9 @@ export default function ProjectInteractiveModal({
                   exposure="1.05"
                   loading="eager"
                   reveal="auto"
-                  camera-orbit={project.cameraOrbit || "35deg 72deg 280%"}
+                  camera-orbit={project.cameraOrbit || "35deg 72deg 140%"}
+                  min-camera-orbit="auto auto 90%"
+                  max-camera-orbit="auto auto 300%"
                   field-of-view={project.fieldOfView || "35deg"}
                   style={{
                     width: "100%",

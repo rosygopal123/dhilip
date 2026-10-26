@@ -183,7 +183,7 @@ export default function Project3DExperience() {
     const mv = modelViewerRef.current;
     if (!mv) return;
     try {
-      mv.cameraOrbit = `35deg 72deg ${isMobile ? 340 : 280}%`;
+      mv.cameraOrbit = `35deg 72deg ${isMobile ? 165 : 140}%`;
       mv.fieldOfView = "35deg";
       mv.setAttribute("auto-rotate", "");
     } catch (e) {
@@ -380,9 +380,9 @@ export default function Project3DExperience() {
                       auto-rotate
                       rotation-per-second="6deg"
                       auto-rotate-delay="0"
-                      camera-orbit={`35deg 72deg ${isMobile ? 340 : 280}%`}
-                      min-camera-orbit="auto auto 120%"
-                      max-camera-orbit="auto auto 450%"
+                      camera-orbit={`35deg 72deg ${isMobile ? 165 : 140}%`}
+                      min-camera-orbit="auto auto 90%"
+                      max-camera-orbit="auto auto 300%"
                       field-of-view="35deg"
                       shadow-intensity="1.2"
                       shadow-softness="0.8"
