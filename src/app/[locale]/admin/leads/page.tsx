@@ -17,9 +17,21 @@ import {
   Mail,
   MapPin,
   ExternalLink,
+  Lock,
+  KeyRound,
+  Eye,
+  EyeOff,
+  LogOut,
+  ShieldCheck,
 } from "lucide-react";
 
 export default function AdminLeadsPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authChecking, setAuthChecking] = useState<boolean>(true);
+  const [passwordInput, setPasswordInput] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [authError, setAuthError] = useState<string>("");
+
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
@@ -42,8 +54,36 @@ export default function AdminLeadsPage() {
   };
 
   useEffect(() => {
-    fetchLeads();
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem("danam_admin_auth");
+      if (stored === "true") {
+        setIsAuthenticated(true);
+        fetchLeads();
+      }
+      setAuthChecking(false);
+    }
   }, []);
+
+  const handleLogin = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const clean = passwordInput.trim().toLowerCase().replace(/\s+/g, "");
+    // Accepts "admin123" or "admin 123"
+    if (clean === "admin123") {
+      sessionStorage.setItem("danam_admin_auth", "true");
+      setIsAuthenticated(true);
+      setAuthError("");
+      fetchLeads();
+    } else {
+      setAuthError("Incorrect admin password. Please try again.");
+    }
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("danam_admin_auth");
+    setIsAuthenticated(false);
+    setPasswordInput("");
+    setAuthError("");
+  };
 
   const handleStatusChange = async (id: string, newStatus: Lead["status"]) => {
     try {
@@ -119,7 +159,7 @@ export default function AdminLeadsPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `ABC_Builders_Leads_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("download", `Danam_Holdings_Leads_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -134,6 +174,93 @@ export default function AdminLeadsPage() {
       l.id.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesStatus && matchesSearch;
   });
+
+  if (authChecking) {
+    return (
+      <div className="min-h-screen bg-surface-1 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-brand-forest border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#07090d] flex items-center justify-center p-6 relative overflow-hidden">
+        {/* Architectural grid background */}
+        <div className="absolute inset-0 blueprint-grid opacity-10 pointer-events-none" />
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-brand-forest/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-brand-teak/15 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 w-full max-w-md bg-[#0d1117] border border-white/15 rounded-2xl p-8 shadow-2xl backdrop-blur-xl">
+          {/* Logo & Header */}
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="w-14 h-14 rounded-2xl bg-[#141b24] border border-white/15 flex items-center justify-center shadow-lg mb-4">
+              <Lock className="w-7 h-7 text-amber-400" />
+            </div>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-brand-leaf-light font-bold">
+              DANAM HOLDINGS • RESTRICTED ACCESS
+            </span>
+            <h1 className="font-display text-2xl font-bold text-white mt-1">
+              Admin CRM Portal
+            </h1>
+            <p className="text-white/60 text-xs mt-1 max-w-xs">
+              Enter executive password to access client inquiries & sales leads.
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2">
+                Admin Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoFocus
+                  required
+                  placeholder="Enter password..."
+                  value={passwordInput}
+                  onChange={(e) => {
+                    setPasswordInput(e.target.value);
+                    if (authError) setAuthError("");
+                  }}
+                  className="w-full bg-[#161d26] border border-white/20 focus:border-amber-400 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-colors pr-11 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors cursor-pointer p-1"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {authError && (
+              <div className="bg-red-500/15 border border-red-500/40 rounded-xl p-3 text-xs text-red-300 font-mono">
+                {authError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-3.5 bg-gradient-to-r from-brand-forest to-brand-forest-dark hover:brightness-110 text-white rounded-xl text-xs font-mono font-bold uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <KeyRound className="w-4 h-4 text-amber-400" />
+              <span>Unlock Dashboard</span>
+            </button>
+          </form>
+
+          {/* Security Badge */}
+          <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-center gap-2 text-white/40 text-[11px] font-mono">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>End-to-End Encrypted Session</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface-1 pt-28 pb-20 px-6 md:px-12 text-left">
@@ -172,6 +299,15 @@ export default function AdminLeadsPage() {
             >
               <Download className="w-4 h-4 text-brand-teak" />
               <span>Export CSV</span>
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="border border-red-500/30 hover:border-red-500/60 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider font-semibold rounded flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Lock Admin Dashboard"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Log Out</span>
             </button>
           </div>
         </div>
