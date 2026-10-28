@@ -56,7 +56,7 @@ function renderFrameToCanvas(
     ctx.fillRect(0, 0, width, height);
     ctx.restore();
 
-    // 3. Foreground building: Scaled by 1.36x so it is nicely zoomed in (matching ABC Builders reference) while staying perfectly centered
+    // 3. Foreground building: Scaled by 1.36x so it is nicely zoomed in while staying perfectly centered
     const zoomScale = 1.36;
     const drawWidth = width * zoomScale;
     const drawHeight = drawWidth / imgRatio;

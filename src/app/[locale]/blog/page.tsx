@@ -157,7 +157,7 @@ Key benefits:
 1. Project Escrow: 70% of client funds must be held in a project bank account used only for construction.
 2. Time Adherence: Delays are subject to penalty interest payouts to the client.
 3. Plan Compliance: Builders cannot modify approved plans without client consent.
-ABC Builders is fully registered under TNRERA.`,
+Danam Holdings is fully registered under TNRERA.`,
         ta: "டிஎன்ஆர்இஆர்ஏ (TNRERA) என்பது ரியல் எஸ்டேட் ஒழுங்குமுறை ஆணையமாகும். \n\nநன்மைகள்: \n1. திட்ட பாதுகாப்பு: வாடிக்கையாளரின் பணத்தில் 70% தனி வங்கிக் கணக்கில் வைக்கப்பட்டு கட்டுமானத்திற்கு மட்டுமே பயன்படுத்தப்படும். \n2. காலக்கெடு: தாமதங்களுக்கு பில்டர் வாடிக்கையாளருக்கு வட்டி செலுத்த வேண்டும். \n3. வரைபட மாற்றம்: வாடிக்கையாளர் அனுமதியின்றி வரைபடங்களை மாற்ற முடியாது."
       }
     },
@@ -215,7 +215,7 @@ Recommendation: For outer walls, wire-cut clay red bricks are premium. For inter
 
   const handleShareWa = (article: Article) => {
     const articleTitle = typeof article.title === "string" ? article.title : article.title.en;
-    const waText = `Read this useful article from ABC Builders: "${articleTitle}" - ${window.location.href}`;
+    const waText = `Read this useful article from Danam Holdings: "${articleTitle}" - ${window.location.href}`;
     const url = `https://wa.me/?text=${encodeURIComponent(waText)}`;
     window.open(url, "_blank");
   };
@@ -224,8 +224,9 @@ Recommendation: For outer walls, wire-cut clay red bricks are premium. For inter
     e.preventDefault();
     if (phoneInput.length === 10) {
       setSubscribed(true);
-      const text = `Hi ABC Builders, I want to subscribe to weekly construction tips. My number is ${phoneInput}.`;
-      window.open(`https://wa.me/919876543210?text=${encodeURIComponent(text)}`, "_blank");
+      const text = `Hi Danam Holdings, I want to subscribe to weekly construction tips. My number is ${phoneInput}.`;
+      const waNum = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918883332499";
+      window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(text)}`, "_blank");
     }
   };
 

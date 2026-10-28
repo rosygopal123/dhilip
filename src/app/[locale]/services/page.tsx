@@ -240,7 +240,7 @@ export default function ServicesPage() {
 
   // WhatsApp Send Action
   const sendWhatsApp = () => {
-    const waText = `Hi ABC Builders, I generated a preliminary BOQ estimate:
+    const waText = `Hi Danam Holdings, I generated a preliminary BOQ estimate:
 - District: ${district}
 - Area: ${est.area} Sq.Ft (${floors} Floors)
 - Grade: ${grade.toUpperCase()}
@@ -248,7 +248,8 @@ export default function ServicesPage() {
 - Estimated Total: Rs. ${est.total.toLocaleString("en-IN")}
 Please contact me for site verification.`;
 
-    const url = `https://wa.me/919876543210?text=${encodeURIComponent(waText)}`;
+    const waNum = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918883332499";
+    const url = `https://wa.me/${waNum}?text=${encodeURIComponent(waText)}`;
     window.open(url, "_blank");
   };
 
