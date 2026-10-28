@@ -5,6 +5,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import LeadCaptureModal from "@/components/LeadCaptureModal";
+import StructuredData from "@/components/StructuredData";
+import Analytics from "@/components/Analytics";
 import "../globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -43,14 +45,59 @@ const notoTamilSerif = Noto_Serif_Tamil({
 type Locale = "en" | "ta";
 
 export async function generateMetadata() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://danamholdings.in";
+
   return {
-    title: "Danam Holdings | Civil Engineering & Turnkey EPC Construction Madurai",
-    description: "Danam Holdings, Madurai – Turnkey civil construction, structural steel, architectural 3D visualization, renovation, and EPC project management across South India.",
-    metadataBase: new URL("https://danamholdings.com"),
+    title: {
+      default: "Danam Holdings | Civil Engineering & Turnkey EPC Construction Madurai",
+      template: "%s | Danam Holdings",
+    },
+    description:
+      "Danam Holdings, Madurai – Turnkey civil construction, structural steel, architectural 3D visualization, renovation, and EPC project management across South India.",
+    metadataBase: new URL(siteUrl),
+    keywords: [
+      "civil engineering Madurai",
+      "turnkey construction Tamil Nadu",
+      "luxury villa construction Madurai",
+      "3D architectural elevation",
+      "360 virtual tour builder",
+      "IS 456 concrete testing",
+      "itemized BOQ contractor",
+      "commercial showroom builder Madurai",
+    ],
+    authors: [{ name: "Danam Holdings" }],
+    creator: "Danam Holdings",
+    publisher: "Danam Holdings",
+    alternates: {
+      canonical: "/",
+      languages: {
+        en: "/en",
+        ta: "/ta",
+      },
+    },
     openGraph: {
-      title: "Danam Holdings | Towards Fortune Unfoldings",
-      description: "Premier civil engineering & turnkey EPC construction across South India.",
+      title: "Danam Holdings | Civil Engineering & Turnkey EPC Construction",
+      description:
+        "Premier civil engineering, turnkey luxury villas, 3D architectural walkarounds, and itemized BOQ transparency across South India.",
+      url: siteUrl,
+      siteName: "Danam Holdings",
       type: "website",
+      locale: "en_IN",
+      images: [
+        {
+          url: "/images/danam/about-villa.webp",
+          width: 1200,
+          height: 630,
+          alt: "Danam Holdings Luxury Villa 3D Walkaround & Turnkey Construction",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Danam Holdings | Civil Engineering & Turnkey EPC Construction",
+      description:
+        "Turnkey luxury villa construction, structural engineering, 3D architectural models, and on-time delivery across Tamil Nadu.",
+      images: ["/images/danam/about-villa.webp"],
     },
   };
 }
@@ -72,6 +119,12 @@ export default async function LocaleLayout({
     >
       <body className="font-ui min-h-full flex flex-col relative bg-surface-0 text-text-primary">
         <LanguageProvider initialLocale={safeLocale}>
+          {/* SEO Structured Data Schema */}
+          <StructuredData />
+
+          {/* Marketing Analytics & Pixels */}
+          <Analytics />
+
           {/* Smooth Scroll via Lenis */}
           <SmoothScroll />
 
