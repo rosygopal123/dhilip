@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import Project3DExperience from "@/components/Project3DExperience";
+import ProjectCadShowcase from "@/components/ProjectCadShowcase";
 import ProjectInteractiveModal from "@/components/ProjectInteractiveModal";
 import { ALL_PROJECTS, ProjectItem } from "@/data/projectsData";
 import {
@@ -15,7 +16,8 @@ import {
   ShieldCheck,
   Building2,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  Ruler
 } from "lucide-react";
 
 export default function ProjectsPage() {
@@ -23,7 +25,7 @@ export default function ProjectsPage() {
   const [filterType, setFilterType] = useState<string>("all");
   const [filterDistrict, setFilterDistrict] = useState<string>("all");
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
-  const [modalTab, setModalTab] = useState<"3d" | "360" | "specs" | "before-after">("3d");
+  const [modalTab, setModalTab] = useState<"3d" | "360" | "cad" | "specs" | "before-after">("3d");
 
   const filteredProjects = ALL_PROJECTS.filter((p) => {
     const matchesType = filterType === "all" || p.type === filterType;
@@ -31,7 +33,7 @@ export default function ProjectsPage() {
     return matchesType && matchesDistrict;
   });
 
-  const openProjectModal = (project: ProjectItem, tab: "3d" | "360" | "specs" | "before-after" = "3d") => {
+  const openProjectModal = (project: ProjectItem, tab: "3d" | "360" | "cad" | "specs" | "before-after" = "3d") => {
     setSelectedProject(project);
     setModalTab(tab);
   };
@@ -52,7 +54,7 @@ export default function ProjectsPage() {
             {t.projects.heroSub}
           </p>
 
-          {/* 3D & 360 Feature Callout Banner */}
+          {/* 3D, 360 & CAD Feature Callout Banner */}
           <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-3 bg-surface-0 border border-border-medium px-4 py-2.5 rounded-2xl shadow-sm text-xs font-ui">
             <span className="flex items-center gap-1.5 text-brand-forest font-bold">
               <Rotate3D className="w-4 h-4 text-amber-500 animate-spin-slow" />
@@ -61,11 +63,12 @@ export default function ProjectsPage() {
             <span className="text-text-tertiary">•</span>
             <span className="flex items-center gap-1.5 text-emerald-600 font-bold">
               <Compass className="w-4 h-4 text-emerald-500" />
-              <span>360° Interior VR Tour on Every Project</span>
+              <span>360° Interior VR Tour</span>
             </span>
-            <span className="text-text-tertiary hidden sm:inline">•</span>
-            <span className="text-text-secondary hidden sm:inline">
-              Zero surprise changes · 100% architectural transparency
+            <span className="text-text-tertiary">•</span>
+            <span className="flex items-center gap-1.5 text-cyan-600 font-bold">
+              <Ruler className="w-4 h-4 text-cyan-500" />
+              <span>Client CAD Blueprints & Sketches</span>
             </span>
           </div>
         </div>
@@ -73,6 +76,9 @@ export default function ProjectsPage() {
 
       {/* 3D Interactive Project Experience (Featured Walkaround) */}
       <Project3DExperience />
+
+      {/* Live Client CAD Blueprints & Structural Sketches Showcase */}
+      <ProjectCadShowcase onOpenProjectModal={openProjectModal} />
 
       {/* Filter and Portfolio Grid */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 py-16">
@@ -137,18 +143,19 @@ export default function ProjectsPage() {
                   {p.badge}
                 </div>
 
-                {/* Top-Right: 3D + 360 Available Pill */}
+                {/* Top-Right: 3D + 360 + CAD Available Pill */}
                 <div className="absolute top-3.5 right-3.5 bg-brand-forest/90 backdrop-blur-md text-white font-mono text-[9px] px-2.5 py-1 uppercase tracking-wider rounded-full border border-white/20 flex items-center gap-1 z-10">
                   <Sparkles className="w-3 h-3 text-amber-300" />
-                  <span>3D + 360° Live</span>
+                  <span className="hidden sm:inline">3D • 360° • CAD</span>
+                  <span className="sm:hidden">Interactive</span>
                 </div>
 
                 {/* Hover Quick Action Buttons Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 z-20">
-                  <div className="flex items-center gap-2">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 z-20">
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => openProjectModal(p, "3d")}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-brand-forest hover:bg-brand-forest-dark text-white text-xs font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
+                      className="flex-1 inline-flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-brand-forest hover:bg-brand-forest-dark text-white text-[11px] font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
                     >
                       <Rotate3D className="w-3.5 h-3.5 text-amber-300" />
                       <span>3D Model</span>
@@ -156,10 +163,18 @@ export default function ProjectsPage() {
 
                     <button
                       onClick={() => openProjectModal(p, "360")}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#0b0e14]/95 hover:bg-[#0b0e14] border border-emerald-400/60 text-emerald-300 text-xs font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
+                      className="flex-1 inline-flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-[#0b0e14]/95 hover:bg-[#0b0e14] border border-emerald-400/60 text-emerald-300 text-[11px] font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
                     >
                       <Compass className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>360° Tour</span>
+                      <span>360° VR</span>
+                    </button>
+
+                    <button
+                      onClick={() => openProjectModal(p, "cad")}
+                      className="flex-1 inline-flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-cyan-950/95 hover:bg-cyan-900 border border-cyan-400/60 text-cyan-200 text-[11px] font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
+                    >
+                      <Ruler className="w-3.5 h-3.5 text-cyan-300" />
+                      <span>CAD</span>
                     </button>
                   </div>
                 </div>
@@ -192,20 +207,29 @@ export default function ProjectsPage() {
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => openProjectModal(p, "3d")}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface-2 hover:bg-brand-forest hover:text-white text-text-primary text-[11px] font-semibold transition-all cursor-pointer border border-border-subtle"
+                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-surface-2 hover:bg-brand-forest hover:text-white text-text-primary text-[11px] font-semibold transition-all cursor-pointer border border-border-subtle"
                       title="Explore 3D Exterior Model"
                     >
                       <Rotate3D className="w-3 h-3 text-amber-500" />
-                      <span>3D View</span>
+                      <span>3D</span>
                     </button>
 
                     <button
                       onClick={() => openProjectModal(p, "360")}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface-2 hover:bg-brand-forest hover:text-white text-text-primary text-[11px] font-semibold transition-all cursor-pointer border border-border-subtle"
+                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-surface-2 hover:bg-brand-forest hover:text-white text-text-primary text-[11px] font-semibold transition-all cursor-pointer border border-border-subtle"
                       title="Step into 360° VR Room Tour"
                     >
                       <Compass className="w-3 h-3 text-emerald-600" />
-                      <span>360° VR</span>
+                      <span>360°</span>
+                    </button>
+
+                    <button
+                      onClick={() => openProjectModal(p, "cad")}
+                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-surface-2 hover:bg-cyan-700 hover:text-white text-text-primary text-[11px] font-semibold transition-all cursor-pointer border border-border-subtle"
+                      title="Inspect Working CAD Blueprints & Sketches"
+                    >
+                      <Ruler className="w-3 h-3 text-cyan-600" />
+                      <span>CAD</span>
                     </button>
                   </div>
 
