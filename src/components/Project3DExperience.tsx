@@ -42,56 +42,84 @@ export interface Project3DItem {
   highlights: string[];
 }
 
-export interface ColorSwatch {
+export interface DualColorTheme {
   id: string;
   name: string;
-  hex: string;
-  rgba: [number, number, number, number];
+  primaryLabel: string;
+  accentLabel: string;
+  primaryHex: string;
+  primaryRGBA: [number, number, number, number];
+  accentHex: string;
+  accentRGBA: [number, number, number, number];
   tag: string;
 }
 
-export const ARCHITECTURAL_PALETTES: ColorSwatch[] = [
+export const DUAL_COLOR_THEMES: DualColorTheme[] = [
   {
-    id: "alpine-white",
-    name: "Alpine White",
-    hex: "#F4F5F2",
-    rgba: [0.96, 0.96, 0.95, 1.0],
-    tag: "Classic Monolith"
+    id: "white-charcoal",
+    name: "Alpine & Charcoal",
+    primaryLabel: "Alpine White",
+    accentLabel: "Charcoal Slate",
+    primaryHex: "#F5F6F4",
+    primaryRGBA: [0.96, 0.96, 0.95, 1.0],
+    accentHex: "#2B2E33",
+    accentRGBA: [0.17, 0.18, 0.20, 1.0],
+    tag: "High Contrast"
   },
   {
-    id: "warm-beige",
-    name: "Sand Beige",
-    hex: "#D6C6B0",
-    rgba: [0.84, 0.78, 0.69, 1.0],
-    tag: "Luxury Warm"
+    id: "sand-teak",
+    name: "Sand & Burma Teak",
+    primaryLabel: "Sand Beige",
+    accentLabel: "Burma Teak",
+    primaryHex: "#DDD0B8",
+    primaryRGBA: [0.86, 0.81, 0.72, 1.0],
+    accentHex: "#4A3525",
+    accentRGBA: [0.29, 0.21, 0.15, 1.0],
+    tag: "Tropical Warmth"
   },
   {
-    id: "ivory-cream",
-    name: "Ivory Cream",
-    hex: "#E8DEC8",
-    rgba: [0.91, 0.87, 0.78, 1.0],
-    tag: "Travertine Stone"
+    id: "ivory-terracotta",
+    name: "Ivory & Terracotta",
+    primaryLabel: "Ivory Travertine",
+    accentLabel: "Earthy Clay",
+    primaryHex: "#EAE3D2",
+    primaryRGBA: [0.92, 0.89, 0.82, 1.0],
+    accentHex: "#A85338",
+    accentRGBA: [0.66, 0.33, 0.22, 1.0],
+    tag: "Heritage Fusion"
   },
   {
-    id: "slate-greige",
-    name: "Slate Greige",
-    hex: "#B5B8B1",
-    rgba: [0.71, 0.72, 0.69, 1.0],
-    tag: "Modern Urban"
+    id: "greige-obsidian",
+    name: "Greige & Obsidian",
+    primaryLabel: "Slate Greige",
+    accentLabel: "Obsidian Black",
+    primaryHex: "#B8BCBA",
+    primaryRGBA: [0.72, 0.74, 0.73, 1.0],
+    accentHex: "#1F2224",
+    accentRGBA: [0.12, 0.13, 0.14, 1.0],
+    tag: "Urban Minimal"
   },
   {
-    id: "terracotta",
-    name: "Terracotta Clay",
-    hex: "#C87A5B",
-    rgba: [0.78, 0.48, 0.36, 1.0],
-    tag: "Earthy Warmth"
+    id: "frost-steel",
+    name: "Frost & Steel Navy",
+    primaryLabel: "Nordic Frost",
+    accentLabel: "Steel Blue",
+    primaryHex: "#E4E7E8",
+    primaryRGBA: [0.89, 0.91, 0.91, 1.0],
+    accentHex: "#2E3D48",
+    accentRGBA: [0.18, 0.24, 0.28, 1.0],
+    tag: "Modern Coastal"
   },
   {
-    id: "charcoal-slate",
-    name: "Charcoal Slate",
-    hex: "#4A5052",
-    rgba: [0.29, 0.31, 0.32, 1.0],
-    tag: "Contemporary Dark"
+    id: "champagne-emerald",
+    name: "Pearl & Danam Emerald",
+    primaryLabel: "Pearl Cream",
+    accentLabel: "Forest Emerald",
+    primaryHex: "#F0EDE4",
+    primaryRGBA: [0.94, 0.93, 0.89, 1.0],
+    accentHex: "#1B3B18",
+    accentRGBA: [0.11, 0.23, 0.09, 1.0],
+    tag: "Danam Signature"
   }
 ];
 
@@ -185,13 +213,13 @@ export default function Project3DExperience() {
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
-  const [selectedColor, setSelectedColor] = useState<string>("alpine-white");
+  const [selectedThemeId, setSelectedThemeId] = useState<string>("white-charcoal");
   const sectionRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
 
-  // Apply real-time architectural wall color to model-viewer materials
-  const applyWallColor = (color: ColorSwatch) => {
-    setSelectedColor(color.id);
+  // Apply real-time dual-tone architectural colors across all models (Villa G+1, Luxury Villa, Contemporary Home)
+  const applyDualColorTheme = (theme: DualColorTheme) => {
+    setSelectedThemeId(theme.id);
     const mv = modelViewerRef.current;
     if (!mv) return;
 
@@ -200,16 +228,38 @@ export default function Project3DExperience() {
 
     for (const mat of materials) {
       const name = (mat.name || "").toUpperCase();
-      if (
-        name.includes("PLASTER WHITE") ||
-        name.includes("M_FASCIA") ||
-        name.includes("M_CEILING") ||
-        name.includes("PLASTER") ||
-        name.includes("WALL")
-      ) {
-        if (mat.pbrMetallicRoughness?.setBaseColorFactor) {
-          mat.pbrMetallicRoughness.setBaseColorFactor(color.rgba);
-        }
+
+      // 1. PRIMARY WALLS:
+      // modern_villa_g1: PLASTER WHITE
+      // villa.glb & LuxuryVilla_site_draco: M_Plaster, M_WallWarm, M_Ceiling
+      const isPrimaryWall =
+        name === "PLASTER WHITE" ||
+        name === "M_PLASTER" ||
+        name === "M_WALLWARM" ||
+        name === "M_CEILING" ||
+        (name.includes("PLASTER") && !name.includes("BLACK")) ||
+        (name.includes("WALL") && !name.includes("LIGHT") && !name.includes("WOOD") && !name.includes("BLACK"));
+
+      if (isPrimaryWall && mat.pbrMetallicRoughness?.setBaseColorFactor) {
+        mat.pbrMetallicRoughness.setBaseColorFactor(theme.primaryRGBA);
+      }
+
+      // 2. ACCENT FEATURES & LOUVERS:
+      // modern_villa_g1: PLASTER BLACK, LOUVER\WINDOW, COMPOUND WALL FENCE
+      // villa.glb & LuxuryVilla_site_draco: M_Fascia__GLB, M_MetalDark, M_MetalBronze, M_Soffit, M_Steel
+      const isAccent =
+        name === "PLASTER BLACK" ||
+        name.includes("PLASTER BLACK") ||
+        name.includes("LOUVER") ||
+        name.includes("FENCE") ||
+        name === "M_FASCIA__GLB" ||
+        name === "M_METALDARK" ||
+        name === "M_METALBRONZE" ||
+        name === "M_SOFFIT" ||
+        name === "M_STEEL";
+
+      if (isAccent && mat.pbrMetallicRoughness?.setBaseColorFactor) {
+        mat.pbrMetallicRoughness.setBaseColorFactor(theme.accentRGBA);
       }
     }
   };
@@ -245,11 +295,11 @@ export default function Project3DExperience() {
 
     const handleModelLoad = () => {
       setIsModelLoaded(true);
-      const current = ARCHITECTURAL_PALETTES.find((c) => c.id === selectedColor);
-      if (current && current.id !== "alpine-white") {
+      const current = DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId);
+      if (current) {
         setTimeout(() => {
-          applyWallColor(current);
-        }, 120);
+          applyDualColorTheme(current);
+        }, 150);
       }
     };
 
@@ -550,33 +600,34 @@ export default function Project3DExperience() {
                     </model-viewer>
                   </div>
 
-                  {/* Real-time Architectural Wall Color Swatches */}
+                  {/* Real-time Dual-Color Architectural Theme Swatches */}
                   {isModelLoaded && (
                     <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-25 flex items-center gap-1.5 sm:gap-2 bg-[#0a0a0d]/90 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full shadow-2xl pointer-events-auto select-none max-w-[95%]">
                       <div className="flex items-center gap-1.5 pr-2 border-r border-white/20 text-white/90">
                         <Palette className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span className="text-[10px] font-mono uppercase tracking-wider hidden sm:inline whitespace-nowrap">
-                          Wall Tone:
+                          Dual Tone:
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 sm:gap-2">
-                        {ARCHITECTURAL_PALETTES.map((color) => {
-                          const isActive = selectedColor === color.id;
+                        {DUAL_COLOR_THEMES.map((theme) => {
+                          const isActive = selectedThemeId === theme.id;
                           return (
                             <button
-                              key={color.id}
-                              onClick={() => applyWallColor(color)}
-                              title={`${color.name} (${color.tag})`}
-                              className={`group relative w-6 h-6 sm:w-7 sm:h-7 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center border ${
+                              key={theme.id}
+                              onClick={() => applyDualColorTheme(theme)}
+                              title={`${theme.name} (${theme.tag}): ${theme.primaryLabel} + ${theme.accentLabel}`}
+                              className={`group relative w-6 h-6 sm:w-7 sm:h-7 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center p-[1px] ${
                                 isActive
-                                  ? "border-amber-400 ring-2 ring-amber-400/50 scale-110 shadow-md"
-                                  : "border-white/30 hover:scale-105 opacity-85 hover:opacity-100"
+                                  ? "ring-2 ring-amber-400 scale-110 shadow-lg"
+                                  : "hover:scale-105 opacity-80 hover:opacity-100"
                               }`}
-                              style={{ backgroundColor: color.hex }}
                             >
-                              {isActive && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-black/70" />
-                              )}
+                              {/* Split Dual-Color Circle */}
+                              <div className="w-full h-full rounded-full overflow-hidden flex border border-white/30">
+                                <div className="w-1/2 h-full" style={{ backgroundColor: theme.primaryHex }} />
+                                <div className="w-1/2 h-full" style={{ backgroundColor: theme.accentHex }} />
+                              </div>
                             </button>
                           );
                         })}
@@ -786,43 +837,51 @@ export default function Project3DExperience() {
                 ))}
               </div>
 
-              {/* Interactive Real-Time Exterior Finish / Paint Configurator */}
+              {/* Interactive Real-Time Dual-Color Theme Configurator */}
               <div className="mt-5 pt-4 border-t border-border-subtle">
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-text-primary flex items-center gap-1.5">
                     <Palette className="w-3.5 h-3.5 text-brand-forest" />
-                    <span>Exterior Finish Palette</span>
+                    <span>Dual-Tone Exterior Finishes</span>
                   </span>
-                  <span className="text-[11px] font-bold text-brand-forest">
-                    {ARCHITECTURAL_PALETTES.find((c) => c.id === selectedColor)?.name}
+                  <span className="text-xs font-bold text-brand-forest">
+                    {DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId)?.name}
                   </span>
                 </div>
-                <p className="text-[11px] text-text-secondary mb-2.5 leading-relaxed">
-                  Click any tone to preview live architectural PBR wall textures on the building:
-                </p>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                  {ARCHITECTURAL_PALETTES.map((color) => {
-                    const isSelected = selectedColor === color.id;
+                <div className="flex items-center justify-between text-[11px] text-text-tertiary mb-3">
+                  <span>Primary Wall + Architectural Accent</span>
+                  <span className="font-mono text-[10px] text-brand-forest bg-brand-forest/10 px-2 py-0.5 rounded border border-brand-forest/20">
+                    {DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId)?.primaryLabel} & {DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId)?.accentLabel}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {DUAL_COLOR_THEMES.map((theme) => {
+                    const isSelected = selectedThemeId === theme.id;
                     return (
                       <button
-                        key={color.id}
-                        onClick={() => applyWallColor(color)}
-                        className={`p-2 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+                        key={theme.id}
+                        onClick={() => applyDualColorTheme(theme)}
+                        className={`p-2.5 rounded-xl border flex items-center gap-2.5 transition-all cursor-pointer text-left ${
                           isSelected
                             ? "border-brand-forest bg-brand-forest/10 ring-1 ring-brand-forest shadow-xs font-bold"
                             : "border-border-subtle hover:border-border-medium bg-surface-1 text-text-secondary"
                         }`}
-                        title={`${color.name} (${color.tag})`}
+                        title={`${theme.name} (${theme.tag})`}
                       >
-                        <span
-                          className="w-5 h-5 rounded-full border border-black/15 shadow-inner flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: color.hex }}
-                        >
-                          {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-black/60" />}
-                        </span>
-                        <span className="text-[9px] font-medium truncate w-full text-center leading-tight">
-                          {color.name.split(" ")[0]}
-                        </span>
+                        {/* Split Dual-Color Swatch */}
+                        <div className="w-6 h-6 rounded-full overflow-hidden flex border border-black/20 shrink-0 shadow-xs">
+                          <div className="w-1/2 h-full" style={{ backgroundColor: theme.primaryHex }} />
+                          <div className="w-1/2 h-full" style={{ backgroundColor: theme.accentHex }} />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-[11px] font-semibold text-text-primary block truncate">
+                            {theme.name}
+                          </span>
+                          <span className="text-[9px] text-text-tertiary block truncate">
+                            {theme.tag}
+                          </span>
+                        </div>
                       </button>
                     );
                   })}
