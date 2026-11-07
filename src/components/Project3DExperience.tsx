@@ -17,7 +17,9 @@ import {
   ZoomIn,
   ZoomOut,
   RotateCcw,
-  Palette
+  Palette,
+  Lightbulb,
+  Moon
 } from "lucide-react";
 
 export interface Project3DItem {
@@ -215,9 +217,51 @@ export default function Project3DExperience() {
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [selectedThemeId, setSelectedThemeId] = useState<string>("white-charcoal");
-  const [sunMode, setSunMode] = useState<"sun" | "sunset" | "studio">("sun");
+  const [sunMode, setSunMode] = useState<"sun" | "sunset" | "night">("sun");
+  const [buildingLightsOn, setBuildingLightsOn] = useState<boolean>(true);
   const sectionRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
+
+  // Real-time architectural lighting control (turns fixtures, downlights, bollards, chandelier & interior lights ON/OFF)
+  const applyBuildingLights = (on: boolean) => {
+    const mv = modelViewerRef.current;
+    if (!mv) return;
+
+    const materials = mv.model?.materials;
+    if (!materials || !Array.isArray(materials)) return;
+
+    for (const mat of materials) {
+      const name = (mat.name || "").toUpperCase();
+      const isLightFixture =
+        name.includes("LIGHT") ||
+        name.includes("LED") ||
+        name.includes("LAMP") ||
+        name.includes("CHANDELIER") ||
+        name.includes("BOLLARD") ||
+        name.includes("EMIT") ||
+        name.includes("POTLIGHT");
+
+      if (isLightFixture && mat.setEmissiveFactor) {
+        if (on) {
+          if (name.includes("POOL")) {
+            mat.setEmissiveFactor([0.4, 0.85, 1.0]);
+          } else if (name.includes("CHANDELIER") || name.includes("INTERIOR")) {
+            mat.setEmissiveFactor([1.0, 0.95, 0.80]);
+          } else {
+            mat.setEmissiveFactor([1.0, 0.92, 0.70]);
+          }
+        } else {
+          mat.setEmissiveFactor([0.0, 0.0, 0.0]);
+        }
+      }
+    }
+  };
+
+  const toggleBuildingLights = () => {
+    const next = !buildingLightsOn;
+    setBuildingLightsOn(next);
+    applyBuildingLights(next);
+  };
 
   // Apply real-time dual-tone architectural colors across all models (Villa G+1, Luxury Villa, Contemporary Home)
   const applyDualColorTheme = (theme: DualColorTheme) => {
@@ -298,11 +342,10 @@ export default function Project3DExperience() {
     const handleModelLoad = () => {
       setIsModelLoaded(true);
       const current = DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId);
-      if (current) {
-        setTimeout(() => {
-          applyDualColorTheme(current);
-        }, 150);
-      }
+      setTimeout(() => {
+        if (current) applyDualColorTheme(current);
+        applyBuildingLights(buildingLightsOn);
+      }, 150);
     };
 
     mv.addEventListener("load", handleModelLoad);
@@ -486,26 +529,26 @@ export default function Project3DExperience() {
 
               {activeView === "3d" && (
                 <div className={`relative w-full h-full overflow-hidden flex items-center justify-center transition-colors duration-500 ${
-                  sunMode === "sun" ? "bg-[#388bfd]" : sunMode === "sunset" ? "bg-[#2b1810]" : "bg-[#0a0a0d]"
+                  sunMode === "sun" ? "bg-[#388bfd]" : sunMode === "sunset" ? "bg-[#2b1810]" : "bg-[#090e18]"
                 }`}>
 
                   {/* Top Status Badge & Sunlight Modes */}
-                  <div className="absolute top-2.5 left-3 sm:left-5 z-25 flex items-center gap-2 pointer-events-auto select-none">
+                  <div className="absolute top-2.5 left-3 sm:left-5 z-25 flex items-center gap-1.5 sm:gap-2 pointer-events-auto select-none flex-wrap">
                     <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 px-2.5 sm:px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
                       <Rotate3D className="w-3.5 h-3.5 text-[#C5A880] animate-spin-slow" />
                       <span className="hidden sm:inline">3D Villa Tour</span>
                     </div>
 
-                    {/* Sunlight & Lighting Modes Switcher */}
+                    {/* Lighting Ambience Switcher */}
                     <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 p-0.5 rounded-full flex items-center shadow-lg">
                       <button
                         onClick={() => setSunMode("sun")}
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
+                        className={`px-2 sm:px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
                           sunMode === "sun"
                             ? "bg-amber-400 text-stone-950 font-bold shadow-sm"
                             : "text-white/80 hover:text-white"
                         }`}
-                        title="Direct Sunlight (Midday Sun)"
+                        title="Direct Sunlight (Daytime Sun)"
                       >
                         <Sun className="w-3 h-3" />
                         <span>Sunlight</span>
@@ -513,7 +556,7 @@ export default function Project3DExperience() {
 
                       <button
                         onClick={() => setSunMode("sunset")}
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
+                        className={`px-2 sm:px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
                           sunMode === "sunset"
                             ? "bg-amber-600 text-white font-bold shadow-sm"
                             : "text-white/80 hover:text-white"
@@ -525,18 +568,38 @@ export default function Project3DExperience() {
                       </button>
 
                       <button
-                        onClick={() => setSunMode("studio")}
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
-                          sunMode === "studio"
-                            ? "bg-emerald-600 text-white font-bold shadow-sm"
+                        onClick={() => {
+                          setSunMode("night");
+                          if (!buildingLightsOn) {
+                            setBuildingLightsOn(true);
+                            applyBuildingLights(true);
+                          }
+                        }}
+                        className={`px-2 sm:px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
+                          sunMode === "night"
+                            ? "bg-indigo-600 text-white font-bold shadow-sm"
                             : "text-white/80 hover:text-white"
                         }`}
-                        title="Studio Neutral"
+                        title="Night Architectural Illumination"
                       >
-                        <Sparkles className="w-3 h-3" />
-                        <span className="hidden sm:inline">Studio</span>
+                        <Moon className="w-3 h-3" />
+                        <span>Night</span>
                       </button>
                     </div>
+
+                    {/* Dedicated Building Lights ON / OFF Toggle */}
+                    <button
+                      onClick={toggleBuildingLights}
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg ${
+                        buildingLightsOn
+                          ? "bg-amber-400 text-stone-950 font-bold border-amber-300 shadow-[0_0_14px_rgba(251,191,36,0.5)]"
+                          : "bg-[#0a0a0d]/90 text-white/70 hover:text-white border-white/15"
+                      }`}
+                      title="Toggle Building Architectural Lights ON / OFF"
+                    >
+                      <Lightbulb className={`w-3.5 h-3.5 ${buildingLightsOn ? "fill-stone-950 text-stone-950 animate-pulse" : "text-white/70"}`} />
+                      <span>{buildingLightsOn ? "Lights ON" : "Lights OFF"}</span>
+                    </button>
                   </div>
 
                   {/* Clean Interactive Zoom & Reset Controls in Top-Right */}
@@ -615,11 +678,11 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Google <model-viewer>: 100% Native WebGL 3D with PBR Daylight / Sunset / Studio Lighting */}
+                  {/* Google <model-viewer>: 100% Native WebGL 3D with PBR Daylight / Sunset / Night Lighting */}
                   <div
                     onPointerDown={dismissGestureHint}
                     className={`w-full h-full flex items-center justify-center overflow-hidden relative cursor-grab active:cursor-grabbing transition-colors duration-500 ${
-                      sunMode === "sun" ? "bg-[#388bfd]" : sunMode === "sunset" ? "bg-[#2b1810]" : "bg-[#0d1610]"
+                      sunMode === "sun" ? "bg-[#388bfd]" : sunMode === "sunset" ? "bg-[#2b1810]" : "bg-[#090e18]"
                     }`}
                   >
                     <model-viewer
@@ -646,9 +709,9 @@ export default function Project3DExperience() {
                           : "neutral"
                       }
                       tone-mapping="neutral"
-                      shadow-intensity={sunMode === "sun" ? "1.8" : sunMode === "sunset" ? "1.6" : "1.3"}
-                      shadow-softness={sunMode === "sun" ? "0.1" : sunMode === "sunset" ? "0.25" : "0.5"}
-                      exposure={sunMode === "sun" ? "1.65" : sunMode === "sunset" ? "1.38" : "1.1"}
+                      shadow-intensity={sunMode === "sun" ? "1.8" : sunMode === "sunset" ? "1.6" : "1.2"}
+                      shadow-softness={sunMode === "sun" ? "0.1" : sunMode === "sunset" ? "0.25" : "0.4"}
+                      exposure={sunMode === "sun" ? "1.65" : sunMode === "sunset" ? "1.38" : "1.25"}
                       loading="eager"
                       reveal="auto"
                       interaction-prompt="none"
@@ -660,7 +723,7 @@ export default function Project3DExperience() {
                             ? "radial-gradient(circle at 75% 18%, rgba(255, 255, 245, 0.95) 0%, rgba(255, 240, 180, 0.6) 12%, rgba(200, 230, 255, 0.25) 28%, transparent 55%), linear-gradient(180deg, #388bfd 0%, #60a5fa 22%, #93c5fd 50%, #dbeafe 78%, #f8fafc 100%)"
                             : sunMode === "sunset"
                             ? "radial-gradient(circle at 30% 55%, rgba(255, 220, 150, 0.9) 0%, rgba(255, 140, 60, 0.5) 15%, transparent 45%), linear-gradient(180deg, #1e293b 0%, #334155 20%, #7c2d12 45%, #c2410c 68%, #ea580c 85%, #fed7aa 100%)"
-                            : "radial-gradient(ellipse at 50% 40%, #1a281d 0%, #0d1610 65%, #050a06 100%)",
+                            : "radial-gradient(circle at 75% 18%, rgba(210, 230, 255, 0.35) 0%, rgba(100, 150, 220, 0.12) 15%, transparent 40%), radial-gradient(ellipse at 50% 30%, #152238 0%, #0d1522 55%, #05080f 100%)",
                         outline: "none",
                         touchAction: "pan-y",
                       }}
