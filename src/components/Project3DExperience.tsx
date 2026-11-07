@@ -467,15 +467,27 @@ export default function Project3DExperience() {
           {/* Left / Center: Interactive 3D Viewer (Clean Framed 3D Card with Dark Architectural Theme) */}
           <div className="lg:col-span-7 bg-[#0a0a0d] border border-white/10 rounded-[22px] overflow-hidden shadow-2xl flex flex-col">
             {/* Viewer Stage: Clean Luxury 3D Card with Architectural Corner Accents */}
-            <div className="relative w-full bg-[#0a0a0d] transition-all duration-300 overflow-hidden h-[340px] sm:h-[400px] lg:h-[460px]">
+            <div className={`relative w-full transition-colors duration-500 overflow-hidden h-[340px] sm:h-[400px] lg:h-[460px] ${
+              sunMode === "sun" ? "bg-[#388bfd]" : sunMode === "sunset" ? "bg-[#2b1810]" : "bg-[#0a0a0d]"
+            }`}>
               {/* Luxury Architectural Viewfinder Corner Reticles */}
-              <span className="pointer-events-none absolute left-4 top-4 z-20 h-4 w-4 border-l border-t border-white/40" />
-              <span className="pointer-events-none absolute right-4 top-4 z-20 h-4 w-4 border-r border-t border-white/40" />
-              <span className="pointer-events-none absolute left-4 bottom-4 z-20 h-4 w-4 border-l border-b border-white/40" />
-              <span className="pointer-events-none absolute right-4 bottom-4 z-20 h-4 w-4 border-r border-b border-white/40" />
+              <span className={`pointer-events-none absolute left-4 top-4 z-20 h-4 w-4 border-l border-t transition-colors duration-300 ${
+                sunMode === "sun" ? "border-slate-800/40" : "border-white/40"
+              }`} />
+              <span className={`pointer-events-none absolute right-4 top-4 z-20 h-4 w-4 border-r border-t transition-colors duration-300 ${
+                sunMode === "sun" ? "border-slate-800/40" : "border-white/40"
+              }`} />
+              <span className={`pointer-events-none absolute left-4 bottom-4 z-20 h-4 w-4 border-l border-b transition-colors duration-300 ${
+                sunMode === "sun" ? "border-slate-800/40" : "border-white/40"
+              }`} />
+              <span className={`pointer-events-none absolute right-4 bottom-4 z-20 h-4 w-4 border-r border-b transition-colors duration-300 ${
+                sunMode === "sun" ? "border-slate-800/40" : "border-white/40"
+              }`} />
 
               {activeView === "3d" && (
-                <div className="relative w-full h-full bg-[#0a0a0d] overflow-hidden flex items-center justify-center">
+                <div className={`relative w-full h-full overflow-hidden flex items-center justify-center transition-colors duration-500 ${
+                  sunMode === "sun" ? "bg-[#388bfd]" : sunMode === "sunset" ? "bg-[#2b1810]" : "bg-[#0a0a0d]"
+                }`}>
 
                   {/* Top Status Badge & Sunlight Modes */}
                   <div className="absolute top-2.5 left-3 sm:left-5 z-25 flex items-center gap-2 pointer-events-auto select-none">
@@ -603,10 +615,12 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Google <model-viewer>: 100% Native WebGL 3D with PBR Studio Lighting & Ambient Vignette */}
+                  {/* Google <model-viewer>: 100% Native WebGL 3D with PBR Daylight / Sunset / Studio Lighting */}
                   <div
                     onPointerDown={dismissGestureHint}
-                    className="w-full h-full flex items-center justify-center overflow-hidden bg-[#0d1610] relative cursor-grab active:cursor-grabbing"
+                    className={`w-full h-full flex items-center justify-center overflow-hidden relative cursor-grab active:cursor-grabbing transition-colors duration-500 ${
+                      sunMode === "sun" ? "bg-[#388bfd]" : sunMode === "sunset" ? "bg-[#2b1810]" : "bg-[#0d1610]"
+                    }`}
                   >
                     <model-viewer
                       ref={modelViewerRef}
@@ -633,8 +647,8 @@ export default function Project3DExperience() {
                       }
                       tone-mapping="neutral"
                       shadow-intensity={sunMode === "sun" ? "1.8" : sunMode === "sunset" ? "1.6" : "1.3"}
-                      shadow-softness={sunMode === "sun" ? "0.2" : sunMode === "sunset" ? "0.3" : "0.5"}
-                      exposure={sunMode === "sun" ? "1.25" : sunMode === "sunset" ? "1.18" : "1.05"}
+                      shadow-softness={sunMode === "sun" ? "0.1" : sunMode === "sunset" ? "0.25" : "0.5"}
+                      exposure={sunMode === "sun" ? "1.65" : sunMode === "sunset" ? "1.38" : "1.1"}
                       loading="eager"
                       reveal="auto"
                       interaction-prompt="none"
@@ -643,9 +657,9 @@ export default function Project3DExperience() {
                         height: "100%",
                         background:
                           sunMode === "sun"
-                            ? "radial-gradient(ellipse at 50% 35%, #223545 0%, #121c24 55%, #080d12 100%)"
+                            ? "radial-gradient(circle at 75% 18%, rgba(255, 255, 245, 0.95) 0%, rgba(255, 240, 180, 0.6) 12%, rgba(200, 230, 255, 0.25) 28%, transparent 55%), linear-gradient(180deg, #388bfd 0%, #60a5fa 22%, #93c5fd 50%, #dbeafe 78%, #f8fafc 100%)"
                             : sunMode === "sunset"
-                            ? "radial-gradient(ellipse at 50% 35%, #3d2014 0%, #20100a 55%, #0d0604 100%)"
+                            ? "radial-gradient(circle at 30% 55%, rgba(255, 220, 150, 0.9) 0%, rgba(255, 140, 60, 0.5) 15%, transparent 45%), linear-gradient(180deg, #1e293b 0%, #334155 20%, #7c2d12 45%, #c2410c 68%, #ea580c 85%, #fed7aa 100%)"
                             : "radial-gradient(ellipse at 50% 40%, #1a281d 0%, #0d1610 65%, #050a06 100%)",
                         outline: "none",
                         touchAction: "pan-y",
