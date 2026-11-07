@@ -15,7 +15,8 @@ import {
   FileText,
   ZoomIn,
   ZoomOut,
-  RotateCcw
+  RotateCcw,
+  Palette
 } from "lucide-react";
 
 export interface Project3DItem {
@@ -40,6 +41,59 @@ export interface Project3DItem {
   };
   highlights: string[];
 }
+
+export interface ColorSwatch {
+  id: string;
+  name: string;
+  hex: string;
+  rgba: [number, number, number, number];
+  tag: string;
+}
+
+export const ARCHITECTURAL_PALETTES: ColorSwatch[] = [
+  {
+    id: "alpine-white",
+    name: "Alpine White",
+    hex: "#F4F5F2",
+    rgba: [0.96, 0.96, 0.95, 1.0],
+    tag: "Classic Monolith"
+  },
+  {
+    id: "warm-beige",
+    name: "Sand Beige",
+    hex: "#D6C6B0",
+    rgba: [0.84, 0.78, 0.69, 1.0],
+    tag: "Luxury Warm"
+  },
+  {
+    id: "ivory-cream",
+    name: "Ivory Cream",
+    hex: "#E8DEC8",
+    rgba: [0.91, 0.87, 0.78, 1.0],
+    tag: "Travertine Stone"
+  },
+  {
+    id: "slate-greige",
+    name: "Slate Greige",
+    hex: "#B5B8B1",
+    rgba: [0.71, 0.72, 0.69, 1.0],
+    tag: "Modern Urban"
+  },
+  {
+    id: "terracotta",
+    name: "Terracotta Clay",
+    hex: "#C87A5B",
+    rgba: [0.78, 0.48, 0.36, 1.0],
+    tag: "Earthy Warmth"
+  },
+  {
+    id: "charcoal-slate",
+    name: "Charcoal Slate",
+    hex: "#4A5052",
+    rgba: [0.29, 0.31, 0.32, 1.0],
+    tag: "Contemporary Dark"
+  }
+];
 
 // Config array: standalone .glb models loaded via @google/model-viewer (100% white-label, zero Sketchfab overlays)
 export const PROJECT_3D_LIST: Project3DItem[] = [
@@ -131,8 +185,34 @@ export default function Project3DExperience() {
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [selectedColor, setSelectedColor] = useState<string>("alpine-white");
   const sectionRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
+
+  // Apply real-time architectural wall color to model-viewer materials
+  const applyWallColor = (color: ColorSwatch) => {
+    setSelectedColor(color.id);
+    const mv = modelViewerRef.current;
+    if (!mv) return;
+
+    const materials = mv.model?.materials;
+    if (!materials || !Array.isArray(materials)) return;
+
+    for (const mat of materials) {
+      const name = (mat.name || "").toUpperCase();
+      if (
+        name.includes("PLASTER WHITE") ||
+        name.includes("M_FASCIA") ||
+        name.includes("M_CEILING") ||
+        name.includes("PLASTER") ||
+        name.includes("WALL")
+      ) {
+        if (mat.pbrMetallicRoughness?.setBaseColorFactor) {
+          mat.pbrMetallicRoughness.setBaseColorFactor(color.rgba);
+        }
+      }
+    }
+  };
 
   // Responsive device check
   useEffect(() => {
@@ -165,6 +245,12 @@ export default function Project3DExperience() {
 
     const handleModelLoad = () => {
       setIsModelLoaded(true);
+      const current = ARCHITECTURAL_PALETTES.find((c) => c.id === selectedColor);
+      if (current && current.id !== "alpine-white") {
+        setTimeout(() => {
+          applyWallColor(current);
+        }, 120);
+      }
     };
 
     mv.addEventListener("load", handleModelLoad);
@@ -463,6 +549,40 @@ export default function Project3DExperience() {
                       <div slot="progress-bar" style={{ display: "none" }} />
                     </model-viewer>
                   </div>
+
+                  {/* Real-time Architectural Wall Color Swatches */}
+                  {isModelLoaded && (
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-25 flex items-center gap-1.5 sm:gap-2 bg-[#0a0a0d]/90 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full shadow-2xl pointer-events-auto select-none max-w-[95%]">
+                      <div className="flex items-center gap-1.5 pr-2 border-r border-white/20 text-white/90">
+                        <Palette className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span className="text-[10px] font-mono uppercase tracking-wider hidden sm:inline whitespace-nowrap">
+                          Wall Tone:
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        {ARCHITECTURAL_PALETTES.map((color) => {
+                          const isActive = selectedColor === color.id;
+                          return (
+                            <button
+                              key={color.id}
+                              onClick={() => applyWallColor(color)}
+                              title={`${color.name} (${color.tag})`}
+                              className={`group relative w-6 h-6 sm:w-7 sm:h-7 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center border ${
+                                isActive
+                                  ? "border-amber-400 ring-2 ring-amber-400/50 scale-110 shadow-md"
+                                  : "border-white/30 hover:scale-105 opacity-85 hover:opacity-100"
+                              }`}
+                              style={{ backgroundColor: color.hex }}
+                            >
+                              {isActive && (
+                                <span className="w-1.5 h-1.5 rounded-full bg-black/70" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -664,6 +784,49 @@ export default function Project3DExperience() {
                     <span>{h}</span>
                   </div>
                 ))}
+              </div>
+
+              {/* Interactive Real-Time Exterior Finish / Paint Configurator */}
+              <div className="mt-5 pt-4 border-t border-border-subtle">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-text-primary flex items-center gap-1.5">
+                    <Palette className="w-3.5 h-3.5 text-brand-forest" />
+                    <span>Exterior Finish Palette</span>
+                  </span>
+                  <span className="text-[11px] font-bold text-brand-forest">
+                    {ARCHITECTURAL_PALETTES.find((c) => c.id === selectedColor)?.name}
+                  </span>
+                </div>
+                <p className="text-[11px] text-text-secondary mb-2.5 leading-relaxed">
+                  Click any tone to preview live architectural PBR wall textures on the building:
+                </p>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {ARCHITECTURAL_PALETTES.map((color) => {
+                    const isSelected = selectedColor === color.id;
+                    return (
+                      <button
+                        key={color.id}
+                        onClick={() => applyWallColor(color)}
+                        className={`p-2 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+                          isSelected
+                            ? "border-brand-forest bg-brand-forest/10 ring-1 ring-brand-forest shadow-xs font-bold"
+                            : "border-border-subtle hover:border-border-medium bg-surface-1 text-text-secondary"
+                        }`}
+                        title={`${color.name} (${color.tag})`}
+                      >
+                        <span
+                          className="w-5 h-5 rounded-full border border-black/15 shadow-inner flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: color.hex }}
+                        >
+                          {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-black/60" />}
+                        </span>
+                        <span className="text-[9px] font-medium truncate w-full text-center leading-tight">
+                          {color.name.split(" ")[0]}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Action Buttons */}
