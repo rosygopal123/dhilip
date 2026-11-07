@@ -652,10 +652,11 @@ export default function ProjectInteractiveModal({
                   auto-rotate-delay="999999"
                   rotation-per-second="18deg"
                   interaction-prompt="auto"
-                  shadow-intensity="1.5"
-                  shadow-softness="0.8"
+                  shadow-intensity="1.6"
+                  shadow-softness="0.4"
                   environment-image="neutral"
-                  exposure="1.05"
+                  tone-mapping="neutral"
+                  exposure="1.15"
                   loading="eager"
                   reveal="auto"
                   camera-orbit={project.cameraOrbit || "35deg 72deg 80%"}
@@ -667,7 +668,7 @@ export default function ProjectInteractiveModal({
                     width: "100%",
                     height: "100%",
                     minHeight: isFullscreen ? "calc(100vh - 150px)" : "480px",
-                    backgroundColor: "#07090d",
+                    background: "radial-gradient(ellipse at 50% 40%, #1a281d 0%, #0d1610 65%, #050a06 100%)",
                     outline: "none"
                   }}
                 >

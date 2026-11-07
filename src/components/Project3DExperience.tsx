@@ -44,6 +44,33 @@ export interface Project3DItem {
 // Config array: standalone .glb models loaded via @google/model-viewer (100% white-label, zero Sketchfab overlays)
 export const PROJECT_3D_LIST: Project3DItem[] = [
   {
+    id: "modern-villa-g1",
+    title: "Modern Villa G+1 (Client Elevation)",
+    tagline: "Contemporary two-storey architectural residence with Gate #25 designer elevation & tinted glass facade",
+    category: "Residential Villa",
+    location: "Koodal Nagar / Sikandar Chavadi, Madurai",
+    builtUpArea: "3,200 Sq.Ft (G+1)",
+    glbModel: "/models/modern_villa_g1.glb",
+    thumbnail: "/images/danam/FFLiving-002.webp",
+    author: "Client Project Elevation (SketchUp 2026)",
+    cameraTarget: "auto auto auto",
+    cameraOrbit: "28deg 74deg 92%",
+    specs: {
+      structure: "Engineered RCC Column-Beam Seismic Zone-III Frame",
+      steel: "Fe550D High-Ductility TMT Rebars",
+      concrete: "Ultratech M25 Ready-Mix Concrete Matrix",
+      vastu: "100% Vastu-Compliant East Entrance & North-East Water Body",
+      floors: "G+1 Floors with Double-Height Facade Glazing",
+      handoverTime: "150 Days Handover Guarantee"
+    },
+    highlights: [
+      "Designer boundary wall with Gate #25 architectural integration",
+      "Expansive floor-to-ceiling tinted glass facade for optimal daylight",
+      "Upper level cantilevered balcony deck with privacy louvers",
+      "Waterproofing & thermal insulation across all roof terraces"
+    ]
+  },
+  {
     id: "luxury-villa-01",
     title: "Modern Luxury Villa Elevation",
     tagline: "Contemporary 4BHK architectural design with Burma teak louvers and terrace deck",
@@ -93,33 +120,6 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
       "Rainwater harvesting & groundwater recharge pit integrated",
       "Concealed copper electrical conduit with surge protection",
       "Anti-skid Italian marble finish in common living zones"
-    ]
-  },
-  {
-    id: "modern-villa-g1",
-    title: "Modern Villa G+1 (Client Elevation)",
-    tagline: "Contemporary two-storey architectural residence with Gate #25 designer elevation & tinted glass facade",
-    category: "Residential Villa",
-    location: "Koodal Nagar / Sikandar Chavadi, Madurai",
-    builtUpArea: "3,200 Sq.Ft (G+1)",
-    glbModel: "/models/modern_villa_g1.glb",
-    thumbnail: "/images/danam/FFLiving-002.webp",
-    author: "Client Project Elevation (SketchUp 2026)",
-    cameraTarget: "auto auto auto",
-    cameraOrbit: "35deg 75deg auto",
-    specs: {
-      structure: "Engineered RCC Column-Beam Seismic Zone-III Frame",
-      steel: "Fe550D High-Ductility TMT Rebars",
-      concrete: "Ultratech M25 Ready-Mix Concrete Matrix",
-      vastu: "100% Vastu-Compliant East Entrance & North-East Water Body",
-      floors: "G+1 Floors with Double-Height Facade Glazing",
-      handoverTime: "150 Days Handover Guarantee"
-    },
-    highlights: [
-      "Designer boundary wall with Gate #25 architectural integration",
-      "Expansive floor-to-ceiling tinted glass facade for optimal daylight",
-      "Upper level cantilevered balcony deck with privacy louvers",
-      "Waterproofing & thermal insulation across all roof terraces"
     ]
   }
 ];
@@ -423,10 +423,10 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Google <model-viewer>: 100% Native WebGL 3D (No static 2D poster image) */}
+                  {/* Google <model-viewer>: 100% Native WebGL 3D with PBR Studio Lighting & Ambient Vignette */}
                   <div
                     onPointerDown={dismissGestureHint}
-                    className="w-full h-full flex items-center justify-center overflow-hidden bg-[#0a0a0d] relative cursor-grab active:cursor-grabbing"
+                    className="w-full h-full flex items-center justify-center overflow-hidden bg-[#0d1610] relative cursor-grab active:cursor-grabbing"
                   >
                     <model-viewer
                       ref={modelViewerRef}
@@ -444,16 +444,18 @@ export default function Project3DExperience() {
                       min-camera-orbit="auto auto 40%"
                       max-camera-orbit="auto auto 200%"
                       field-of-view="30deg"
-                      shadow-intensity="1.2"
-                      shadow-softness="0.8"
-                      exposure="1.0"
+                      environment-image="neutral"
+                      tone-mapping="neutral"
+                      shadow-intensity="1.6"
+                      shadow-softness="0.4"
+                      exposure="1.15"
                       loading="eager"
                       reveal="auto"
                       interaction-prompt="none"
                       style={{
                         width: "100%",
                         height: "100%",
-                        backgroundColor: "#0a0a0d",
+                        background: "radial-gradient(ellipse at 50% 40%, #1a281d 0%, #0d1610 65%, #050a06 100%)",
                         outline: "none",
                         touchAction: "pan-y",
                       }}

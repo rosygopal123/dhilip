@@ -177,7 +177,7 @@ export const ALL_PROJECTS: ProjectItem[] = [
     author: "SR Family, Madurai",
     glbModel: "/models/modern_villa_g1.glb",
     modelAuthor: "Client Architectural Model (SketchUp 2026)",
-    cameraOrbit: "35deg 75deg auto",
+    cameraOrbit: "28deg 74deg 92%",
     cameraTarget: "auto auto auto",
     rooms360: [
       { id: "living", name: "Living & Atrium", tag: "Double Height", panoramaUrl: "/panoramas/living-room.jpg", specs: "14'6\" Height · Statuario Marble" },
