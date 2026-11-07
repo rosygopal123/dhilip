@@ -5,6 +5,7 @@ import {
   Sparkles,
   Layers,
   Sun,
+  Sunset,
   ShieldCheck,
   CheckCircle2,
   Compass,
@@ -214,6 +215,7 @@ export default function Project3DExperience() {
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [selectedThemeId, setSelectedThemeId] = useState<string>("white-charcoal");
+  const [sunMode, setSunMode] = useState<"sun" | "sunset" | "studio">("sun");
   const sectionRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
 
@@ -475,11 +477,53 @@ export default function Project3DExperience() {
               {activeView === "3d" && (
                 <div className="relative w-full h-full bg-[#0a0a0d] overflow-hidden flex items-center justify-center">
 
-                  {/* Top Status Badge */}
-                  <div className="absolute top-3 left-5 z-20 pointer-events-none select-none">
+                  {/* Top Status Badge & Sunlight Modes */}
+                  <div className="absolute top-2.5 left-3 sm:left-5 z-25 flex items-center gap-2 pointer-events-auto select-none">
                     <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 px-2.5 sm:px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
                       <Rotate3D className="w-3.5 h-3.5 text-[#C5A880] animate-spin-slow" />
-                      <span>3D Villa Tour</span>
+                      <span className="hidden sm:inline">3D Villa Tour</span>
+                    </div>
+
+                    {/* Sunlight & Lighting Modes Switcher */}
+                    <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 p-0.5 rounded-full flex items-center shadow-lg">
+                      <button
+                        onClick={() => setSunMode("sun")}
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
+                          sunMode === "sun"
+                            ? "bg-amber-400 text-stone-950 font-bold shadow-sm"
+                            : "text-white/80 hover:text-white"
+                        }`}
+                        title="Direct Sunlight (Midday Sun)"
+                      >
+                        <Sun className="w-3 h-3" />
+                        <span>Sunlight</span>
+                      </button>
+
+                      <button
+                        onClick={() => setSunMode("sunset")}
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
+                          sunMode === "sunset"
+                            ? "bg-amber-600 text-white font-bold shadow-sm"
+                            : "text-white/80 hover:text-white"
+                        }`}
+                        title="Golden Hour Sunset"
+                      >
+                        <Sunset className="w-3 h-3" />
+                        <span>Sunset</span>
+                      </button>
+
+                      <button
+                        onClick={() => setSunMode("studio")}
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
+                          sunMode === "studio"
+                            ? "bg-emerald-600 text-white font-bold shadow-sm"
+                            : "text-white/80 hover:text-white"
+                        }`}
+                        title="Studio Neutral"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        <span className="hidden sm:inline">Studio</span>
+                      </button>
                     </div>
                   </div>
 
@@ -580,18 +624,29 @@ export default function Project3DExperience() {
                       min-camera-orbit="auto auto 40%"
                       max-camera-orbit="auto auto 200%"
                       field-of-view="30deg"
-                      environment-image="neutral"
+                      environment-image={
+                        sunMode === "sun"
+                          ? "/environments/sunny_sky.jpg"
+                          : sunMode === "sunset"
+                          ? "/environments/sunset_sky.jpg"
+                          : "neutral"
+                      }
                       tone-mapping="neutral"
-                      shadow-intensity="1.6"
-                      shadow-softness="0.4"
-                      exposure="1.15"
+                      shadow-intensity={sunMode === "sun" ? "1.8" : sunMode === "sunset" ? "1.6" : "1.3"}
+                      shadow-softness={sunMode === "sun" ? "0.2" : sunMode === "sunset" ? "0.3" : "0.5"}
+                      exposure={sunMode === "sun" ? "1.25" : sunMode === "sunset" ? "1.18" : "1.05"}
                       loading="eager"
                       reveal="auto"
                       interaction-prompt="none"
                       style={{
                         width: "100%",
                         height: "100%",
-                        background: "radial-gradient(ellipse at 50% 40%, #1a281d 0%, #0d1610 65%, #050a06 100%)",
+                        background:
+                          sunMode === "sun"
+                            ? "radial-gradient(ellipse at 50% 35%, #223545 0%, #121c24 55%, #080d12 100%)"
+                            : sunMode === "sunset"
+                            ? "radial-gradient(ellipse at 50% 35%, #3d2014 0%, #20100a 55%, #0d0604 100%)"
+                            : "radial-gradient(ellipse at 50% 40%, #1a281d 0%, #0d1610 65%, #050a06 100%)",
                         outline: "none",
                         touchAction: "pan-y",
                       }}
