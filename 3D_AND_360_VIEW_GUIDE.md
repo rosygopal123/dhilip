@@ -651,3 +651,131 @@ export default function Minimal360({ src }: { src: string }) {
 | **Next.js SSR crash on `<model-viewer>`** | Web component evaluated on Node server. | Load script dynamically in `useEffect` and guard with `customElements.get("model-viewer")`. |
 | **Hotspot pins drift when zooming / rotating** | Missing aspect ratio or incorrect tangent projection. | Use `Math.tan(deltaYaw) / (Math.tan(fov * 0.5) * aspect)` projection formula. |
 | **Slow room switching** | Loading 4MB panorama on every click. | Use module-scoped `textureCanvasCache` and preload all rooms on mount. |
+| **Blender freezes ("Not Responding") on GLB import** | Online converters (e.g. ImageToStl) split model into 160,000+ separate mesh primitives & 100MB JSON. | Export directly from SketchUp 2023/2026 via `File > Export > 3D Model > glTF` or purge in SketchUp first. |
+| **SketchUp model looks flat / 2D on desktop** | Shadows disabled and black profile edges enabled by default. | Enable `View > Shadows` in SketchUp; WebGL browser automatically applies PBR sunlight & contact shadows. |
+| **Model exported in inches appears tiny/huge or off-center** | SketchUp export units use inches (e.g. 5,000 units instead of 15m). | Set `camera-target="auto auto auto"` and `camera-orbit="35deg 75deg auto"` so `<model-viewer>` dynamically frames any scale. |
+
+---
+
+## 8. Client CAD & SketchUp to WebGL Pipeline (Converting 800MB to 6MB-10MB)
+
+### 8.1 The Root Causes of Conversion Failures & Crashes
+1. **AutoCAD (`.dwg` / `.dxf`) is NOT a 3D Mesh**:
+   - Contains 2D vector splines, lines, and NURBS curves. WebGL only renders polygonal triangle meshes with UV maps.
+   - Solution: Export from AutoCAD/Civil 3D via `FBXEXPORT` command to `.fbx` or `.obj`, then open in Blender or SketchUp.
+
+2. **The "ImageToStl" Shatter Disaster (Case Study: `HDFC Govindh` 201.2 MB GLB)**:
+   - When an unoptimized SketchUp project was passed through a generic online converter, the tool converted every single face into its own individual node and mesh.
+   - Result: **163,553 separate meshes**, **163,638 nodes**, and **102 MB of pure JSON text** inside a single GLB file.
+   - Result in Blender: Blender attempts to create 163,553 separate Outliner data structures in RAM, causing an instant freeze (`Blender (Not Responding)`) and crash.
+   - **Rule**: NEVER use generic online file converter websites for architectural 3D models. Always export directly from SketchUp or use Blender with Draco compression.
+
+3. **Reversed Face Normals (Blue vs. White Faces)**:
+   - SketchUp renders back-faces by default. WebGL engines have **Backface Culling** enabled for 60fps performance.
+   - If a wall has its blue back-face facing outward, the browser renders it completely transparent/invisible.
+   - Fix: In SketchUp, right click inverted faces $\rightarrow$ `Reverse Faces` (outer surfaces must be White).
+
+4. **Why the Website's 13MB Model can contain Trees, Glass, and Furniture**:
+   - **Instancing**: The tree geometry is saved only once in memory; the scene simply places 20 transform references to it.
+   - **PBR Mathematical Shaders**: Realistic glass, chrome, and stainless steel require 0 MB of image textures (Roughness `0.05`, Transmission `1.0`, Metallic `0.9`).
+   - **Normal Maps**: Instead of 200,000 polygons for sofa cushions, a 500-poly box with a baked normal map creates photorealistic creases with 99% less weight.
+   - **Google Draco Compression**: Geometry quantization compresses coordinate buffers by 80-90% with zero perceived quality loss.
+
+---
+
+### 8.2 The SketchUp Direct Export Recipe (Tested & Verified)
+
+```
+Raw Client Model (.skp) [8.93 MB - 40 MB]
+           │
+           ▼
+[Step 1] Window > Model Info > Statistics > "Purge Unused"
+           │
+           ▼
+[Step 2] View > Shadows (Verify PBR depth & ensure exterior faces are White)
+           │
+           ▼
+[Step 3] File > Export > 3D Model... > Choose "glTF Binary (*.glb)"
+           │
+           ▼
+Optimized Web Asset (.glb) [6.37 MB] ── Ready for <model-viewer>!
+```
+
+**Real Test Output:**
+* Input: `MODERN+VILLA+G+1.skp` (8.93 MB)
+* Output: `MODERN+VILLA+G+1.glb` (**6.37 MB**, 693 meshes, 30 materials, 14 textures)
+* Asset location in codebase: `public/models/modern_villa_g1.glb`
+
+---
+
+### 8.3 Multi-Model Project Switcher Architecture
+
+To allow clients and prospects to seamlessly switch between multiple 3D architectural elevations without page reload:
+
+1. **Model Configuration Schema (`src/components/Project3DExperience.tsx` & `src/data/projectsData.ts`)**:
+```typescript
+export interface Project3DItem {
+  id: string;
+  title: string;
+  tagline: string;
+  category: string;
+  location: string;
+  builtUpArea: string;
+  glbModel: string;
+  thumbnail: string;
+  author: string;
+  cameraTarget?: string; // e.g. "auto auto auto" or "0m 4.5m -5m"
+  cameraOrbit?: string;  // e.g. "35deg 75deg auto"
+  specs: { ... };
+  highlights: string[];
+}
+```
+
+2. **Registered Live Models in Codebase**:
+* Model 1: `luxury-villa-01` $\rightarrow$ `/models/villa.glb` (13 MB Draco Villa G+2)
+* Model 2: `contemporary-residence-02` $\rightarrow$ `/models/LuxuryVilla_site_draco.glb` (13 MB Luxury Villa G+1)
+* Model 3: `modern-villa-g1` $\rightarrow$ `/models/modern_villa_g1.glb` (**6.37 MB** Client Modern Villa G+1 with Gate #25 Elevation)
+
+3. **Dynamic Auto-Centering for Arbitrary Model Units**:
+```html
+<model-viewer
+  key={selectedProject.id}
+  src={selectedProject.glbModel}
+  camera-controls
+  disable-tap
+  disable-pan
+  auto-rotate
+  camera-orbit={selectedProject.cameraOrbit || (isMobile ? "35deg 72deg 95%" : "35deg 72deg 80%")}
+  camera-target={selectedProject.cameraTarget || "auto auto auto"}
+  min-camera-orbit="auto auto 40%"
+  max-camera-orbit="auto auto 200%"
+  field-of-view="30deg"
+  shadow-intensity="1.2"
+  shadow-softness="0.8"
+  exposure="1.0"
+/>
+```
+Using `camera-target="auto auto auto"` ensures that models exported with arbitrary unit scales (e.g. SketchUp inches vs Blender meters) center their bounding box without off-axis wobble or jumping on click.
+
+---
+
+## 9. Current Website Status & Pending Tasks (Session Handover)
+
+### Completed Features:
+1. **Interactive 3D Walkaround**: Fully responsive Google `<model-viewer>` with dynamic script loading, gesture hint overlays, zoom controls, and 3-model switcher tabs.
+2. **Interactive 360° VR Tour Pro**: Custom WebGL equirectangular shader engine with 4 rooms (`living-room`, `master-bedroom`, `modular-kitchen`, `sky-terrace`), NPOT texture resampling, interactive teleport portals, digital measuring ruler, radar floor plan, and day/night grading.
+3. **Turnkey Lead Management Portal (`/admin/leads`)**:
+   - Protected by `admin 123` password authentication gate.
+   - Session storage persistence, password reveal toggle, CSV export, and status tagging.
+4. **SEO & Discovery Infrastructure**:
+   - Dynamic `sitemap.xml` (`src/app/sitemap.ts`) & `robots.txt` (`src/app/robots.ts`).
+   - OpenGraph 1200x630 social sharing metadata.
+   - JSON-LD LocalBusiness & GeneralContractor structured data.
+   - GA4 & Meta Pixel analytics component.
+5. **Cleaned Branding**: All legacy "ABC Builders" placeholders replaced with Danam Holdings Madurai contact info (+91 88833 32499).
+
+### Pending Items (For Future Sessions):
+1. **Google Sheets / Webhook Lead Sync**: Automatic webhook forwarding when a new customer fills out the lead modal (`/api/leads`).
+2. **Tamil Translations for 3D/360 Overlays**: Localization dictionary entries for the 3D tour controls and room names.
+3. **GitHub Push**: Git commit is created locally, but `git push origin main` is intentionally held until user gives final deployment approval.
+

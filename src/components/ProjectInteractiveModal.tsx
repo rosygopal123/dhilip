@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { ProjectItem, Project360Room, ProjectCadDrawing } from "@/data/projectsData";
+import { ProjectItem, Project360Room } from "@/data/projectsData";
 import {
   X,
   Rotate3D,
@@ -23,15 +23,13 @@ import {
   ChevronRight,
   Eye,
   SlidersHorizontal,
-  Info,
-  Ruler,
-  ExternalLink
+  Info
 } from "lucide-react";
 import BeforeAfterSlider from "./BeforeAfterSlider";
 
 interface ProjectInteractiveModalProps {
   project: ProjectItem | null;
-  initialTab?: "3d" | "360" | "cad" | "specs" | "before-after";
+  initialTab?: "3d" | "360" | "specs" | "before-after";
   onClose: () => void;
 }
 
@@ -105,7 +103,7 @@ export default function ProjectInteractiveModal({
   initialTab = "3d",
   onClose
 }: ProjectInteractiveModalProps) {
-  const [activeTab, setActiveTab] = useState<"3d" | "360" | "cad" | "specs" | "before-after">(initialTab);
+  const [activeTab, setActiveTab] = useState<"3d" | "360" | "specs" | "before-after">(initialTab);
   const [is3dLoaded, setIs3dLoaded] = useState<boolean>(false);
   const [selectedRoomIdx, setSelectedRoomIdx] = useState<number>(0);
   const [isNightMode, setIsNightMode] = useState<boolean>(false);
@@ -116,14 +114,6 @@ export default function ProjectInteractiveModal({
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [showGestureGuide, setShowGestureGuide] = useState<boolean>(true);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-
-  // CAD Blueprint Viewer State
-  const [selectedCadIdx, setSelectedCadIdx] = useState<number>(0);
-  const [cadZoom, setCadZoom] = useState<number>(1);
-  const [cadPan, setCadPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [isCadDragging, setIsCadDragging] = useState<boolean>(false);
-  const [cadDragStart, setCadDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [cadTheme, setCadTheme] = useState<"blueprint" | "drafting">("blueprint");
 
   const modalContainerRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
@@ -165,9 +155,6 @@ export default function ProjectInteractiveModal({
     if (project) {
       setActiveTab(initialTab);
       setSelectedRoomIdx(0);
-      setSelectedCadIdx(0);
-      setCadZoom(1);
-      setCadPan({ x: 0, y: 0 });
       setYaw(0);
       setPitch(0);
       setFov(1.25);
@@ -175,35 +162,6 @@ export default function ProjectInteractiveModal({
       pitchRef.current = 0;
     }
   }, [project, initialTab]);
-
-  // CAD Blueprint Pan & Zoom Handlers
-  const handleCadWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const zoomDelta = e.deltaY < 0 ? 0.2 : -0.2;
-    setCadZoom((prev) => Math.min(3.5, Math.max(0.6, Number((prev + zoomDelta).toFixed(2)))));
-  };
-
-  const handleCadMouseDown = (e: React.MouseEvent) => {
-    setIsCadDragging(true);
-    setCadDragStart({ x: e.clientX - cadPan.x, y: e.clientY - cadPan.y });
-  };
-
-  const handleCadMouseMove = (e: React.MouseEvent) => {
-    if (!isCadDragging) return;
-    setCadPan({
-      x: e.clientX - cadDragStart.x,
-      y: e.clientY - cadDragStart.y
-    });
-  };
-
-  const handleCadMouseUp = () => {
-    setIsCadDragging(false);
-  };
-
-  const resetCadTransform = () => {
-    setCadZoom(1);
-    setCadPan({ x: 0, y: 0 });
-  };
 
   // Load Google <model-viewer> script
   useEffect(() => {
@@ -558,7 +516,6 @@ export default function ProjectInteractiveModal({
   if (!project) return null;
 
   const currentRoom = project.rooms360[selectedRoomIdx] || project.rooms360[0];
-  const currentCad = project.cadDrawings?.[selectedCadIdx] || project.cadDrawings?.[0];
 
   const handleOpenLeadModal = () => {
     onClose();
@@ -566,15 +523,9 @@ export default function ProjectInteractiveModal({
   };
 
   const handleOpenWhatsApp = () => {
-    let msgText = `Hi Danam Holdings, I am reviewing "${project.title}" (${project.location}) on your website.`;
-    if (activeTab === "cad") {
-      msgText = `Hi Danam Holdings, I am reviewing the CAD Blueprint & Architectural Drawings for "${project.title}" (${currentCad?.sheetNo || "DWG"}) on your website and would like to consult on architectural plans for my site.`;
-    } else if (activeTab === "3d") {
-      msgText = `Hi Danam Holdings, I am reviewing the interactive 3D Exterior Elevation for "${project.title}" (${project.location}) and would like to build a similar project.`;
-    } else if (activeTab === "360") {
-      msgText = `Hi Danam Holdings, I am exploring the 360° Interior VR Walkthrough for "${project.title}" (${currentRoom?.name || "Room"}) and would like to consult on interior execution.`;
-    }
-    const msg = encodeURIComponent(msgText);
+    const msg = encodeURIComponent(
+      `Hi Danam Holdings, I am reviewing the 3D Elevation & 360° VR View for "${project.title}" (${project.location}) and would like to build a similar project.`
+    );
     window.open(`https://wa.me/918883332499?text=${msg}`, "_blank");
   };
 
@@ -636,18 +587,6 @@ export default function ProjectInteractiveModal({
             >
               <Compass className="w-3.5 h-3.5 text-emerald-300" />
               <span>360° Interior VR</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("cad")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-ui text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === "cad"
-                  ? "bg-brand-forest text-white shadow-md ring-1 ring-white/20"
-                  : "text-white/60 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              <Ruler className="w-3.5 h-3.5 text-cyan-300" />
-              <span>CAD & Blueprints</span>
             </button>
 
             <button
@@ -924,241 +863,6 @@ export default function ProjectInteractiveModal({
                   })}
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* TAB: CAD & Blueprints Interactive Technical Drawing Inspector */}
-          {activeTab === "cad" && (
-            <div className="relative flex-1 flex flex-col bg-[#070b12] text-white min-h-[500px]">
-              {/* CAD Controls Top Toolbar */}
-              <div className="bg-[#0b101b] border-b border-white/10 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shrink-0 z-20">
-                {/* Left: Drawing Sheet Selector */}
-                <div className="flex items-center gap-1.5 overflow-x-auto max-w-full">
-                  <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-1 mr-1">
-                    <Ruler className="w-3.5 h-3.5" />
-                    <span>Sheets:</span>
-                  </span>
-                  {(project.cadDrawings || []).map((sheet, sIdx) => {
-                    const isSelected = selectedCadIdx === sIdx;
-                    return (
-                      <button
-                        key={sheet.id}
-                        onClick={() => {
-                          setSelectedCadIdx(sIdx);
-                          resetCadTransform();
-                        }}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                          isSelected
-                            ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400/60 font-bold shadow-xs"
-                            : "bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-transparent"
-                        }`}
-                      >
-                        <span className="text-[10px] opacity-75">{sheet.sheetNo}</span>
-                        <span className="hidden sm:inline">•</span>
-                        <span className="truncate max-w-[140px] sm:max-w-none">{sheet.type}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Right: Zoom, Theme, and Reset Controls */}
-                <div className="flex items-center gap-2">
-                  {/* Theme Switcher */}
-                  <div className="flex items-center bg-black/40 border border-white/10 rounded-xl p-0.5 text-[11px] font-mono">
-                    <button
-                      onClick={() => setCadTheme("blueprint")}
-                      className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${
-                        cadTheme === "blueprint" ? "bg-cyan-600/40 text-cyan-300 font-bold" : "text-white/50 hover:text-white"
-                      }`}
-                      title="Engineering Blueprint Mode"
-                    >
-                      Blueprint
-                    </button>
-                    <button
-                      onClick={() => setCadTheme("drafting")}
-                      className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${
-                        cadTheme === "drafting" ? "bg-white/20 text-white font-bold" : "text-white/50 hover:text-white"
-                      }`}
-                      title="Architectural Drafting Paper Mode"
-                    >
-                      Draft
-                    </button>
-                  </div>
-
-                  {/* Zoom Controls */}
-                  <div className="flex items-center gap-1 bg-black/40 border border-white/10 rounded-xl p-0.5">
-                    <button
-                      onClick={() => setCadZoom((prev) => Math.max(0.6, Number((prev - 0.25).toFixed(2))))}
-                      className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
-                      title="Zoom Out CAD Sheet"
-                    >
-                      <ZoomOut className="w-3.5 h-3.5" />
-                    </button>
-                    <span className="text-[10px] font-mono font-bold px-1.5 text-cyan-300 min-w-[42px] text-center">
-                      {Math.round(cadZoom * 100)}%
-                    </span>
-                    <button
-                      onClick={() => setCadZoom((prev) => Math.min(3.5, Number((prev + 0.25).toFixed(2))))}
-                      className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
-                      title="Zoom In CAD Sheet"
-                    >
-                      <ZoomIn className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={resetCadTransform}
-                      className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
-                      title="Reset View"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  {/* Open Raw High-Res Link */}
-                  {currentCad && (
-                    <a
-                      href={currentCad.dwgUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 text-white/70 hover:text-cyan-300 hover:bg-white/10 border border-white/10 rounded-xl transition-colors cursor-pointer"
-                      title="Open High-Resolution Blueprint Image in New Tab"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              {/* Main Interactive CAD Stage */}
-              <div
-                className={`relative flex-1 overflow-hidden select-none cursor-grab active:cursor-grabbing min-h-[360px] sm:min-h-[440px] flex items-center justify-center ${
-                  cadTheme === "blueprint"
-                    ? "bg-[#061527] bg-[radial-gradient(#1e3a5f_1px,transparent_1px)] [background-size:24px_24px]"
-                    : "bg-[#181a20] bg-[radial-gradient(#2d3342_1px,transparent_1px)] [background-size:20px_20px]"
-                }`}
-                onWheel={handleCadWheel}
-                onMouseDown={handleCadMouseDown}
-                onMouseMove={handleCadMouseMove}
-                onMouseUp={handleCadMouseUp}
-                onMouseLeave={handleCadMouseUp}
-              >
-                {/* Viewfinder Reticles */}
-                <span className="pointer-events-none absolute left-4 top-4 z-10 h-5 w-5 border-l-2 border-t-2 border-cyan-400/40" />
-                <span className="pointer-events-none absolute right-4 top-4 z-10 h-5 w-5 border-r-2 border-t-2 border-cyan-400/40" />
-                <span className="pointer-events-none absolute left-4 bottom-4 z-10 h-5 w-5 border-l-2 border-b-2 border-cyan-400/40" />
-                <span className="pointer-events-none absolute right-4 bottom-4 z-10 h-5 w-5 border-r-2 border-b-2 border-cyan-400/40" />
-
-                {/* Engineering Blueprint Watermark & Stamp */}
-                <div className="absolute top-4 left-6 z-10 pointer-events-none">
-                  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-cyan-400/30">
-                    <ShieldCheck className="w-4 h-4 text-cyan-400" />
-                    <div>
-                      <span className="text-[10px] font-mono font-bold text-cyan-300 block tracking-wider uppercase">
-                        {currentCad?.sheetNo || "CAD DWG"} • {currentCad?.scale || "1:50"}
-                      </span>
-                      <span className="text-[9px] text-white/50 font-mono block">
-                        {currentCad?.approvalStatus || "IS 456 Structural Verified"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Scale Bar Indicator in Bottom Left */}
-                <div className="absolute bottom-4 left-6 z-10 pointer-events-none hidden sm:flex flex-col bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 font-mono text-[9px] text-white/60">
-                  <span className="text-[8px] text-cyan-400 font-bold uppercase tracking-widest mb-0.5">Scale Bar</span>
-                  <div className="flex items-center gap-1">
-                    <span>0m</span>
-                    <div className="w-16 h-1.5 border border-cyan-400/70 bg-gradient-to-r from-cyan-400 via-transparent to-cyan-400"></div>
-                    <span>5m</span>
-                    <div className="w-16 h-1.5 border border-cyan-400/70 bg-gradient-to-r from-cyan-400 via-transparent to-cyan-400"></div>
-                    <span>10m</span>
-                  </div>
-                </div>
-
-                {/* Hint banner */}
-                <div className="absolute bottom-4 right-6 z-10 pointer-events-none text-right hidden md:block">
-                  <span className="text-[10px] font-mono text-white/40 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10">
-                    Drag to Pan • Scroll to Zoom ({Math.round(cadZoom * 100)}%)
-                  </span>
-                </div>
-
-                {/* The CAD Drawing Canvas Image with Transform */}
-                {currentCad ? (
-                  <div
-                    style={{
-                      transform: `translate(${cadPan.x}px, ${cadPan.y}px) scale(${cadZoom})`,
-                      transition: isCadDragging ? "none" : "transform 0.15s ease-out",
-                      transformOrigin: "center center"
-                    }}
-                    className="relative max-w-full max-h-full p-6 flex items-center justify-center transition-all"
-                  >
-                    <div
-                      className={`relative rounded-xl overflow-hidden shadow-2xl border transition-all ${
-                        cadTheme === "blueprint"
-                          ? "border-cyan-400/50 shadow-[0_0_50px_rgba(6,182,212,0.15)] ring-1 ring-cyan-400/30"
-                          : "border-white/20 shadow-2xl"
-                      }`}
-                    >
-                      <img
-                        src={currentCad.dwgUrl}
-                        alt={currentCad.title}
-                        className={`max-w-[85vw] max-h-[62vh] object-contain transition-all ${
-                          cadTheme === "blueprint"
-                            ? "contrast-125 brightness-95 filter hue-rotate-15"
-                            : "contrast-110"
-                        }`}
-                        draggable={false}
-                      />
-
-                      {/* Corner Title Block inside Blueprint */}
-                      <div className="absolute bottom-2 right-2 bg-black/85 backdrop-blur-md border border-cyan-400/40 p-2 rounded-lg text-left font-mono text-[9px] pointer-events-none max-w-[220px]">
-                        <span className="text-cyan-400 font-bold block uppercase truncate">DANAM HOLDINGS CIVIL EPC</span>
-                        <span className="text-white/80 block truncate font-sans text-[10px] font-semibold">{project.title}</span>
-                        <span className="text-white/50 block">{currentCad.sheetNo} • REV-03</span>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-white/50 font-mono text-xs">No CAD Blueprint Attached</div>
-                )}
-              </div>
-
-              {/* Technical Blueprint Specifications Drawer */}
-              {currentCad && (
-                <div className="bg-[#0b101b] border-t border-white/10 p-4 sm:p-5 shrink-0">
-                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                    <div className="max-w-2xl">
-                      <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                        <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
-                          {currentCad.sheetNo}
-                        </span>
-                        <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" />
-                          {currentCad.approvalStatus}
-                        </span>
-                        <span className="text-xs font-mono text-white/50">
-                          Scale: {currentCad.scale} • Dim: {currentCad.dimensions}
-                        </span>
-                      </div>
-                      <h4 className="font-display text-sm sm:text-base font-bold text-white">
-                        {currentCad.title}
-                      </h4>
-                      <p className="font-ui text-xs text-white/70 mt-1 leading-relaxed">
-                        {currentCad.description}
-                      </p>
-                    </div>
-
-                    {/* Quick Specs Badges */}
-                    <div className="flex flex-wrap lg:flex-col gap-1.5 shrink-0 font-ui text-[11px] text-white/80">
-                      {currentCad.keySpecs.map((spec, idx) => (
-                        <div key={idx} className="flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
-                          <CheckCircle2 className="w-3 h-3 text-cyan-400 shrink-0" />
-                          <span className="truncate max-w-[320px]">{spec}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           )}
 

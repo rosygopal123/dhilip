@@ -29,6 +29,7 @@ export interface Project3DItem {
   thumbnail: string;
   author: string;
   cameraTarget?: string;
+  cameraOrbit?: string;
   specs: {
     structure: string;
     steel: string;
@@ -92,6 +93,33 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
       "Rainwater harvesting & groundwater recharge pit integrated",
       "Concealed copper electrical conduit with surge protection",
       "Anti-skid Italian marble finish in common living zones"
+    ]
+  },
+  {
+    id: "modern-villa-g1",
+    title: "Modern Villa G+1 (Client Elevation)",
+    tagline: "Contemporary two-storey architectural residence with Gate #25 designer elevation & tinted glass facade",
+    category: "Residential Villa",
+    location: "Koodal Nagar / Sikandar Chavadi, Madurai",
+    builtUpArea: "3,200 Sq.Ft (G+1)",
+    glbModel: "/models/modern_villa_g1.glb",
+    thumbnail: "/images/danam/FFLiving-002.webp",
+    author: "Client Project Elevation (SketchUp 2026)",
+    cameraTarget: "auto auto auto",
+    cameraOrbit: "35deg 75deg auto",
+    specs: {
+      structure: "Engineered RCC Column-Beam Seismic Zone-III Frame",
+      steel: "Fe550D High-Ductility TMT Rebars",
+      concrete: "Ultratech M25 Ready-Mix Concrete Matrix",
+      vastu: "100% Vastu-Compliant East Entrance & North-East Water Body",
+      floors: "G+1 Floors with Double-Height Facade Glazing",
+      handoverTime: "150 Days Handover Guarantee"
+    },
+    highlights: [
+      "Designer boundary wall with Gate #25 architectural integration",
+      "Expansive floor-to-ceiling tinted glass facade for optimal daylight",
+      "Upper level cantilevered balcony deck with privacy louvers",
+      "Waterproofing & thermal insulation across all roof terraces"
     ]
   }
 ];
@@ -198,7 +226,7 @@ export default function Project3DExperience() {
     const mv = modelViewerRef.current;
     if (!mv) return;
     try {
-      mv.cameraOrbit = `35deg 72deg ${isMobile ? 95 : 80}%`;
+      mv.cameraOrbit = selectedProject.cameraOrbit || (isMobile ? "35deg 72deg 95%" : "35deg 72deg 80%");
       mv.cameraTarget = selectedProject.cameraTarget || "0m 4.5m -5m";
       mv.fieldOfView = "30deg";
       mv.setAttribute("auto-rotate", "");
@@ -411,7 +439,7 @@ export default function Project3DExperience() {
                       auto-rotate
                       rotation-per-second="6deg"
                       auto-rotate-delay="999999"
-                      camera-orbit={`35deg 72deg ${isMobile ? 95 : 80}%`}
+                      camera-orbit={selectedProject.cameraOrbit || (isMobile ? "35deg 72deg 95%" : "35deg 72deg 80%")}
                       camera-target={selectedProject.cameraTarget || "0m 4.5m -5m"}
                       min-camera-orbit="auto auto 40%"
                       max-camera-orbit="auto auto 200%"
@@ -565,6 +593,35 @@ export default function Project3DExperience() {
           <div className="lg:col-span-5 flex flex-col gap-5">
             {/* Quick Details Card */}
             <div className="bg-surface-0 border border-border-medium rounded-2xl p-5 shadow-sm text-text-primary">
+              {/* Interactive Project Switcher */}
+              <div className="mb-4 pb-3 border-b border-border-subtle">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-text-tertiary block mb-2">
+                  Select 3D Model:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {PROJECT_3D_LIST.map((proj) => {
+                    const isSelected = selectedProject.id === proj.id;
+                    return (
+                      <button
+                        key={proj.id}
+                        onClick={() => {
+                          setSelectedProject(proj);
+                          setShowGestureHint(true);
+                        }}
+                        className={`px-2.5 py-1.5 rounded-lg text-xs font-ui font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                          isSelected
+                            ? "bg-brand-forest text-white shadow-xs font-bold"
+                            : "bg-surface-1 text-text-secondary hover:text-text-primary hover:bg-surface-2 border border-border-subtle"
+                        }`}
+                      >
+                        <Rotate3D className={`w-3 h-3 ${isSelected ? "text-amber-300" : "text-text-tertiary"}`} />
+                        <span>{proj.title}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <span className="inline-block px-2.5 py-0.5 rounded-full bg-brand-amber/10 border border-brand-amber/30 text-brand-gold text-[10px] font-extrabold uppercase tracking-wider mb-2">
                 Featured 3D Concept
               </span>

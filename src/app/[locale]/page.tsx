@@ -12,7 +12,7 @@ import HomeFAQ from "@/components/HomeFAQ";
 import MobileQuickBar from "@/components/MobileQuickBar";
 import ProjectInteractiveModal from "@/components/ProjectInteractiveModal";
 import { ALL_PROJECTS, ProjectItem } from "@/data/projectsData";
-import { ChevronRight, Star, ShieldCheck, Award, Building2, CheckCircle2, Rotate3D, Compass, Eye, Ruler } from "lucide-react";
+import { ChevronRight, Star, ShieldCheck, Award, Building2, CheckCircle2, Rotate3D, Compass, Eye } from "lucide-react";
 
 // Custom Stat Counter Component
 function StatCard({ number, label, suffix = "" }: { number: number; label: string; suffix?: string }) {
@@ -76,9 +76,7 @@ export default function HomePage() {
   };
 
   const [modalProject, setModalProject] = useState<ProjectItem | null>(null);
-  const [modalTab, setModalTab] = useState<"3d" | "360" | "cad" | "specs" | "before-after">(
-    "3d"
-  );
+  const [modalTab, setModalTab] = useState<"3d" | "360" | "specs" | "before-after">("3d");
 
   const danamFeaturedProjects = ALL_PROJECTS.slice(0, 4);
 
@@ -265,30 +263,22 @@ export default function HomePage() {
                   </div>
 
                   {/* Hover Quick Action Buttons */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
-                    <div className="flex items-center gap-1.5">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={() => { setModalProject(p); setModalTab("3d"); }}
-                        className="flex-1 inline-flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-brand-forest hover:bg-brand-forest-dark text-white text-[11px] font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-brand-forest hover:bg-brand-forest-dark text-white text-xs font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
                       >
                         <Rotate3D className="w-3.5 h-3.5 text-amber-300" />
-                        <span>3D</span>
+                        <span>3D Exterior</span>
                       </button>
 
                       <button
                         onClick={() => { setModalProject(p); setModalTab("360"); }}
-                        className="flex-1 inline-flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-[#0b0e14]/95 hover:bg-[#0b0e14] border border-emerald-400/60 text-emerald-300 text-[11px] font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#0b0e14]/95 hover:bg-[#0b0e14] border border-emerald-400/60 text-emerald-300 text-xs font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
                       >
                         <Compass className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>360°</span>
-                      </button>
-
-                      <button
-                        onClick={() => { setModalProject(p); setModalTab("cad"); }}
-                        className="flex-1 inline-flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-cyan-950/95 hover:bg-cyan-900 border border-cyan-400/60 text-cyan-200 text-[11px] font-bold uppercase tracking-wider transition-transform hover:scale-105 shadow-lg cursor-pointer"
-                      >
-                        <Ruler className="w-3.5 h-3.5 text-cyan-300" />
-                        <span>CAD</span>
+                        <span>360° VR Tour</span>
                       </button>
                     </div>
                   </div>
@@ -314,33 +304,25 @@ export default function HomePage() {
                   <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-border-subtle">
                     <button
                       onClick={() => { setModalProject(p); setModalTab("3d"); }}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-2 hover:bg-brand-forest hover:text-white text-text-primary text-xs font-semibold transition-all cursor-pointer border border-border-subtle"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-brand-forest hover:text-white text-text-primary text-xs font-semibold transition-all cursor-pointer border border-border-subtle"
                     >
                       <Rotate3D className="w-3.5 h-3.5 text-amber-500" />
-                      <span>3D</span>
+                      <span>3D Model</span>
                     </button>
 
                     <button
                       onClick={() => { setModalProject(p); setModalTab("360"); }}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-2 hover:bg-brand-forest hover:text-white text-text-primary text-xs font-semibold transition-all cursor-pointer border border-border-subtle"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-2 hover:bg-brand-forest hover:text-white text-text-primary text-xs font-semibold transition-all cursor-pointer border border-border-subtle"
                     >
                       <Compass className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>360°</span>
-                    </button>
-
-                    <button
-                      onClick={() => { setModalProject(p); setModalTab("cad"); }}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-2 hover:bg-cyan-700 hover:text-white text-text-primary text-xs font-semibold transition-all cursor-pointer border border-border-subtle"
-                    >
-                      <Ruler className="w-3.5 h-3.5 text-cyan-600" />
-                      <span>CAD</span>
+                      <span>360° Tour</span>
                     </button>
 
                     <button
                       onClick={() => { setModalProject(p); setModalTab("specs"); }}
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-brand-forest hover:bg-brand-forest/10 text-xs font-bold transition-all cursor-pointer ml-auto"
                     >
-                      <span>Specs →</span>
+                      <span>Specs & BOQ →</span>
                     </button>
                   </div>
                 </div>
