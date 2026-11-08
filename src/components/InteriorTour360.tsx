@@ -412,13 +412,13 @@ void main() {
   float tanHalfFov = tan(u_fov * 0.5);
   vec3 ray = normalize(vec3(screen.x * tanHalfFov * u_aspect, -screen.y * tanHalfFov, 1.0));
 
-  // Pitch rotation (X axis)
+  // Pitch rotation (X axis) - pitch > 0 tilts camera up towards ceiling
   float cp = cos(u_pitch);
   float sp = sin(u_pitch);
   vec3 rPitch = vec3(
     ray.x,
-    ray.y * cp - ray.z * sp,
-    ray.y * sp + ray.z * cp
+    ray.y * cp + ray.z * sp,
+    -ray.y * sp + ray.z * cp
   );
 
   // Yaw rotation (Y axis)
@@ -458,7 +458,7 @@ export default function InteriorTour360() {
   const [activeRoomIndex, setActiveRoomIndex] = useState<number>(0);
   const [yaw, setYaw] = useState<number>(0); // radians
   const [pitch, setPitch] = useState<number>(0); // radians (-0.7 to 0.7)
-  const [fov, setFov] = useState<number>(1.25); // ~72 degrees
+  const [fov, setFov] = useState<number>(1.05); // ~60 degrees architectural perspective
   const [autoRotate, setAutoRotate] = useState<boolean>(true);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
@@ -481,7 +481,7 @@ export default function InteriorTour360() {
   const lastMousePosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const yawRef = useRef<number>(0);
   const pitchRef = useRef<number>(0);
-  const fovRef = useRef<number>(1.25);
+  const fovRef = useRef<number>(1.05);
   const autoRotateRef = useRef<boolean>(true);
   const isDraggingRef = useRef<boolean>(false);
   const nightFactorRef = useRef<number>(0);
@@ -835,8 +835,8 @@ export default function InteriorTour360() {
     if (nextYaw < 0) nextYaw += Math.PI * 2;
 
     // Pitch clamped to prevent pole flip (-68 deg to +68 deg)
-    const maxPitch = 1.18;
-    const nextPitch = Math.max(-maxPitch, Math.min(maxPitch, pitchRef.current + dy * sensitivity));
+    const maxPitch = 0.52;
+    const nextPitch = Math.max(-maxPitch, Math.min(maxPitch, pitchRef.current - dy * sensitivity));
 
     yawRef.current = nextYaw;
     pitchRef.current = nextPitch;
@@ -860,11 +860,11 @@ export default function InteriorTour360() {
   const resetView = () => {
     setYaw(0);
     setPitch(0);
-    setFov(1.25);
+    setFov(1.05);
     setAutoRotate(true);
     yawRef.current = 0;
     pitchRef.current = 0;
-    fovRef.current = 1.25;
+    fovRef.current = 1.05;
   };
 
   const toggleFullscreen = () => {
