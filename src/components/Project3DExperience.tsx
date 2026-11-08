@@ -160,8 +160,8 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     author: "Client Project Elevation (SketchUp 2026)",
     cameraTarget: "auto auto auto",
     cameraOrbit: "28deg 74deg 92%",
-    interiorCameraTarget: "0.2m 0.55m 0.15m",
-    interiorCameraOrbit: "10deg 85deg 0.8m",
+    interiorCameraTarget: "11.9m 3.0m -18.0m",
+    interiorCameraOrbit: "0deg 85deg 3m",
     specs: {
       structure: "Engineered RCC Column-Beam Seismic Zone-III Frame",
       steel: "Fe550D High-Ductility TMT Rebars",
@@ -182,60 +182,60 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
         number: 1,
         title: "Gate #25 Architectural Entrance",
         category: "Civil Elevation & Fabrication",
-        position: "-0.7m 0.35m 0.5m",
+        position: "8.7m 1.5m 0.2m",
         normal: "0m 0m 1m",
         specs: "Heavy-gauge designer MS fabrication with anti-rust zinc primer, teak texture inlays, and automated sliding motor conduit.",
         materials: ["IS 2062 Grade Steel", "Reinforced M25 Gate Pillars", "Concealed Motor Provision"],
-        focusOrbit: "15deg 80deg 50%",
-        focusTarget: "-0.7m 0.35m 0.5m"
+        focusOrbit: "15deg 80deg 18m",
+        focusTarget: "8.7m 1.5m 0m"
       },
       {
         id: "facade-glazing",
         number: 2,
         title: "Floor-to-Ceiling Tinted Glazing",
         category: "Fenestration & Thermal Insulation",
-        position: "0.35m 0.65m 0.35m",
+        position: "6.8m 3.5m -14.2m",
         normal: "0m 0m 1m",
         specs: "Saint-Gobain double-glazed toughened solar glass (35dB acoustic noise cutoff, 78% UV rejection) with architectural mullions.",
         materials: ["Saint-Gobain Solar Control", "35dB Acoustic Cutoff", "Heavy Powder-Coat Aluminum"],
-        focusOrbit: "30deg 75deg 55%",
-        focusTarget: "0.35m 0.65m 0.35m"
+        focusOrbit: "25deg 78deg 22m",
+        focusTarget: "6.8m 3.5m -14.2m"
       },
       {
         id: "balcony-louvers",
         number: 3,
         title: "Cantilever Balcony Deck & Louvers",
         category: "Structural RCC & Facade",
-        position: "-0.45m 0.85m 0.35m",
+        position: "4.8m 7.2m -14.0m",
         normal: "0m 0m 1m",
         specs: "Engineered RCC projection with privacy vertical louvers, LED deck soffits, and 12mm toughened glass safety railing.",
         materials: ["Fe550D TMT Reinforcement", "Weatherproof Louvers", "12mm Toughened Glass"],
-        focusOrbit: "-10deg 70deg 55%",
-        focusTarget: "-0.45m 0.85m 0.35m"
+        focusOrbit: "-10deg 75deg 20m",
+        focusTarget: "4.8m 7.2m -14.0m"
       },
       {
         id: "courtyard-pool",
         number: 4,
         title: "Courtyard Water Feature & Pool",
         category: "Landscape & Waterproofing",
-        position: "0.65m 0.18m 0.45m",
+        position: "15.5m 0.8m -14.8m",
         normal: "0m 1m 0m",
         specs: "Reinforced concrete leisure pool with turquoise underwater LED illumination, overflow channel, and 4-layer FRP waterproofing.",
         materials: ["FRP Dual-Coat Membrane", "LED IP68 Underwater Lights", "Anti-Skid Coping"],
-        focusOrbit: "45deg 65deg 55%",
-        focusTarget: "0.65m 0.18m 0.45m"
+        focusOrbit: "45deg 65deg 18m",
+        focusTarget: "15.5m 0.8m -14.8m"
       },
       {
         id: "terrace-slab",
         number: 5,
         title: "Rooftop Terrace & Solar Provision",
         category: "Roofing & Thermal Barrier",
-        position: "-0.1m 1.15m 0.1m",
+        position: "12.5m 10.6m -17.5m",
         normal: "0m 1m 0m",
         specs: "Monolithic RCC slab with cool-roof reflective tiles, 5kW solar conduit array, and parapet safety glass rails.",
         materials: ["IS 456 M25 Concrete", "Cool Roof Solar Reflectance", "Concealed Inverter Line"],
-        focusOrbit: "20deg 45deg 70%",
-        focusTarget: "-0.1m 1.15m 0.1m"
+        focusOrbit: "20deg 45deg 26m",
+        focusTarget: "12.5m 10.6m -17.5m"
       }
     ]
   },
@@ -251,7 +251,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     author: "Zigurat Architecture Studio",
     cameraTarget: "0m 4.5m -5m",
     cameraOrbit: "35deg 72deg 80%",
-    interiorCameraTarget: "0m 3.2m 0m",
+    interiorCameraTarget: "0.4m 3.2m -5m",
     interiorCameraOrbit: "0deg 85deg 5m",
     specs: {
       structure: "Seismic Zone-III Earthquake Resistant RCC Frame",
@@ -273,36 +273,36 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
         number: 1,
         title: "Grand Entrance Portico",
         category: "Portico & Cladding",
-        position: "0m 1.5m 6m",
+        position: "0.4m 1.8m 4.5m",
         normal: "0m 0m 1m",
         specs: "Double-height main door with Burma teak solid timber frame and biometric smart lock integration.",
         materials: ["Grade-A Burma Teak", "Biometric Access", "Polished Granite Threshold"],
         focusOrbit: "0deg 80deg 50%",
-        focusTarget: "0m 1.5m 6m"
+        focusTarget: "0.4m 1.8m 4.5m"
       },
       {
         id: "lux-louvers",
         number: 2,
         title: "Natural Teak Sun-Breaker Louvers",
         category: "Passive Climate Architecture",
-        position: "-4.5m 5.2m 3m",
+        position: "-3.5m 5.8m -4.0m",
         normal: "0m 0m 1m",
         specs: "Vertical treated wooden fins providing natural solar shading and cutting peak afternoon heat by 5°C.",
         materials: ["Weather-Treated Wood", "Thermal Cutoff", "Concealed Steel Core"],
         focusOrbit: "-20deg 75deg 50%",
-        focusTarget: "-4.5m 5.2m 3m"
+        focusTarget: "-3.5m 5.8m -4.0m"
       },
       {
         id: "lux-terrace",
         number: 3,
         title: "Sky Terrace Garden & Deck",
         category: "Rooftop Architecture",
-        position: "0m 8.5m -2m",
+        position: "0.4m 9.5m -8.5m",
         normal: "0m 1m 0m",
         specs: "Weatherproof WPC composite wood decking with built-in drip irrigation planters and solar array provision.",
         materials: ["WPC Composite Deck", "FRP Waterproof Membrane", "Toughened Glass Railing"],
         focusOrbit: "25deg 50deg 60%",
-        focusTarget: "0m 8.5m -2m"
+        focusTarget: "0.4m 9.5m -8.5m"
       }
     ]
   },
@@ -318,7 +318,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     author: "Zigurat Architecture Studio",
     cameraTarget: "0m 4.5m -5m",
     cameraOrbit: "35deg 72deg 80%",
-    interiorCameraTarget: "0m 3m 0m",
+    interiorCameraTarget: "0.4m 3m -5m",
     interiorCameraOrbit: "0deg 85deg 4.5m",
     specs: {
       structure: "Engineered Monolithic Shear Wall + Column RCC",
@@ -340,24 +340,24 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
         number: 1,
         title: "Cantilevered Floating Balcony",
         category: "Structural RCC",
-        position: "-3m 4.5m 2m",
+        position: "-3.5m 5.2m -4.0m",
         normal: "0m 0m 1m",
         specs: "Monolithic cantilevered deck with high-ductility Fe550D reinforcement and flush glass balustrade.",
         materials: ["TATA Tiscon 550D", "Clear Vision 12mm Glass", "Anti-Skid Vitrified"],
         focusOrbit: "-15deg 70deg 50%",
-        focusTarget: "-3m 4.5m 2m"
+        focusTarget: "-3.5m 5.2m -4.0m"
       },
       {
         id: "contemp-glazing",
         number: 2,
         title: "Thermal-Break Glass Envelopes",
         category: "Energy-Efficient Glazing",
-        position: "2m 2.5m 3m",
+        position: "0.4m 3.8m -6.5m",
         normal: "0m 0m 1m",
         specs: "Heavy-duty sliding glass pocket doors connecting interior living lounge directly with courtyard.",
         materials: ["Double Insulated Glass", "Thermal Break Aluminum", "Hafele Slide Gear"],
         focusOrbit: "30deg 75deg 50%",
-        focusTarget: "2m 2.5m 3m"
+        focusTarget: "0.4m 3.8m -6.5m"
       }
     ]
   }
@@ -899,8 +899,8 @@ export default function Project3DExperience() {
     try {
       if (nextMode === "interior") {
         mv.removeAttribute("auto-rotate");
-        mv.cameraTarget = selectedProject.interiorCameraTarget || "0.2m 0.55m 0.15m";
-        mv.cameraOrbit = selectedProject.interiorCameraOrbit || "10deg 85deg 0.8m";
+        mv.cameraTarget = selectedProject.interiorCameraTarget || "11.9m 3.0m -18.0m";
+        mv.cameraOrbit = selectedProject.interiorCameraOrbit || "0deg 85deg 3m";
         mv.fieldOfView = "48deg";
         // Ensure warm interior lights are on
         if (!buildingLightsOn) {
