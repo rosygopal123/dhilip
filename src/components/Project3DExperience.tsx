@@ -228,7 +228,7 @@ export default function Project3DExperience() {
     }
   };
 
-  // Real-time architectural lighting control (turns fixtures, downlights, bollards, chandelier & interior lights ON/OFF)
+  // Real-time architectural lighting control (illuminates fixtures, glowing windows, curtains & pool)
   const applyBuildingLights = (on: boolean) => {
     const mv = modelViewerRef.current;
     if (!mv) return;
@@ -238,6 +238,8 @@ export default function Project3DExperience() {
 
     for (const mat of materials) {
       const name = (mat.name || "").toUpperCase();
+
+      // 1. Light Fixtures (Downlights, Sconces, Bollards, Stairs, Chandeliers)
       const isLightFixture =
         name.includes("LIGHT") ||
         name.includes("LED") ||
@@ -250,12 +252,37 @@ export default function Project3DExperience() {
       if (isLightFixture && mat.setEmissiveFactor) {
         if (on) {
           if (name.includes("POOL")) {
-            mat.setEmissiveFactor([0.4, 0.85, 1.0]);
+            mat.setEmissiveFactor([0.2, 0.85, 1.0]);
           } else if (name.includes("CHANDELIER") || name.includes("INTERIOR")) {
-            mat.setEmissiveFactor([1.0, 0.95, 0.80]);
+            mat.setEmissiveFactor([1.0, 0.96, 0.82]);
           } else {
-            mat.setEmissiveFactor([1.0, 0.92, 0.70]);
+            mat.setEmissiveFactor([1.0, 0.94, 0.75]);
           }
+        } else {
+          mat.setEmissiveFactor([0.0, 0.0, 0.0]);
+        }
+      }
+
+      // 2. Window Glazing & Curtains (Warm interior illumination glowing through glass)
+      const isWindowOrCurtain =
+        name === "GLAZING" ||
+        name.includes("GLAZING") ||
+        name.includes("CURTAIN") ||
+        name.includes("GLASS");
+
+      if (isWindowOrCurtain && !name.includes("RAILING") && mat.setEmissiveFactor) {
+        if (on) {
+          mat.setEmissiveFactor([0.55, 0.42, 0.22]);
+        } else {
+          mat.setEmissiveFactor([0.0, 0.0, 0.0]);
+        }
+      }
+
+      // 3. Pool / Courtyard Water Feature
+      const isPoolWater = name.includes("WATER") || name.includes("POOL");
+      if (isPoolWater && mat.setEmissiveFactor) {
+        if (on) {
+          mat.setEmissiveFactor([0.15, 0.70, 0.95]);
         } else {
           mat.setEmissiveFactor([0.0, 0.0, 0.0]);
         }
@@ -695,7 +722,7 @@ export default function Project3DExperience() {
                       tone-mapping="neutral"
                       shadow-intensity={bgTheme === "white" ? "1.6" : "1.3"}
                       shadow-softness={bgTheme === "white" ? "0.2" : "0.35"}
-                      exposure={bgTheme === "white" ? "1.35" : (buildingLightsOn ? "1.35" : "1.2")}
+                      exposure={bgTheme === "white" ? "1.35" : (buildingLightsOn ? "0.95" : "0.60")}
                       loading="eager"
                       reveal="auto"
                       interaction-prompt="none"
