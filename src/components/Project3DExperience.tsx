@@ -583,7 +583,6 @@ export default function Project3DExperience() {
   const [accentColor, setAccentColor] = useState<string>("#2B2E33");
   const [bgTheme, setBgTheme] = useState<"white" | "black">("black");
   const [buildingLightsOn, setBuildingLightsOn] = useState<boolean>(true);
-  const [viewMode, setViewMode] = useState<"exterior" | "interior">("exterior");
   const [showHotspots, setShowHotspots] = useState<boolean>(true);
   const [activeHotspot, setActiveHotspot] = useState<ProjectHotspot | null>(null);
   const [show360InteriorModal, setShow360InteriorModal] = useState<boolean>(false);
@@ -877,7 +876,6 @@ export default function Project3DExperience() {
     const mv = modelViewerRef.current;
     if (!mv) return;
     try {
-      setViewMode("exterior");
       setActiveHotspot(null);
       mv.cameraOrbit = selectedProject.cameraOrbit || (isMobile ? "35deg 72deg 95%" : "35deg 72deg 80%");
       mv.cameraTarget = selectedProject.cameraTarget || "0m 4.5m -5m";
@@ -885,35 +883,6 @@ export default function Project3DExperience() {
       mv.setAttribute("auto-rotate", "");
     } catch (e) {
       console.warn("Reset camera error:", e);
-    }
-  };
-
-  const toggleViewMode = () => {
-    const nextMode = viewMode === "exterior" ? "interior" : "exterior";
-    setViewMode(nextMode);
-    setActiveHotspot(null);
-
-    const mv = modelViewerRef.current;
-    if (!mv) return;
-
-    try {
-      if (nextMode === "interior") {
-        mv.removeAttribute("auto-rotate");
-        mv.cameraTarget = selectedProject.interiorCameraTarget || "11.9m 3.0m -18.0m";
-        mv.cameraOrbit = selectedProject.interiorCameraOrbit || "0deg 85deg 3m";
-        mv.fieldOfView = "48deg";
-        // Ensure warm interior lights are on
-        if (!buildingLightsOn) {
-          setBuildingLightsOn(true);
-          applyBuildingLights(true);
-        }
-      } else {
-        mv.cameraTarget = selectedProject.cameraTarget || "auto auto auto";
-        mv.cameraOrbit = selectedProject.cameraOrbit || (isMobile ? "35deg 72deg 95%" : "35deg 72deg 80%");
-        mv.fieldOfView = "30deg";
-      }
-    } catch (e) {
-      console.warn("Toggle view mode error:", e);
     }
   };
 
@@ -1155,27 +1124,14 @@ export default function Project3DExperience() {
                         <span>{showHotspots ? "Pins ON" : "Pins OFF"}</span>
                       </button>
 
-                      {/* View Inside / Exterior Elevation Switcher */}
+                      {/* View Inside 360° Interior VR Walkthrough */}
                       <button
-                        onClick={toggleViewMode}
-                        className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg shrink-0 ${
-                          viewMode === "interior"
-                            ? "bg-emerald-500 text-stone-950 font-bold border-emerald-400 shadow-[0_0_14px_rgba(16,185,129,0.5)] scale-105"
-                            : "bg-[#0a0a0d]/90 text-white/80 hover:text-white border-white/15"
-                        }`}
-                        title={viewMode === "interior" ? "Switch back to Exterior Elevation View" : "Step inside 3D model to inspect ground floor & interior layout"}
+                        onClick={() => setShow360InteriorModal(true)}
+                        className="px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg shrink-0 bg-amber-500/20 text-amber-300 border-amber-400/40 hover:bg-amber-500/35 font-bold"
+                        title="Step Inside to View 360° Furnished Interior Rooms"
                       >
-                        {viewMode === "interior" ? (
-                          <>
-                            <Building2 className="w-3.5 h-3.5" />
-                            <span>Exterior View</span>
-                          </>
-                        ) : (
-                          <>
-                            <DoorOpen className="w-3.5 h-3.5 text-amber-400" />
-                            <span>View Inside</span>
-                          </>
-                        )}
+                        <DoorOpen className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                        <span>View Inside 360°</span>
                       </button>
                     </div>
 
@@ -1298,7 +1254,7 @@ export default function Project3DExperience() {
                       <div slot="progress-bar" style={{ display: "none" }} />
 
                       {/* Interactive 3D Hotspot Pins ("Hubstop Pins") */}
-                      {showHotspots && viewMode === "exterior" && selectedProject.hotspots?.map((hotspot) => (
+                      {showHotspots && selectedProject.hotspots?.map((hotspot) => (
                         <button
                           key={hotspot.id}
                           slot={`hotspot-${hotspot.id}`}
@@ -1334,23 +1290,6 @@ export default function Project3DExperience() {
                       ))}
                     </model-viewer>
                   </div>
-
-                  {/* Interior Mode HUD Banner */}
-                  {viewMode === "interior" && (
-                    <div className="absolute top-14 left-2 right-2 sm:left-1/2 sm:-translate-x-1/2 sm:w-auto z-25 bg-[#0a0a0d]/90 backdrop-blur-md border border-emerald-400/40 px-3 py-1.5 rounded-full text-white text-[11px] sm:text-xs font-mono flex items-center justify-between sm:justify-center gap-2 shadow-2xl animate-in fade-in">
-                      <div className="flex items-center gap-1.5">
-                        <DoorOpen className="w-3.5 h-3.5 text-emerald-400 animate-pulse shrink-0" />
-                        <span className="truncate">Viewing Ground Floor Interior · Orbit 360° Inside</span>
-                      </div>
-                      <button
-                        onClick={() => setShow360InteriorModal(true)}
-                        className="px-2.5 py-0.5 rounded-full bg-amber-400 text-stone-950 font-bold hover:bg-amber-300 transition-colors text-[10px] uppercase flex items-center gap-1 cursor-pointer shrink-0"
-                      >
-                        <span>360° VR Rooms</span>
-                        <Maximize2 className="w-2.5 h-2.5" />
-                      </button>
-                    </div>
-                  )}
 
                   {/* Active Hotspot Spec Card Pop-up */}
                   {activeHotspot && (

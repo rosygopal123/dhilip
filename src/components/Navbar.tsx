@@ -59,14 +59,16 @@ export default function Navbar() {
     return pathname === href;
   };
 
-  const useWhiteText = theme === "night" || !scrolled;
+  const isHome = pathname === `/${locale}` || pathname === `/${locale}/` || pathname === "/";
+  const isSolid = !isHome || scrolled;
+  const useWhiteText = theme === "night" || (!isSolid);
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-        scrolled
-          ? "bg-surface-0/95 backdrop-blur-md py-3 shadow-md border-b border-border-subtle"
-          : "bg-gradient-to-b from-black/60 via-black/20 to-transparent py-4 sm:py-5"
+        isSolid
+          ? "bg-surface-0 shadow-md border-b border-border-subtle py-3"
+          : "bg-gradient-to-b from-black/75 via-black/30 to-transparent py-4 sm:py-5"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 flex justify-between items-center">
@@ -79,10 +81,10 @@ export default function Navbar() {
           />
           <div className="flex flex-col">
             <span className="font-display text-lg sm:text-2xl font-bold tracking-tight text-white group-hover:text-brand-leaf-light transition-colors leading-tight">
-              <span className="text-brand-leaf-light">Danam</span> <span className={scrolled && theme === "light" ? "text-brand-forest-dark" : "text-white"}>Holdings</span>
+              <span className="text-brand-leaf-light">Danam</span> <span className={isSolid && theme === "light" ? "text-brand-forest-dark" : "text-white"}>Holdings</span>
             </span>
             <span className={`font-ui text-[8px] sm:text-[9px] font-semibold tracking-[0.14em] uppercase transition-colors ${
-              scrolled && theme === "light" ? "text-text-secondary" : "text-white/80"
+              isSolid && theme === "light" ? "text-text-secondary" : "text-white/80"
             }`}>
               Towards Fortune Unfoldings
             </span>
