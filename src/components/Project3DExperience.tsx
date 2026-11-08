@@ -215,10 +215,71 @@ export default function Project3DExperience() {
   const [showGestureHint, setShowGestureHint] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [selectedThemeId, setSelectedThemeId] = useState<string>("white-charcoal");
+  const [primaryColor, setPrimaryColor] = useState<string>("#F5F6F4");
+  const [accentColor, setAccentColor] = useState<string>("#2B2E33");
   const [bgTheme, setBgTheme] = useState<"white" | "black">("black");
   const [buildingLightsOn, setBuildingLightsOn] = useState<boolean>(true);
   const sectionRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
+
+  const hexToRGBA = (hex: string): [number, number, number, number] => {
+    const cleanHex = hex.replace("#", "");
+    const r = parseInt(cleanHex.substring(0, 2), 16) / 255;
+    const g = parseInt(cleanHex.substring(2, 4), 16) / 255;
+    const b = parseInt(cleanHex.substring(4, 6), 16) / 255;
+    return [r, g, b, 1.0];
+  };
+
+  // Real-time custom color picker applicator for primary walls or accent louvers
+  const applyCustomColor = (target: "primary" | "accent", hex: string) => {
+    const newPrimary = target === "primary" ? hex : primaryColor;
+    const newAccent = target === "accent" ? hex : accentColor;
+    if (target === "primary") setPrimaryColor(hex);
+    if (target === "accent") setAccentColor(hex);
+    setSelectedThemeId("custom");
+
+    const mv = modelViewerRef.current;
+    if (!mv) return;
+
+    const materials = mv.model?.materials;
+    if (!materials || !Array.isArray(materials)) return;
+
+    const primaryRGBA = hexToRGBA(newPrimary);
+    const accentRGBA = hexToRGBA(newAccent);
+
+    for (const mat of materials) {
+      const name = (mat.name || "").toUpperCase();
+
+      // 1. PRIMARY WALLS:
+      const isPrimaryWall =
+        name === "PLASTER WHITE" ||
+        name === "M_PLASTER" ||
+        name === "M_WALLWARM" ||
+        name === "M_CEILING" ||
+        (name.includes("PLASTER") && !name.includes("BLACK")) ||
+        (name.includes("WALL") && !name.includes("LIGHT") && !name.includes("WOOD") && !name.includes("BLACK"));
+
+      if (isPrimaryWall && mat.pbrMetallicRoughness?.setBaseColorFactor) {
+        mat.pbrMetallicRoughness.setBaseColorFactor(primaryRGBA);
+      }
+
+      // 2. ACCENT FEATURES & LOUVERS:
+      const isAccent =
+        name === "PLASTER BLACK" ||
+        name.includes("PLASTER BLACK") ||
+        name.includes("LOUVER") ||
+        name.includes("FENCE") ||
+        name === "M_FASCIA__GLB" ||
+        name === "M_METALDARK" ||
+        name === "M_METALBRONZE" ||
+        name === "M_SOFFIT" ||
+        name === "M_STEEL";
+
+      if (isAccent && mat.pbrMetallicRoughness?.setBaseColorFactor) {
+        mat.pbrMetallicRoughness.setBaseColorFactor(accentRGBA);
+      }
+    }
+  };
 
   const selectBgTheme = (theme: "white" | "black") => {
     setBgTheme(theme);
@@ -299,6 +360,8 @@ export default function Project3DExperience() {
   // Apply real-time dual-tone architectural colors across all models (Villa G+1, Luxury Villa, Contemporary Home)
   const applyDualColorTheme = (theme: DualColorTheme) => {
     setSelectedThemeId(theme.id);
+    setPrimaryColor(theme.primaryHex);
+    setAccentColor(theme.accentHex);
     const mv = modelViewerRef.current;
     if (!mv) return;
 
@@ -376,7 +439,11 @@ export default function Project3DExperience() {
       setIsModelLoaded(true);
       const current = DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId);
       setTimeout(() => {
-        if (current) applyDualColorTheme(current);
+        if (current) {
+          applyDualColorTheme(current);
+        } else {
+          applyCustomColor("primary", primaryColor);
+        }
         applyBuildingLights(buildingLightsOn);
       }, 150);
     };
@@ -738,16 +805,58 @@ export default function Project3DExperience() {
                     </model-viewer>
                   </div>
 
-                  {/* Real-time Dual-Color Architectural Theme Swatches */}
+                  {/* Real-time Interactive Color Picker & Palette Bar */}
                   {isModelLoaded && (
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-25 flex items-center gap-1.5 sm:gap-2 bg-[#0a0a0d]/90 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full shadow-2xl pointer-events-auto select-none max-w-[95%]">
-                      <div className="flex items-center gap-1.5 pr-2 border-r border-white/20 text-white/90">
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-25 flex items-center gap-1.5 sm:gap-2.5 bg-[#0a0a0d]/95 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full shadow-2xl pointer-events-auto select-none max-w-[95%] overflow-x-auto">
+                      <div className="flex items-center gap-1.5 pr-1.5 sm:pr-2 border-r border-white/20 text-white/90 shrink-0">
                         <Palette className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span className="text-[10px] font-mono uppercase tracking-wider hidden sm:inline whitespace-nowrap">
-                          Dual Tone:
+                          Color Pickers:
                         </span>
                       </div>
-                      <div className="flex items-center gap-1.5 sm:gap-2">
+
+                      {/* Primary Wall Color Picker */}
+                      <label
+                        className="group relative flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 cursor-pointer transition-all shadow-sm shrink-0"
+                        title="Click to pick custom Primary Wall color"
+                      >
+                        <span
+                          className="w-3.5 h-3.5 rounded-full border border-white shrink-0 shadow-xs"
+                          style={{ backgroundColor: primaryColor }}
+                        />
+                        <span className="text-[10px] font-mono text-white/90 whitespace-nowrap">
+                          Wall: <strong className="text-white">{primaryColor.toUpperCase()}</strong>
+                        </span>
+                        <input
+                          type="color"
+                          value={primaryColor}
+                          onChange={(e) => applyCustomColor("primary", e.target.value)}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        />
+                      </label>
+
+                      {/* Accent / Louver Color Picker */}
+                      <label
+                        className="group relative flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 cursor-pointer transition-all shadow-sm shrink-0"
+                        title="Click to pick custom Accent / Louver / Trim color"
+                      >
+                        <span
+                          className="w-3.5 h-3.5 rounded-full border border-white shrink-0 shadow-xs"
+                          style={{ backgroundColor: accentColor }}
+                        />
+                        <span className="text-[10px] font-mono text-white/90 whitespace-nowrap">
+                          Accent: <strong className="text-white">{accentColor.toUpperCase()}</strong>
+                        </span>
+                        <input
+                          type="color"
+                          value={accentColor}
+                          onChange={(e) => applyCustomColor("accent", e.target.value)}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        />
+                      </label>
+
+                      {/* Preset Theme Swatches */}
+                      <div className="flex items-center gap-1.5 pl-1.5 sm:pl-2 border-l border-white/20 shrink-0">
                         {DUAL_COLOR_THEMES.map((theme) => {
                           const isActive = selectedThemeId === theme.id;
                           return (
@@ -755,13 +864,12 @@ export default function Project3DExperience() {
                               key={theme.id}
                               onClick={() => applyDualColorTheme(theme)}
                               title={`${theme.name} (${theme.tag}): ${theme.primaryLabel} + ${theme.accentLabel}`}
-                              className={`group relative w-6 h-6 sm:w-7 sm:h-7 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center p-[1px] ${
+                              className={`group relative w-6 h-6 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center p-[1px] ${
                                 isActive
                                   ? "ring-2 ring-amber-400 scale-110 shadow-lg"
-                                  : "hover:scale-105 opacity-80 hover:opacity-100"
+                                  : "hover:scale-105 opacity-75 hover:opacity-100"
                               }`}
                             >
-                              {/* Split Dual-Color Circle */}
                               <div className="w-full h-full rounded-full overflow-hidden flex border border-white/30">
                                 <div className="w-1/2 h-full" style={{ backgroundColor: theme.primaryHex }} />
                                 <div className="w-1/2 h-full" style={{ backgroundColor: theme.accentHex }} />
@@ -975,24 +1083,64 @@ export default function Project3DExperience() {
                 ))}
               </div>
 
-              {/* Interactive Real-Time Dual-Color Theme Configurator */}
+              {/* Interactive Real-Time Dual-Color Theme Configurator & Color Pickers */}
               <div className="mt-5 pt-4 border-t border-border-subtle">
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-text-primary flex items-center gap-1.5">
                     <Palette className="w-3.5 h-3.5 text-brand-forest" />
-                    <span>Dual-Tone Exterior Finishes</span>
+                    <span>Exterior Wall & Accent Finishes</span>
                   </span>
                   <span className="text-xs font-bold text-brand-forest">
-                    {DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId)?.name}
+                    {selectedThemeId === "custom" ? "Custom Color Palette" : DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId)?.name}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-[11px] text-text-tertiary mb-3">
-                  <span>Primary Wall + Architectural Accent</span>
+                  <span>Custom Color Pickers or Architectural Palettes</span>
                   <span className="font-mono text-[10px] text-brand-forest bg-brand-forest/10 px-2 py-0.5 rounded border border-brand-forest/20">
-                    {DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId)?.primaryLabel} & {DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId)?.accentLabel}
+                    {primaryColor.toUpperCase()} & {accentColor.toUpperCase()}
                   </span>
                 </div>
 
+                {/* Multiple Interactive Color Pickers (Wall & Accent) */}
+                <div className="grid grid-cols-2 gap-2.5 mb-3.5">
+                  <label className="p-2.5 rounded-xl border border-border-subtle bg-surface-1 flex items-center gap-2.5 cursor-pointer hover:border-brand-forest hover:bg-surface-2 transition-all relative shadow-xs">
+                    <span
+                      className="w-6 h-6 rounded-full border-2 border-white shadow-xs shrink-0"
+                      style={{ backgroundColor: primaryColor }}
+                    />
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-bold uppercase text-text-tertiary block leading-tight">Primary Wall</span>
+                      <span className="text-xs font-mono font-bold text-text-primary block leading-tight mt-0.5">{primaryColor.toUpperCase()}</span>
+                    </div>
+                    <input
+                      type="color"
+                      value={primaryColor}
+                      onChange={(e) => applyCustomColor("primary", e.target.value)}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      title="Click to pick custom Primary Wall color"
+                    />
+                  </label>
+
+                  <label className="p-2.5 rounded-xl border border-border-subtle bg-surface-1 flex items-center gap-2.5 cursor-pointer hover:border-brand-forest hover:bg-surface-2 transition-all relative shadow-xs">
+                    <span
+                      className="w-6 h-6 rounded-full border-2 border-white shadow-xs shrink-0"
+                      style={{ backgroundColor: accentColor }}
+                    />
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-bold uppercase text-text-tertiary block leading-tight">Accent Louver</span>
+                      <span className="text-xs font-mono font-bold text-text-primary block leading-tight mt-0.5">{accentColor.toUpperCase()}</span>
+                    </div>
+                    <input
+                      type="color"
+                      value={accentColor}
+                      onChange={(e) => applyCustomColor("accent", e.target.value)}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      title="Click to pick custom Accent / Louver / Trim color"
+                    />
+                  </label>
+                </div>
+
+                {/* Preset Themes */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {DUAL_COLOR_THEMES.map((theme) => {
                     const isSelected = selectedThemeId === theme.id;
