@@ -1,5 +1,28 @@
 [
   {
+    "id": "LEAD-252969",
+    "name": "Suresh Kumar R",
+    "mobile": "08072239594",
+    "email": "",
+    "district": "Madurai",
+    "projectType": "Turnkey Construction",
+    "budget": "Not Specified",
+    "areaSqFt": "1800 Sq.Ft",
+    "message": "",
+    "vastuPreferred": true,
+    "aadhaarNumber": "",
+    "source": "WhatsApp Floating Widget",
+    "assignedManager": {
+      "name": "Er. Ramesh Kumar",
+      "role": "Chief Manager (South & Central Zone)",
+      "office": "Madurai HQ Office"
+    },
+    "status": "NEW",
+    "createdAt": "2026-11-08T03:24:59.099Z",
+    "hubspotSynced": true,
+    "n8nSynced": true
+  },
+  {
     "id": "LEAD-408999",
     "name": "HubSpot Live Test",
     "mobile": "9361599097",

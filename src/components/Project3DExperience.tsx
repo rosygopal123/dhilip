@@ -17,8 +17,27 @@ import {
   RotateCcw,
   Palette,
   Lightbulb,
-  Moon
+  Moon,
+  DoorOpen,
+  MapPin,
+  X,
+  Building2,
+  Eye,
+  Maximize2
 } from "lucide-react";
+
+export interface ProjectHotspot {
+  id: string;
+  number: number;
+  title: string;
+  category: string;
+  position: string;
+  normal: string;
+  specs: string;
+  materials: string[];
+  focusOrbit?: string;
+  focusTarget?: string;
+}
 
 export interface Project3DItem {
   id: string;
@@ -32,6 +51,8 @@ export interface Project3DItem {
   author: string;
   cameraTarget?: string;
   cameraOrbit?: string;
+  interiorCameraTarget?: string;
+  interiorCameraOrbit?: string;
   specs: {
     structure: string;
     steel: string;
@@ -41,6 +62,7 @@ export interface Project3DItem {
     handoverTime: string;
   };
   highlights: string[];
+  hotspots: ProjectHotspot[];
 }
 
 export interface DualColorTheme {
@@ -138,6 +160,8 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     author: "Client Project Elevation (SketchUp 2026)",
     cameraTarget: "auto auto auto",
     cameraOrbit: "28deg 74deg 92%",
+    interiorCameraTarget: "0.2m 0.55m 0.15m",
+    interiorCameraOrbit: "10deg 85deg 0.8m",
     specs: {
       structure: "Engineered RCC Column-Beam Seismic Zone-III Frame",
       steel: "Fe550D High-Ductility TMT Rebars",
@@ -151,6 +175,68 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
       "Expansive floor-to-ceiling tinted glass facade for optimal daylight",
       "Upper level cantilevered balcony deck with privacy louvers",
       "Waterproofing & thermal insulation across all roof terraces"
+    ],
+    hotspots: [
+      {
+        id: "gate-25",
+        number: 1,
+        title: "Gate #25 Architectural Entrance",
+        category: "Civil Elevation & Fabrication",
+        position: "-0.7m 0.35m 0.5m",
+        normal: "0m 0m 1m",
+        specs: "Heavy-gauge designer MS fabrication with anti-rust zinc primer, teak texture inlays, and automated sliding motor conduit.",
+        materials: ["IS 2062 Grade Steel", "Reinforced M25 Gate Pillars", "Concealed Motor Provision"],
+        focusOrbit: "15deg 80deg 50%",
+        focusTarget: "-0.7m 0.35m 0.5m"
+      },
+      {
+        id: "facade-glazing",
+        number: 2,
+        title: "Floor-to-Ceiling Tinted Glazing",
+        category: "Fenestration & Thermal Insulation",
+        position: "0.35m 0.65m 0.35m",
+        normal: "0m 0m 1m",
+        specs: "Saint-Gobain double-glazed toughened solar glass (35dB acoustic noise cutoff, 78% UV rejection) with architectural mullions.",
+        materials: ["Saint-Gobain Solar Control", "35dB Acoustic Cutoff", "Heavy Powder-Coat Aluminum"],
+        focusOrbit: "30deg 75deg 55%",
+        focusTarget: "0.35m 0.65m 0.35m"
+      },
+      {
+        id: "balcony-louvers",
+        number: 3,
+        title: "Cantilever Balcony Deck & Louvers",
+        category: "Structural RCC & Facade",
+        position: "-0.45m 0.85m 0.35m",
+        normal: "0m 0m 1m",
+        specs: "Engineered RCC projection with privacy vertical louvers, LED deck soffits, and 12mm toughened glass safety railing.",
+        materials: ["Fe550D TMT Reinforcement", "Weatherproof Louvers", "12mm Toughened Glass"],
+        focusOrbit: "-10deg 70deg 55%",
+        focusTarget: "-0.45m 0.85m 0.35m"
+      },
+      {
+        id: "courtyard-pool",
+        number: 4,
+        title: "Courtyard Water Feature & Pool",
+        category: "Landscape & Waterproofing",
+        position: "0.65m 0.18m 0.45m",
+        normal: "0m 1m 0m",
+        specs: "Reinforced concrete leisure pool with turquoise underwater LED illumination, overflow channel, and 4-layer FRP waterproofing.",
+        materials: ["FRP Dual-Coat Membrane", "LED IP68 Underwater Lights", "Anti-Skid Coping"],
+        focusOrbit: "45deg 65deg 55%",
+        focusTarget: "0.65m 0.18m 0.45m"
+      },
+      {
+        id: "terrace-slab",
+        number: 5,
+        title: "Rooftop Terrace & Solar Provision",
+        category: "Roofing & Thermal Barrier",
+        position: "-0.1m 1.15m 0.1m",
+        normal: "0m 1m 0m",
+        specs: "Monolithic RCC slab with cool-roof reflective tiles, 5kW solar conduit array, and parapet safety glass rails.",
+        materials: ["IS 456 M25 Concrete", "Cool Roof Solar Reflectance", "Concealed Inverter Line"],
+        focusOrbit: "20deg 45deg 70%",
+        focusTarget: "-0.1m 1.15m 0.1m"
+      }
     ]
   },
   {
@@ -164,6 +250,9 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     thumbnail: "/images/danam/about-villa.webp",
     author: "Zigurat Architecture Studio",
     cameraTarget: "0m 4.5m -5m",
+    cameraOrbit: "35deg 72deg 80%",
+    interiorCameraTarget: "0m 3.2m 0m",
+    interiorCameraOrbit: "0deg 85deg 5m",
     specs: {
       structure: "Seismic Zone-III Earthquake Resistant RCC Frame",
       steel: "Fe550D High-Ductility TMT Rebars",
@@ -177,6 +266,44 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
       "Acoustic UPVC double-glazed panoramic windows (35dB noise cutoff)",
       "Dedicated Pooja Room in Ishanya (North-East) corner",
       "Rooftop terrace garden ready for 5kW Solar array & waterproof membrane"
+    ],
+    hotspots: [
+      {
+        id: "lux-entrance",
+        number: 1,
+        title: "Grand Entrance Portico",
+        category: "Portico & Cladding",
+        position: "0m 1.5m 6m",
+        normal: "0m 0m 1m",
+        specs: "Double-height main door with Burma teak solid timber frame and biometric smart lock integration.",
+        materials: ["Grade-A Burma Teak", "Biometric Access", "Polished Granite Threshold"],
+        focusOrbit: "0deg 80deg 50%",
+        focusTarget: "0m 1.5m 6m"
+      },
+      {
+        id: "lux-louvers",
+        number: 2,
+        title: "Natural Teak Sun-Breaker Louvers",
+        category: "Passive Climate Architecture",
+        position: "-4.5m 5.2m 3m",
+        normal: "0m 0m 1m",
+        specs: "Vertical treated wooden fins providing natural solar shading and cutting peak afternoon heat by 5°C.",
+        materials: ["Weather-Treated Wood", "Thermal Cutoff", "Concealed Steel Core"],
+        focusOrbit: "-20deg 75deg 50%",
+        focusTarget: "-4.5m 5.2m 3m"
+      },
+      {
+        id: "lux-terrace",
+        number: 3,
+        title: "Sky Terrace Garden & Deck",
+        category: "Rooftop Architecture",
+        position: "0m 8.5m -2m",
+        normal: "0m 1m 0m",
+        specs: "Weatherproof WPC composite wood decking with built-in drip irrigation planters and solar array provision.",
+        materials: ["WPC Composite Deck", "FRP Waterproof Membrane", "Toughened Glass Railing"],
+        focusOrbit: "25deg 50deg 60%",
+        focusTarget: "0m 8.5m -2m"
+      }
     ]
   },
   {
@@ -190,6 +317,9 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
     thumbnail: "/images/danam/ddhvrktrjjjln58schqk.webp",
     author: "Zigurat Architecture Studio",
     cameraTarget: "0m 4.5m -5m",
+    cameraOrbit: "35deg 72deg 80%",
+    interiorCameraTarget: "0m 3m 0m",
+    interiorCameraOrbit: "0deg 85deg 4.5m",
     specs: {
       structure: "Engineered Monolithic Shear Wall + Column RCC",
       steel: "TATA Tiscon 550D Super Ductile",
@@ -203,9 +333,243 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
       "Rainwater harvesting & groundwater recharge pit integrated",
       "Concealed copper electrical conduit with surge protection",
       "Anti-skid Italian marble finish in common living zones"
+    ],
+    hotspots: [
+      {
+        id: "contemp-balcony",
+        number: 1,
+        title: "Cantilevered Floating Balcony",
+        category: "Structural RCC",
+        position: "-3m 4.5m 2m",
+        normal: "0m 0m 1m",
+        specs: "Monolithic cantilevered deck with high-ductility Fe550D reinforcement and flush glass balustrade.",
+        materials: ["TATA Tiscon 550D", "Clear Vision 12mm Glass", "Anti-Skid Vitrified"],
+        focusOrbit: "-15deg 70deg 50%",
+        focusTarget: "-3m 4.5m 2m"
+      },
+      {
+        id: "contemp-glazing",
+        number: 2,
+        title: "Thermal-Break Glass Envelopes",
+        category: "Energy-Efficient Glazing",
+        position: "2m 2.5m 3m",
+        normal: "0m 0m 1m",
+        specs: "Heavy-duty sliding glass pocket doors connecting interior living lounge directly with courtyard.",
+        materials: ["Double Insulated Glass", "Thermal Break Aluminum", "Hafele Slide Gear"],
+        focusOrbit: "30deg 75deg 50%",
+        focusTarget: "2m 2.5m 3m"
+      }
     ]
   }
 ];
+
+// WebGL Equirectangular Shader Sources for 360 Interior VR Room Tour
+const VS_PANORAMA = `
+attribute vec2 a_position;
+varying vec2 v_uv;
+void main() {
+  v_uv = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}
+`;
+
+const FS_PANORAMA = `
+precision mediump float;
+uniform sampler2D u_image;
+uniform float u_yaw;
+uniform float u_pitch;
+uniform float u_fov;
+uniform float u_aspect;
+uniform float u_night_factor;
+varying vec2 v_uv;
+
+#define PI 3.14159265358979323846
+
+void main() {
+  vec2 screen = (v_uv - 0.5) * 2.0;
+  float tanHalfFov = tan(u_fov * 0.5);
+  vec3 ray = normalize(vec3(screen.x * tanHalfFov * u_aspect, -screen.y * tanHalfFov, 1.0));
+
+  float cp = cos(u_pitch);
+  float sp = sin(u_pitch);
+  vec3 rPitch = vec3(
+    ray.x,
+    ray.y * cp - ray.z * sp,
+    ray.y * sp + ray.z * cp
+  );
+
+  float cy = cos(u_yaw);
+  float sy = sin(u_yaw);
+  vec3 rYaw = vec3(
+    rPitch.x * cy + rPitch.z * sy,
+    rPitch.y,
+    -rPitch.x * sy + rPitch.z * cy
+  );
+
+  float lon = atan(rYaw.x, rYaw.z);
+  float lat = asin(clamp(rYaw.y, -0.9999, 0.9999));
+
+  vec2 texCoord = vec2(
+    fract(lon / (2.0 * PI) + 0.5),
+    clamp(lat / PI + 0.5, 0.001, 0.999)
+  );
+
+  vec4 col = texture2D(u_image, texCoord);
+
+  if (u_night_factor > 0.0) {
+    vec3 nightWarm = vec3(col.r * 1.08 + 0.04, col.g * 0.88, col.b * 0.70) * 0.85;
+    col.rgb = mix(col.rgb, nightWarm, u_night_factor);
+  }
+
+  gl_FragColor = col;
+}
+`;
+
+function Interior360Canvas({ panoramaUrl, isNight }: { panoramaUrl: string; isNight: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isDraggingRef = useRef(false);
+  const lastPosRef = useRef({ x: 0, y: 0 });
+  const yawRef = useRef(0);
+  const pitchRef = useRef(0);
+  const animFrameRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let gl = canvas.getContext("webgl", { antialias: true, alpha: false }) as WebGLRenderingContext | null;
+    if (!gl) {
+      gl = canvas.getContext("experimental-webgl") as WebGLRenderingContext | null;
+    }
+    if (!gl) return;
+
+    const compileShader = (type: number, src: string) => {
+      if (!gl) return null;
+      const s = gl.createShader(type);
+      if (!s) return null;
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    };
+
+    const vs = compileShader(gl.VERTEX_SHADER, VS_PANORAMA);
+    const fs = compileShader(gl.FRAGMENT_SHADER, FS_PANORAMA);
+    if (!vs || !fs) return;
+
+    const prog = gl.createProgram();
+    if (!prog) return;
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+      gl.STATIC_DRAW
+    );
+    const posAttr = gl.getAttribLocation(prog, "a_position");
+    gl.enableVertexAttribArray(posAttr);
+    gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
+
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    // Initial placeholder 2x2
+    const placeholder = document.createElement("canvas");
+    placeholder.width = 2;
+    placeholder.height = 2;
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, placeholder);
+
+    // Load panorama image
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (!gl) return;
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    };
+    img.src = panoramaUrl;
+
+    const uYaw = gl.getUniformLocation(prog, "u_yaw");
+    const uPitch = gl.getUniformLocation(prog, "u_pitch");
+    const uFov = gl.getUniformLocation(prog, "u_fov");
+    const uAspect = gl.getUniformLocation(prog, "u_aspect");
+    const uNight = gl.getUniformLocation(prog, "u_night_factor");
+
+    let running = true;
+    const render = () => {
+      if (!running || !gl || !canvas) return;
+
+      // Auto gentle continuous pan when user is not touching
+      if (!isDraggingRef.current) {
+        yawRef.current += 0.0008;
+      }
+
+      if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
+
+      gl.useProgram(prog);
+      gl.uniform1f(uYaw, yawRef.current);
+      gl.uniform1f(uPitch, pitchRef.current);
+      gl.uniform1f(uFov, 1.25);
+      gl.uniform1f(uAspect, canvas.width / (canvas.height || 1));
+      gl.uniform1f(uNight, isNight ? 0.75 : 0.0);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      animFrameRef.current = requestAnimationFrame(render);
+    };
+    render();
+
+    return () => {
+      running = false;
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, [panoramaUrl, isNight]);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    isDraggingRef.current = true;
+    lastPosRef.current = { x: e.clientX, y: e.clientY };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return;
+    const dx = e.clientX - lastPosRef.current.x;
+    const dy = e.clientY - lastPosRef.current.y;
+    lastPosRef.current = { x: e.clientX, y: e.clientY };
+    yawRef.current -= dx * 0.004;
+    pitchRef.current = Math.max(-1.4, Math.min(1.4, pitchRef.current + dy * 0.004));
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    isDraggingRef.current = false;
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+  };
+
+  return (
+    <canvas
+      ref={canvasRef}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      className="w-full h-full cursor-grab active:cursor-grabbing block"
+      style={{ touchAction: "none" }}
+    />
+  );
+}
 
 export default function Project3DExperience() {
   const [selectedProject, setSelectedProject] = useState<Project3DItem>(PROJECT_3D_LIST[0]);
@@ -219,6 +583,12 @@ export default function Project3DExperience() {
   const [accentColor, setAccentColor] = useState<string>("#2B2E33");
   const [bgTheme, setBgTheme] = useState<"white" | "black">("black");
   const [buildingLightsOn, setBuildingLightsOn] = useState<boolean>(true);
+  const [viewMode, setViewMode] = useState<"exterior" | "interior">("exterior");
+  const [showHotspots, setShowHotspots] = useState<boolean>(true);
+  const [activeHotspot, setActiveHotspot] = useState<ProjectHotspot | null>(null);
+  const [show360InteriorModal, setShow360InteriorModal] = useState<boolean>(false);
+  const [active360RoomId, setActive360RoomId] = useState<string>("living-room");
+  const [is360Night, setIs360Night] = useState<boolean>(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
 
@@ -507,6 +877,8 @@ export default function Project3DExperience() {
     const mv = modelViewerRef.current;
     if (!mv) return;
     try {
+      setViewMode("exterior");
+      setActiveHotspot(null);
       mv.cameraOrbit = selectedProject.cameraOrbit || (isMobile ? "35deg 72deg 95%" : "35deg 72deg 80%");
       mv.cameraTarget = selectedProject.cameraTarget || "0m 4.5m -5m";
       mv.fieldOfView = "30deg";
@@ -515,6 +887,91 @@ export default function Project3DExperience() {
       console.warn("Reset camera error:", e);
     }
   };
+
+  const toggleViewMode = () => {
+    const nextMode = viewMode === "exterior" ? "interior" : "exterior";
+    setViewMode(nextMode);
+    setActiveHotspot(null);
+
+    const mv = modelViewerRef.current;
+    if (!mv) return;
+
+    try {
+      if (nextMode === "interior") {
+        mv.removeAttribute("auto-rotate");
+        mv.cameraTarget = selectedProject.interiorCameraTarget || "0.2m 0.55m 0.15m";
+        mv.cameraOrbit = selectedProject.interiorCameraOrbit || "10deg 85deg 0.8m";
+        mv.fieldOfView = "48deg";
+        // Ensure warm interior lights are on
+        if (!buildingLightsOn) {
+          setBuildingLightsOn(true);
+          applyBuildingLights(true);
+        }
+      } else {
+        mv.cameraTarget = selectedProject.cameraTarget || "auto auto auto";
+        mv.cameraOrbit = selectedProject.cameraOrbit || (isMobile ? "35deg 72deg 95%" : "35deg 72deg 80%");
+        mv.fieldOfView = "30deg";
+      }
+    } catch (e) {
+      console.warn("Toggle view mode error:", e);
+    }
+  };
+
+  const toggleHotspots = () => {
+    setShowHotspots((prev) => !prev);
+    if (showHotspots) {
+      setActiveHotspot(null);
+    }
+  };
+
+  const handleSelectHotspot = (hotspot: ProjectHotspot) => {
+    setActiveHotspot(hotspot);
+    const mv = modelViewerRef.current;
+    if (mv && hotspot.focusOrbit && hotspot.focusTarget) {
+      try {
+        mv.removeAttribute("auto-rotate");
+        mv.cameraOrbit = hotspot.focusOrbit;
+        mv.cameraTarget = hotspot.focusTarget;
+      } catch (e) {
+        console.warn("Focus hotspot error:", e);
+      }
+    }
+  };
+
+  const INTERIOR_360_ROOMS = [
+    {
+      id: "living-room",
+      name: "Living & Atrium",
+      tag: "Double Volume",
+      panoramaUrl: "/panoramas/living-room.jpg",
+      specs: "480 Sq.Ft · 14'6\" Height · Italian Statuario Marble · Ambient LED Coves",
+      features: "Patio Pocket Sliders · Acoustic Glass · Double Height Chandelier"
+    },
+    {
+      id: "master-bedroom",
+      name: "Master Suite",
+      tag: "King Sanctuary",
+      panoramaUrl: "/panoramas/master-bedroom.jpg",
+      specs: "320 Sq.Ft · Burma Teak Accents · Walk-in Wardrobe Provision · 35dB Noise Cutoff",
+      features: "Private Balcony Access · False Ceiling Indirect Warm Glow"
+    },
+    {
+      id: "modular-kitchen",
+      name: "Modular Kitchen",
+      tag: "German Blum",
+      panoramaUrl: "/panoramas/modular-kitchen.jpg",
+      specs: "220 Sq.Ft · Seamless Quartz Countertops · Blum Soft-Close Pullouts · SS304 Sink",
+      features: "Integrated Chimney Duct · Quartz Breakfast Island"
+    },
+    {
+      id: "sky-terrace",
+      name: "Sky Terrace Lounge",
+      tag: "Rooftop Open",
+      panoramaUrl: "/panoramas/sky-terrace.jpg",
+      specs: "650 Sq.Ft · Weatherproof WPC Decking · Toughened Glass Balustrades · Solar Ready",
+      features: "Drip Irrigation Planters · FRP Waterproof Membrane"
+    }
+  ];
 
   const realProjects = [
     { name: "Rajmahal Aishvaryam", loc: "Madurai", img: "/images/danam/ddhvrktrjjjln58schqk.webp", tag: "Turnkey EPC" },
@@ -594,14 +1051,14 @@ export default function Project3DExperience() {
               <span>Civil Specs</span>
             </button>
 
-            <a
-              href="#interior-360-tour"
+            <button
+              onClick={() => setShow360InteriorModal(true)}
               className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 border border-amber-500/30"
-              title="Step Inside Interior 360 Rooms"
+              title="Step Inside Furnished 360° Interior VR Rooms"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
               <span>Step Inside 360°</span>
-            </a>
+            </button>
           </div>
         </div>
 
@@ -682,6 +1139,43 @@ export default function Project3DExperience() {
                       >
                         <Lightbulb className={`w-3.5 h-3.5 ${buildingLightsOn ? "fill-stone-950 text-stone-950 animate-pulse" : "text-white/70"}`} />
                         <span>{buildingLightsOn ? "Lights ON" : "Lights OFF"}</span>
+                      </button>
+
+                      {/* Hotspot Pins Toggle ("Hubstop Pins") */}
+                      <button
+                        onClick={toggleHotspots}
+                        className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg shrink-0 ${
+                          showHotspots
+                            ? "bg-amber-500/20 text-amber-300 border-amber-400/40 hover:bg-amber-500/30"
+                            : "bg-[#0a0a0d]/90 text-white/60 hover:text-white border-white/15"
+                        }`}
+                        title="Toggle 3D Civil Engineering Hotspot Pins"
+                      >
+                        <MapPin className={`w-3.5 h-3.5 ${showHotspots ? "text-amber-400" : "text-white/60"}`} />
+                        <span>{showHotspots ? "Pins ON" : "Pins OFF"}</span>
+                      </button>
+
+                      {/* View Inside / Exterior Elevation Switcher */}
+                      <button
+                        onClick={toggleViewMode}
+                        className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg shrink-0 ${
+                          viewMode === "interior"
+                            ? "bg-emerald-500 text-stone-950 font-bold border-emerald-400 shadow-[0_0_14px_rgba(16,185,129,0.5)] scale-105"
+                            : "bg-[#0a0a0d]/90 text-white/80 hover:text-white border-white/15"
+                        }`}
+                        title={viewMode === "interior" ? "Switch back to Exterior Elevation View" : "Step inside 3D model to inspect ground floor & interior layout"}
+                      >
+                        {viewMode === "interior" ? (
+                          <>
+                            <Building2 className="w-3.5 h-3.5" />
+                            <span>Exterior View</span>
+                          </>
+                        ) : (
+                          <>
+                            <DoorOpen className="w-3.5 h-3.5 text-amber-400" />
+                            <span>View Inside</span>
+                          </>
+                        )}
                       </button>
                     </div>
 
@@ -802,8 +1296,124 @@ export default function Project3DExperience() {
                       }}
                     >
                       <div slot="progress-bar" style={{ display: "none" }} />
+
+                      {/* Interactive 3D Hotspot Pins ("Hubstop Pins") */}
+                      {showHotspots && viewMode === "exterior" && selectedProject.hotspots?.map((hotspot) => (
+                        <button
+                          key={hotspot.id}
+                          slot={`hotspot-${hotspot.id}`}
+                          data-position={hotspot.position}
+                          data-normal={hotspot.normal}
+                          data-visibility-attribute="visible"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectHotspot(hotspot);
+                          }}
+                          className="hotspot group pointer-events-auto cursor-pointer focus:outline-none select-none"
+                          style={{
+                            background: "transparent",
+                            border: "none",
+                            padding: 0,
+                            transform: "translate(-50%, -50%)",
+                          }}
+                          title={`Click to inspect: ${hotspot.title}`}
+                        >
+                          <div className="relative flex items-center justify-center">
+                            {/* Radar Wave */}
+                            <span className="absolute -inset-1.5 rounded-full bg-amber-400/50 animate-ping opacity-75 pointer-events-none" />
+                            {/* Pin Badge */}
+                            <span className="relative w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-amber-500 hover:bg-amber-400 border-2 border-white shadow-[0_0_14px_rgba(245,158,11,0.9)] flex items-center justify-center text-[10px] font-bold font-mono text-stone-950 transition-transform group-hover:scale-125">
+                              {hotspot.number}
+                            </span>
+                            {/* Tooltip on hover */}
+                            <span className="pointer-events-none absolute left-1/2 -top-8 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-stone-950/95 text-white border border-white/20 text-[10px] font-mono whitespace-nowrap px-2 py-0.5 rounded-md shadow-2xl z-30">
+                              {hotspot.title}
+                            </span>
+                          </div>
+                        </button>
+                      ))}
                     </model-viewer>
                   </div>
+
+                  {/* Interior Mode HUD Banner */}
+                  {viewMode === "interior" && (
+                    <div className="absolute top-14 left-2 right-2 sm:left-1/2 sm:-translate-x-1/2 sm:w-auto z-25 bg-[#0a0a0d]/90 backdrop-blur-md border border-emerald-400/40 px-3 py-1.5 rounded-full text-white text-[11px] sm:text-xs font-mono flex items-center justify-between sm:justify-center gap-2 shadow-2xl animate-in fade-in">
+                      <div className="flex items-center gap-1.5">
+                        <DoorOpen className="w-3.5 h-3.5 text-emerald-400 animate-pulse shrink-0" />
+                        <span className="truncate">Viewing Ground Floor Interior · Orbit 360° Inside</span>
+                      </div>
+                      <button
+                        onClick={() => setShow360InteriorModal(true)}
+                        className="px-2.5 py-0.5 rounded-full bg-amber-400 text-stone-950 font-bold hover:bg-amber-300 transition-colors text-[10px] uppercase flex items-center gap-1 cursor-pointer shrink-0"
+                      >
+                        <span>360° VR Rooms</span>
+                        <Maximize2 className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Active Hotspot Spec Card Pop-up */}
+                  {activeHotspot && (
+                    <div className="absolute bottom-16 sm:bottom-14 left-3 right-3 sm:left-auto sm:right-4 sm:max-w-sm z-30 bg-[#0a0a0d]/95 backdrop-blur-xl border border-amber-400/35 rounded-2xl p-4 shadow-[0_12px_40px_rgba(0,0,0,0.85)] animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-amber-500 text-stone-950 font-mono font-bold text-xs flex items-center justify-center shadow-sm">
+                            {activeHotspot.number}
+                          </span>
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold">
+                            {activeHotspot.category}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => setActiveHotspot(null)}
+                          className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                          title="Close Hotspot Details"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      <h4 className="font-display text-sm sm:text-base font-bold text-white mt-1.5">
+                        {activeHotspot.title}
+                      </h4>
+                      <p className="text-xs text-stone-300 mt-1 leading-relaxed">
+                        {activeHotspot.specs}
+                      </p>
+
+                      <div className="flex flex-wrap gap-1.5 mt-2.5">
+                        {activeHotspot.materials.map((mat, idx) => (
+                          <span
+                            key={idx}
+                            className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white/10 text-stone-200 border border-white/15"
+                          >
+                            ✓ {mat}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-white/15">
+                        <button
+                          onClick={() => {
+                            const text = encodeURIComponent(
+                              `Hi Danam Holdings, I'm interested in the "${activeHotspot.title}" specification (${activeHotspot.category}) on the ${selectedProject.title}. Please share itemized civil pricing.`
+                            );
+                            window.open(`https://wa.me/918883332499?text=${text}`, "_blank");
+                          }}
+                          className="flex-1 py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-ui text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                        >
+                          <span>Enquire Spec</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={resetCamera}
+                          className="py-1.5 px-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/90 text-xs font-mono transition-colors cursor-pointer"
+                          title="Reset Camera View"
+                        >
+                          Reset View
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Real-time Interactive Color Picker & Palette Bar */}
                   {isModelLoaded && (
@@ -1212,6 +1822,158 @@ export default function Project3DExperience() {
           </div>
         </div>
       </div>
+
+      {/* 360° Interior VR Walkthrough Modal */}
+      {show360InteriorModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-5xl bg-[#0a0a0d] border border-white/15 rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-white/10 bg-[#121217]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                  <Compass className="w-4 h-4 animate-spin-slow" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-display text-sm sm:text-base font-bold text-white">
+                      360° Interior Virtual Walkthrough
+                    </h3>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold uppercase hidden sm:inline">
+                      Turnkey Spec
+                    </span>
+                  </div>
+                  <p className="text-[10px] sm:text-xs text-white/60 font-mono">
+                    Drag mouse or touch 360° to look around • Real Madurai villa interior finish
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Night Glow Toggle */}
+                <button
+                  onClick={() => setIs360Night((prev) => !prev)}
+                  className={`px-3 py-1 rounded-full text-xs font-mono flex items-center gap-1.5 cursor-pointer border transition-all ${
+                    is360Night
+                      ? "bg-amber-400 text-stone-950 font-bold border-amber-300"
+                      : "bg-white/10 text-white/80 hover:text-white border-white/15"
+                  }`}
+                  title="Toggle Day / Night Ambient Lighting in Room"
+                >
+                  <Moon className={`w-3.5 h-3.5 ${is360Night ? "fill-stone-950" : ""}`} />
+                  <span className="hidden sm:inline">{is360Night ? "Warm Night" : "Natural Day"}</span>
+                </button>
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setShow360InteriorModal(false)}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/15"
+                  title="Return to 3D Villa"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Room Switcher Tabs */}
+            <div className="flex items-center gap-1.5 px-4 sm:px-6 py-2.5 bg-black/40 border-b border-white/10 overflow-x-auto">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-white/50 mr-1 hidden sm:inline">
+                Select Room:
+              </span>
+              {INTERIOR_360_ROOMS.map((room) => {
+                const isActive = active360RoomId === room.id;
+                return (
+                  <button
+                    key={room.id}
+                    onClick={() => setActive360RoomId(room.id)}
+                    className={`px-3 py-1.5 rounded-xl font-ui text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                      isActive
+                        ? "bg-amber-500 text-stone-950 font-bold shadow-md shadow-amber-500/20"
+                        : "bg-white/5 text-white/70 hover:text-white hover:bg-white/10 border border-white/10"
+                    }`}
+                  >
+                    <span>{room.name}</span>
+                    <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${isActive ? "bg-stone-950/20 text-stone-950" : "text-white/40"}`}>
+                      {room.tag}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Main Interactive 360 Viewport */}
+            <div className="relative w-full h-[360px] sm:h-[450px] md:h-[500px] bg-black overflow-hidden select-none">
+              <Interior360Canvas
+                panoramaUrl={
+                  INTERIOR_360_ROOMS.find((r) => r.id === active360RoomId)?.panoramaUrl ||
+                  "/panoramas/living-room.jpg"
+                }
+                isNight={is360Night}
+              />
+
+              {/* Viewport Overlay Controls */}
+              <div className="pointer-events-none absolute left-4 top-4 z-20 flex items-center gap-2">
+                <span className="bg-black/70 backdrop-blur-md border border-white/20 text-white font-mono text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>360° Equirectangular VR</span>
+                </span>
+              </div>
+
+              {/* Gesture Guide */}
+              <div className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-black/70 backdrop-blur-md border border-white/15 px-3 py-1 rounded-full text-white/80 font-mono text-[10px] flex items-center gap-1.5">
+                <Compass className="w-3 h-3 text-amber-400 animate-spin-slow" />
+                <span>Click & drag horizontally/vertically to look 360°</span>
+              </div>
+            </div>
+
+            {/* Room Specs Footer */}
+            {(() => {
+              const currentRoom = INTERIOR_360_ROOMS.find((r) => r.id === active360RoomId);
+              if (!currentRoom) return null;
+              return (
+                <div className="p-4 sm:p-5 bg-[#121217] border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-display text-sm font-bold text-white">
+                        {currentRoom.name}
+                      </h4>
+                      <span className="text-[10px] font-mono text-amber-400 border border-amber-400/30 px-2 py-0.5 rounded-full">
+                        {currentRoom.tag}
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 mt-1 font-mono">
+                      {currentRoom.specs}
+                    </p>
+                    <p className="text-[11px] text-white/50 mt-0.5">
+                      {currentRoom.features}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-stretch sm:self-auto shrink-0">
+                    <button
+                      onClick={() => {
+                        const text = encodeURIComponent(
+                          `Hi Danam Holdings, I was viewing the 360° interior tour of the ${currentRoom.name} (${selectedProject.title}) and would like turnkey interior pricing.`
+                        );
+                        window.open(`https://wa.me/918883332499?text=${text}`, "_blank");
+                      }}
+                      className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-ui text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                    >
+                      <span>Get Room Estimate</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setShow360InteriorModal(false)}
+                      className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-mono transition-colors cursor-pointer border border-white/15"
+                    >
+                      Back to 3D Villa
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
