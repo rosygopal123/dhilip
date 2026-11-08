@@ -219,6 +219,7 @@ export default function Project3DExperience() {
   const [selectedThemeId, setSelectedThemeId] = useState<string>("white-charcoal");
   const [sunMode, setSunMode] = useState<"sun" | "sunset" | "night">("sun");
   const [buildingLightsOn, setBuildingLightsOn] = useState<boolean>(true);
+  const [bgTheme, setBgTheme] = useState<"sky" | "white" | "black">("sky");
   const sectionRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
 
@@ -511,29 +512,45 @@ export default function Project3DExperience() {
           <div className="lg:col-span-7 bg-[#0a0a0d] border border-white/10 rounded-[22px] overflow-hidden shadow-2xl flex flex-col">
             {/* Viewer Stage: Clean Luxury 3D Card with Architectural Corner Accents */}
             <div className={`relative w-full transition-colors duration-500 overflow-hidden h-[340px] sm:h-[400px] lg:h-[460px] ${
-              sunMode === "sun" ? "bg-[#388bfd]" : sunMode === "sunset" ? "bg-[#2b1810]" : "bg-[#0a0a0d]"
+              bgTheme === "white"
+                ? "bg-[#f1f5f9]"
+                : bgTheme === "black"
+                ? "bg-[#030508]"
+                : sunMode === "sun"
+                ? "bg-[#388bfd]"
+                : sunMode === "sunset"
+                ? "bg-[#2b1810]"
+                : "bg-[#050914]"
             }`}>
               {/* Luxury Architectural Viewfinder Corner Reticles */}
               <span className={`pointer-events-none absolute left-4 top-4 z-20 h-4 w-4 border-l border-t transition-colors duration-300 ${
-                sunMode === "sun" ? "border-slate-800/40" : "border-white/40"
+                bgTheme === "white" || (sunMode === "sun" && bgTheme === "sky") ? "border-slate-800/40" : "border-white/40"
               }`} />
               <span className={`pointer-events-none absolute right-4 top-4 z-20 h-4 w-4 border-r border-t transition-colors duration-300 ${
-                sunMode === "sun" ? "border-slate-800/40" : "border-white/40"
+                bgTheme === "white" || (sunMode === "sun" && bgTheme === "sky") ? "border-slate-800/40" : "border-white/40"
               }`} />
               <span className={`pointer-events-none absolute left-4 bottom-4 z-20 h-4 w-4 border-l border-b transition-colors duration-300 ${
-                sunMode === "sun" ? "border-slate-800/40" : "border-white/40"
+                bgTheme === "white" || (sunMode === "sun" && bgTheme === "sky") ? "border-slate-800/40" : "border-white/40"
               }`} />
               <span className={`pointer-events-none absolute right-4 bottom-4 z-20 h-4 w-4 border-r border-b transition-colors duration-300 ${
-                sunMode === "sun" ? "border-slate-800/40" : "border-white/40"
+                bgTheme === "white" || (sunMode === "sun" && bgTheme === "sky") ? "border-slate-800/40" : "border-white/40"
               }`} />
 
               {activeView === "3d" && (
                 <div className={`relative w-full h-full overflow-hidden flex items-center justify-center transition-colors duration-500 ${
-                  sunMode === "sun" ? "bg-[#388bfd]" : sunMode === "sunset" ? "bg-[#2b1810]" : "bg-[#090e18]"
+                  bgTheme === "white"
+                    ? "bg-[#f1f5f9]"
+                    : bgTheme === "black"
+                    ? "bg-[#030508]"
+                    : sunMode === "sun"
+                    ? "bg-[#388bfd]"
+                    : sunMode === "sunset"
+                    ? "bg-[#2b1810]"
+                    : "bg-[#050914]"
                 }`}>
 
                   {/* Top Status Badge & Sunlight Modes */}
-                  <div className="absolute top-2.5 left-3 sm:left-5 z-25 flex items-center gap-1.5 sm:gap-2 pointer-events-auto select-none flex-wrap">
+                  <div className="absolute top-2.5 left-3 sm:left-5 z-25 flex items-center gap-1.5 sm:gap-2 pointer-events-auto select-none flex-wrap max-w-[70%] sm:max-w-none">
                     <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 px-2.5 sm:px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
                       <Rotate3D className="w-3.5 h-3.5 text-[#C5A880] animate-spin-slow" />
                       <span className="hidden sm:inline">3D Villa Tour</span>
@@ -570,17 +587,15 @@ export default function Project3DExperience() {
                       <button
                         onClick={() => {
                           setSunMode("night");
-                          if (!buildingLightsOn) {
-                            setBuildingLightsOn(true);
-                            applyBuildingLights(true);
-                          }
+                          setBuildingLightsOn(true);
+                          applyBuildingLights(true);
                         }}
                         className={`px-2 sm:px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
                           sunMode === "night"
                             ? "bg-indigo-600 text-white font-bold shadow-sm"
                             : "text-white/80 hover:text-white"
                         }`}
-                        title="Night Architectural Illumination"
+                        title="Night Mode (No Sun, Moon & Light Points ON)"
                       >
                         <Moon className="w-3 h-3" />
                         <span>Night</span>
@@ -600,6 +615,48 @@ export default function Project3DExperience() {
                       <Lightbulb className={`w-3.5 h-3.5 ${buildingLightsOn ? "fill-stone-950 text-stone-950 animate-pulse" : "text-white/70"}`} />
                       <span>{buildingLightsOn ? "Lights ON" : "Lights OFF"}</span>
                     </button>
+
+                    {/* White / Black / Sky Background Change Option */}
+                    <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 p-0.5 rounded-full flex items-center shadow-lg">
+                      <button
+                        onClick={() => setBgTheme("white")}
+                        className={`px-2 sm:px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
+                          bgTheme === "white"
+                            ? "bg-white text-stone-900 font-bold shadow-sm"
+                            : "text-white/80 hover:text-white"
+                        }`}
+                        title="White Architectural Studio Background"
+                      >
+                        <span className="w-2.5 h-2.5 rounded-full bg-white border border-stone-400 shrink-0" />
+                        <span>White</span>
+                      </button>
+
+                      <button
+                        onClick={() => setBgTheme("black")}
+                        className={`px-2 sm:px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
+                          bgTheme === "black"
+                            ? "bg-stone-900 text-white font-bold ring-1 ring-white/60 shadow-sm"
+                            : "text-white/80 hover:text-white"
+                        }`}
+                        title="Black Luxury Studio Background"
+                      >
+                        <span className="w-2.5 h-2.5 rounded-full bg-stone-950 border border-white/70 shrink-0" />
+                        <span>Black</span>
+                      </button>
+
+                      <button
+                        onClick={() => setBgTheme("sky")}
+                        className={`px-2 sm:px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1 cursor-pointer transition-all ${
+                          bgTheme === "sky"
+                            ? "bg-blue-600 text-white font-bold shadow-sm"
+                            : "text-white/80 hover:text-white"
+                        }`}
+                        title="Realistic Sky & Environment Background"
+                      >
+                        <Compass className="w-3 h-3" />
+                        <span>Sky</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Clean Interactive Zoom & Reset Controls in Top-Right */}
@@ -678,11 +735,52 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
+                  {/* Realistic Silver Glowing Moon in Night Sky (No sun, only moon!) */}
+                  {sunMode === "night" && bgTheme === "sky" && (
+                    <div className="absolute top-16 sm:top-12 right-6 sm:right-20 z-15 pointer-events-none select-none transition-all duration-700 animate-fade-in flex flex-col items-center">
+                      <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#ffffff] via-[#f1f5f9] to-[#cbd5e1] shadow-[0_0_28px_10px_rgba(241,245,249,0.5),0_0_65px_25px_rgba(148,163,184,0.3)] overflow-hidden">
+                        {/* Subtle realistic lunar craters */}
+                        <div className="absolute top-2 left-3 w-3.5 h-3.5 rounded-full bg-slate-300/40 blur-[0.5px]" />
+                        <div className="absolute top-5 left-2 w-4 h-5 rounded-full bg-slate-300/35 blur-[1px]" />
+                        <div className="absolute bottom-3 left-4 w-3 h-3 rounded-full bg-slate-300/30 blur-[0.5px]" />
+                        <div className="absolute top-4 right-2 w-4 h-4 rounded-full bg-slate-400/25 blur-[1px]" />
+                        <div className="absolute bottom-2 right-4 w-2.5 h-2.5 rounded-full bg-slate-400/30 blur-[0.5px]" />
+                        {/* Soft lunar edge terminator shadow */}
+                        <div className="absolute inset-0 rounded-full shadow-[inset_-4px_-4px_8px_rgba(15,23,42,0.4)]" />
+                      </div>
+                      <span className="text-[9px] font-mono tracking-widest text-slate-300/80 mt-1 uppercase drop-shadow">Silver Moon</span>
+                    </div>
+                  )}
+
+                  {/* Midday Sun (Only in Day mode) */}
+                  {sunMode === "sun" && bgTheme === "sky" && (
+                    <div className="absolute top-16 sm:top-12 right-6 sm:right-20 z-15 pointer-events-none select-none transition-all duration-700 animate-fade-in flex flex-col items-center">
+                      <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#ffffff] via-[#fffbeb] to-[#fde047] shadow-[0_0_35px_15px_rgba(253,224,71,0.65),0_0_80px_35px_rgba(251,191,36,0.35)]" />
+                      <span className="text-[9px] font-mono tracking-widest text-amber-200/90 mt-1 uppercase drop-shadow">Midday Sun</span>
+                    </div>
+                  )}
+
+                  {/* Golden Hour Sunset */}
+                  {sunMode === "sunset" && bgTheme === "sky" && (
+                    <div className="absolute top-20 sm:top-16 left-8 sm:left-20 z-15 pointer-events-none select-none transition-all duration-700 animate-fade-in flex flex-col items-center">
+                      <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#fff7ed] via-[#fdba74] to-[#f97316] shadow-[0_0_35px_15px_rgba(249,115,22,0.6),0_0_75px_30px_rgba(234,88,12,0.35)]" />
+                      <span className="text-[9px] font-mono tracking-widest text-orange-200/90 mt-1 uppercase drop-shadow">Golden Sunset</span>
+                    </div>
+                  )}
+
                   {/* Google <model-viewer>: 100% Native WebGL 3D with PBR Daylight / Sunset / Night Lighting */}
                   <div
                     onPointerDown={dismissGestureHint}
                     className={`w-full h-full flex items-center justify-center overflow-hidden relative cursor-grab active:cursor-grabbing transition-colors duration-500 ${
-                      sunMode === "sun" ? "bg-[#388bfd]" : sunMode === "sunset" ? "bg-[#2b1810]" : "bg-[#090e18]"
+                      bgTheme === "white"
+                        ? "bg-[#f1f5f9]"
+                        : bgTheme === "black"
+                        ? "bg-[#030508]"
+                        : sunMode === "sun"
+                        ? "bg-[#388bfd]"
+                        : sunMode === "sunset"
+                        ? "bg-[#2b1810]"
+                        : "bg-[#050914]"
                     }`}
                   >
                     <model-viewer
@@ -702,16 +800,48 @@ export default function Project3DExperience() {
                       max-camera-orbit="auto auto 200%"
                       field-of-view="30deg"
                       environment-image={
-                        sunMode === "sun"
+                        bgTheme === "white" || bgTheme === "black"
+                          ? "neutral"
+                          : sunMode === "sun"
                           ? "/environments/sunny_sky.jpg"
                           : sunMode === "sunset"
                           ? "/environments/sunset_sky.jpg"
                           : "neutral"
                       }
                       tone-mapping="neutral"
-                      shadow-intensity={sunMode === "sun" ? "1.8" : sunMode === "sunset" ? "1.6" : "1.2"}
-                      shadow-softness={sunMode === "sun" ? "0.1" : sunMode === "sunset" ? "0.25" : "0.4"}
-                      exposure={sunMode === "sun" ? "1.65" : sunMode === "sunset" ? "1.38" : "1.25"}
+                      shadow-intensity={
+                        bgTheme === "white"
+                          ? "1.6"
+                          : bgTheme === "black"
+                          ? "1.4"
+                          : sunMode === "sun"
+                          ? "1.8"
+                          : sunMode === "sunset"
+                          ? "1.6"
+                          : "1.2"
+                      }
+                      shadow-softness={
+                        bgTheme === "white"
+                          ? "0.2"
+                          : bgTheme === "black"
+                          ? "0.3"
+                          : sunMode === "sun"
+                          ? "0.1"
+                          : sunMode === "sunset"
+                          ? "0.25"
+                          : "0.4"
+                      }
+                      exposure={
+                        bgTheme === "white"
+                          ? "1.4"
+                          : bgTheme === "black"
+                          ? (buildingLightsOn ? "1.3" : "1.1")
+                          : sunMode === "sun"
+                          ? "1.65"
+                          : sunMode === "sunset"
+                          ? "1.38"
+                          : "1.22"
+                      }
                       loading="eager"
                       reveal="auto"
                       interaction-prompt="none"
@@ -719,11 +849,15 @@ export default function Project3DExperience() {
                         width: "100%",
                         height: "100%",
                         background:
-                          sunMode === "sun"
+                          bgTheme === "white"
+                            ? "linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #e2e8f0 100%)"
+                            : bgTheme === "black"
+                            ? "radial-gradient(ellipse at 50% 40%, #10131a 0%, #06080d 60%, #010204 100%)"
+                            : sunMode === "sun"
                             ? "radial-gradient(circle at 75% 18%, rgba(255, 255, 245, 0.95) 0%, rgba(255, 240, 180, 0.6) 12%, rgba(200, 230, 255, 0.25) 28%, transparent 55%), linear-gradient(180deg, #388bfd 0%, #60a5fa 22%, #93c5fd 50%, #dbeafe 78%, #f8fafc 100%)"
                             : sunMode === "sunset"
                             ? "radial-gradient(circle at 30% 55%, rgba(255, 220, 150, 0.9) 0%, rgba(255, 140, 60, 0.5) 15%, transparent 45%), linear-gradient(180deg, #1e293b 0%, #334155 20%, #7c2d12 45%, #c2410c 68%, #ea580c 85%, #fed7aa 100%)"
-                            : "radial-gradient(circle at 75% 18%, rgba(210, 230, 255, 0.35) 0%, rgba(100, 150, 220, 0.12) 15%, transparent 40%), radial-gradient(ellipse at 50% 30%, #152238 0%, #0d1522 55%, #05080f 100%)",
+                            : "radial-gradient(circle at 75% 16%, rgba(226, 232, 240, 0.28) 0%, rgba(148, 163, 184, 0.1) 15%, transparent 45%), linear-gradient(180deg, #040711 0%, #09101f 35%, #0f1930 70%, #15223e 100%)",
                         outline: "none",
                         touchAction: "pan-y",
                       }}
