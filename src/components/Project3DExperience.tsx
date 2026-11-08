@@ -517,7 +517,7 @@ export default function Project3DExperience() {
           <div className="lg:col-span-7 bg-[#0a0a0d] border border-white/10 rounded-[22px] overflow-hidden shadow-2xl flex flex-col">
             {/* Viewer Stage: Clean Luxury 3D Card with Architectural Corner Accents */}
             <div className={`relative w-full transition-colors duration-500 overflow-hidden h-[340px] sm:h-[400px] lg:h-[460px] ${
-              bgTheme === "white" ? "bg-[#f1f5f9]" : "bg-[#030508]"
+              bgTheme === "white" ? "bg-white" : "bg-black"
             }`}>
               {/* Luxury Architectural Viewfinder Corner Reticles */}
               <span className={`pointer-events-none absolute left-4 top-4 z-20 h-4 w-4 border-l border-t transition-colors duration-300 ${
@@ -535,86 +535,89 @@ export default function Project3DExperience() {
 
               {activeView === "3d" && (
                 <div className={`relative w-full h-full overflow-hidden flex items-center justify-center transition-colors duration-500 ${
-                  bgTheme === "white" ? "bg-[#f1f5f9]" : "bg-[#030508]"
+                  bgTheme === "white" ? "bg-white" : "bg-black"
                 }`}>
 
-                  {/* Top Status Badge & White / Black Background Controls */}
-                  <div className="absolute top-2.5 left-3 sm:left-5 z-25 flex items-center gap-1.5 sm:gap-2 pointer-events-auto select-none flex-wrap">
-                    <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 px-2.5 sm:px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md">
-                      <Rotate3D className="w-3.5 h-3.5 text-[#C5A880] animate-spin-slow" />
-                      <span className="hidden sm:inline">3D Villa Tour</span>
+                  {/* Top Header: Left Controls (Badges & Mode) + Right Controls (Zoom/Reset) with No Overlap */}
+                  <div className="absolute top-2.5 left-2 sm:left-4 right-2 sm:right-4 z-25 flex items-center justify-between pointer-events-none select-none gap-2">
+                    {/* Left: 3D Badge + White/Black Switcher + Lights Toggle */}
+                    <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto flex-wrap">
+                      <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 px-2.5 sm:px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md shrink-0">
+                        <Rotate3D className="w-3.5 h-3.5 text-[#C5A880] animate-spin-slow" />
+                        <span className="hidden sm:inline">3D Villa Tour</span>
+                      </div>
+
+                      {/* ONLY White & Complete Black Background Options */}
+                      <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 p-0.5 rounded-full flex items-center shadow-lg shrink-0">
+                        <button
+                          onClick={() => selectBgTheme("white")}
+                          className={`px-3 py-1 rounded-full text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all ${
+                            bgTheme === "white"
+                              ? "bg-white text-stone-900 font-bold shadow-md scale-105"
+                              : "text-white/80 hover:text-white"
+                          }`}
+                          title="Complete White Background"
+                        >
+                          <span className="w-2.5 h-2.5 rounded-full bg-white border border-stone-400 shrink-0" />
+                          <span>White</span>
+                        </button>
+
+                        <button
+                          onClick={() => selectBgTheme("black")}
+                          className={`px-3 py-1 rounded-full text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all ${
+                            bgTheme === "black"
+                              ? "bg-black text-white font-bold ring-1 ring-white/60 shadow-md scale-105"
+                              : "text-white/80 hover:text-white"
+                          }`}
+                          title="Complete Black Background"
+                        >
+                          <span className="w-2.5 h-2.5 rounded-full bg-black border border-white/70 shrink-0" />
+                          <span>Black</span>
+                        </button>
+                      </div>
+
+                      {/* Dedicated Building Lights ON / OFF Toggle */}
+                      <button
+                        onClick={toggleBuildingLights}
+                        className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg shrink-0 ${
+                          buildingLightsOn
+                            ? "bg-amber-400 text-stone-950 font-bold border-amber-300 shadow-[0_0_14px_rgba(251,191,36,0.5)]"
+                            : "bg-[#0a0a0d]/90 text-white/70 hover:text-white border-white/15"
+                        }`}
+                        title="Toggle Building Architectural Lights ON / OFF"
+                      >
+                        <Lightbulb className={`w-3.5 h-3.5 ${buildingLightsOn ? "fill-stone-950 text-stone-950 animate-pulse" : "text-white/70"}`} />
+                        <span>{buildingLightsOn ? "Lights ON" : "Lights OFF"}</span>
+                      </button>
                     </div>
 
-                    {/* ONLY White & Black Background Options */}
-                    <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 p-0.5 rounded-full flex items-center shadow-lg">
+                    {/* Right: Clean Interactive Zoom & Reset Controls */}
+                    <div className="flex items-center gap-0.5 sm:gap-1 bg-[#0a0a0d]/95 backdrop-blur-md border border-white/15 p-1 rounded-xl shadow-xl pointer-events-auto select-none shrink-0">
                       <button
-                        onClick={() => selectBgTheme("white")}
-                        className={`px-3 py-1 rounded-full text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all ${
-                          bgTheme === "white"
-                            ? "bg-white text-stone-900 font-bold shadow-md scale-105"
-                            : "text-white/80 hover:text-white"
-                        }`}
-                        title="White Studio Background"
+                        onClick={zoomCameraOut}
+                        className="px-1.5 sm:px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer flex items-center gap-1"
+                        title="Zoom Out (Full View)"
                       >
-                        <span className="w-2.5 h-2.5 rounded-full bg-white border border-stone-400 shrink-0" />
-                        <span>White</span>
+                        <ZoomOut className="w-3.5 h-3.5" />
+                        <span className="text-[10px] uppercase hidden md:inline">Zoom Out</span>
                       </button>
-
                       <button
-                        onClick={() => selectBgTheme("black")}
-                        className={`px-3 py-1 rounded-full text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all ${
-                          bgTheme === "black"
-                            ? "bg-stone-900 text-white font-bold ring-1 ring-white/60 shadow-md scale-105"
-                            : "text-white/80 hover:text-white"
-                        }`}
-                        title="Black Night Background (Moon & Light Points ON)"
+                        onClick={zoomCameraIn}
+                        className="px-1.5 sm:px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer border-l border-white/20 flex items-center gap-1"
+                        title="Zoom In"
                       >
-                        <span className="w-2.5 h-2.5 rounded-full bg-stone-950 border border-white/70 shrink-0" />
-                        <span>Black</span>
+                        <ZoomIn className="w-3.5 h-3.5" />
+                        <span className="text-[10px] uppercase hidden md:inline">Zoom In</span>
+                      </button>
+                      <button
+                        onClick={resetCamera}
+                        className="px-1.5 sm:px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer border-l border-white/20 flex items-center gap-1"
+                        title="Reset View to Center"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span className="text-[10px] uppercase hidden md:inline">Reset</span>
                       </button>
                     </div>
-
-                    {/* Dedicated Building Lights ON / OFF Toggle */}
-                    <button
-                      onClick={toggleBuildingLights}
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg ${
-                        buildingLightsOn
-                          ? "bg-amber-400 text-stone-950 font-bold border-amber-300 shadow-[0_0_14px_rgba(251,191,36,0.5)]"
-                          : "bg-[#0a0a0d]/90 text-white/70 hover:text-white border-white/15"
-                      }`}
-                      title="Toggle Building Architectural Lights ON / OFF"
-                    >
-                      <Lightbulb className={`w-3.5 h-3.5 ${buildingLightsOn ? "fill-stone-950 text-stone-950 animate-pulse" : "text-white/70"}`} />
-                      <span>{buildingLightsOn ? "Lights ON" : "Lights OFF"}</span>
-                    </button>
-                  </div>
-
-                  {/* Clean Interactive Zoom & Reset Controls in Top-Right */}
-                  <div className="absolute top-2.5 right-3 z-25 flex items-center gap-1 bg-[#0a0a0d]/95 backdrop-blur-md border border-white/15 p-1 rounded-xl shadow-xl pointer-events-auto select-none">
-                    <button
-                      onClick={zoomCameraOut}
-                      className="px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer flex items-center gap-1"
-                      title="Zoom Out (Full View)"
-                    >
-                      <ZoomOut className="w-3.5 h-3.5" />
-                      <span className="text-[10px] uppercase hidden sm:inline">Zoom Out</span>
-                    </button>
-                    <button
-                      onClick={zoomCameraIn}
-                      className="px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer border-l border-white/20 flex items-center gap-1"
-                      title="Zoom In"
-                    >
-                      <ZoomIn className="w-3.5 h-3.5" />
-                      <span className="text-[10px] uppercase hidden sm:inline">Zoom In</span>
-                    </button>
-                    <button
-                      onClick={resetCamera}
-                      className="px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer border-l border-white/20 flex items-center gap-1"
-                      title="Reset View to Center"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span className="text-[10px] uppercase hidden sm:inline">Reset</span>
-                    </button>
                   </div>
 
                   {/* Architectural 3D Loading Spinner (Visible while GLB streams directly into WebGL) */}
@@ -665,28 +668,11 @@ export default function Project3DExperience() {
                     </div>
                   )}
 
-                  {/* Realistic Silver Glowing Moon in Black Night Sky (No sun, only moon!) */}
-                  {bgTheme === "black" && (
-                    <div className="absolute top-16 sm:top-12 right-6 sm:right-20 z-15 pointer-events-none select-none transition-all duration-700 animate-fade-in flex flex-col items-center">
-                      <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#ffffff] via-[#f1f5f9] to-[#cbd5e1] shadow-[0_0_28px_10px_rgba(241,245,249,0.5),0_0_65px_25px_rgba(148,163,184,0.3)] overflow-hidden">
-                        {/* Subtle realistic lunar craters */}
-                        <div className="absolute top-2 left-3 w-3.5 h-3.5 rounded-full bg-slate-300/40 blur-[0.5px]" />
-                        <div className="absolute top-5 left-2 w-4 h-5 rounded-full bg-slate-300/35 blur-[1px]" />
-                        <div className="absolute bottom-3 left-4 w-3 h-3 rounded-full bg-slate-300/30 blur-[0.5px]" />
-                        <div className="absolute top-4 right-2 w-4 h-4 rounded-full bg-slate-400/25 blur-[1px]" />
-                        <div className="absolute bottom-2 right-4 w-2.5 h-2.5 rounded-full bg-slate-400/30 blur-[0.5px]" />
-                        {/* Soft lunar edge terminator shadow */}
-                        <div className="absolute inset-0 rounded-full shadow-[inset_-4px_-4px_8px_rgba(15,23,42,0.4)]" />
-                      </div>
-                      <span className="text-[9px] font-mono tracking-widest text-slate-300/80 mt-1 uppercase drop-shadow">Silver Moon</span>
-                    </div>
-                  )}
-
-                  {/* Google <model-viewer>: 100% Native WebGL 3D with PBR White Studio / Black Night Lighting */}
+                  {/* Google <model-viewer>: 100% Native WebGL 3D with PBR White Studio / Pure Solid Black Lighting */}
                   <div
                     onPointerDown={dismissGestureHint}
                     className={`w-full h-full flex items-center justify-center overflow-hidden relative cursor-grab active:cursor-grabbing transition-colors duration-500 ${
-                      bgTheme === "white" ? "bg-[#f1f5f9]" : "bg-[#030508]"
+                      bgTheme === "white" ? "bg-white" : "bg-black"
                     }`}
                   >
                     <model-viewer
@@ -709,17 +695,14 @@ export default function Project3DExperience() {
                       tone-mapping="neutral"
                       shadow-intensity={bgTheme === "white" ? "1.6" : "1.3"}
                       shadow-softness={bgTheme === "white" ? "0.2" : "0.35"}
-                      exposure={bgTheme === "white" ? "1.35" : (buildingLightsOn ? "1.3" : "1.15")}
+                      exposure={bgTheme === "white" ? "1.35" : (buildingLightsOn ? "1.35" : "1.2")}
                       loading="eager"
                       reveal="auto"
                       interaction-prompt="none"
                       style={{
                         width: "100%",
                         height: "100%",
-                        background:
-                          bgTheme === "white"
-                            ? "linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #e2e8f0 100%)"
-                            : "radial-gradient(circle at 75% 16%, rgba(226, 232, 240, 0.28) 0%, rgba(148, 163, 184, 0.1) 15%, transparent 45%), linear-gradient(180deg, #040711 0%, #09101f 35%, #0f1930 70%, #15223e 100%)",
+                        background: bgTheme === "white" ? "#ffffff" : "#000000",
                         outline: "none",
                         touchAction: "pan-y",
                       }}
