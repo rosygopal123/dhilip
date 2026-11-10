@@ -850,7 +850,7 @@ export default function Project3DExperience() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Dynamically load Google <model-viewer> official standalone bundle on client mount
+  // Dynamically load Google <model-viewer> official standalone bundle (local first, CDN fallback)
   useEffect(() => {
     if (typeof window !== "undefined" && customElements.get("model-viewer")) {
       setIs3dLoaded(true);
@@ -858,33 +858,75 @@ export default function Project3DExperience() {
     }
     const s = document.createElement("script");
     s.type = "module";
-    s.src = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js";
-    s.onload = () => setIs3dLoaded(true);
+    s.src = "/js/model-viewer.min.js";
+    s.onload = () => {
+      customElements.whenDefined("model-viewer").then(() => setIs3dLoaded(true));
+    };
+    s.onerror = () => {
+      // Fallback to Google CDN if local file fails
+      const fallback = document.createElement("script");
+      fallback.type = "module";
+      fallback.src = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js";
+      fallback.onload = () => {
+        customElements.whenDefined("model-viewer").then(() => setIs3dLoaded(true));
+      };
+      fallback.onerror = () => setIs3dLoaded(true);
+      document.body.appendChild(fallback);
+    };
     document.body.appendChild(s);
   }, []);
 
   // Track 3D model load completion to display gesture hint directly over the rendered 3D model
   useEffect(() => {
-    setIsModelLoaded(false);
     const mv = modelViewerRef.current;
     if (!mv) return;
 
-    const handleModelLoad = () => {
+    const handleModelReady = () => {
       setIsModelLoaded(true);
       const current = DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId);
       setTimeout(() => {
-        if (current) {
-          applyDualColorTheme(current);
-        } else {
-          applyCustomColor("primary", primaryColor);
-        }
-        applyBuildingLights(buildingLightsOn);
+        try {
+          if (current) {
+            applyDualColorTheme(current);
+          } else {
+            applyCustomColor("primary", primaryColor);
+          }
+          applyBuildingLights(buildingLightsOn);
+        } catch {}
       }, 150);
     };
 
-    mv.addEventListener("load", handleModelLoad);
+    // If model is already cached/loaded, dismiss spinner immediately
+    if (mv.loaded || mv.modelIsVisible) {
+      handleModelReady();
+      return;
+    }
+
+    const handleProgress = (event: any) => {
+      if (event?.detail?.totalProgress >= 0.95) {
+        handleModelReady();
+      }
+    };
+
+    const handleError = () => {
+      // On error, still dismiss loading spinner so viewer is not stuck
+      setIsModelLoaded(true);
+    };
+
+    mv.addEventListener("load", handleModelReady);
+    mv.addEventListener("progress", handleProgress);
+    mv.addEventListener("error", handleError);
+
+    // Failsafe timeout: Never leave user waiting more than 2.5 seconds
+    const failsafeTimer = setTimeout(() => {
+      setIsModelLoaded(true);
+    }, 2500);
+
     return () => {
-      mv.removeEventListener("load", handleModelLoad);
+      clearTimeout(failsafeTimer);
+      mv.removeEventListener("load", handleModelReady);
+      mv.removeEventListener("progress", handleProgress);
+      mv.removeEventListener("error", handleError);
     };
   }, [selectedProject.id, is3dLoaded]);
 
@@ -1289,6 +1331,8 @@ export default function Project3DExperience() {
                       key={selectedProject.id}
                       src={selectedProject.glbModel}
                       alt={selectedProject.title}
+                      onLoad={() => setIsModelLoaded(true)}
+                      onError={() => setIsModelLoaded(true)}
                       camera-controls
                       disable-tap
                       disable-pan

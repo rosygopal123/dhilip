@@ -41,6 +41,47 @@ export interface ProjectItem {
 
 export const ALL_PROJECTS: ProjectItem[] = [
   {
+    id: "pandian-residence",
+    title: "Pandian Commercial & Residence",
+    img: "/images/danam/marthupandiyar-20vk-20model-201.webp",
+    beforeImg: "/images/danam/hh1.webp",
+    location: "Madurai",
+    type: "commercial",
+    badge: "Commercial & Residential",
+    area: "3,800 Sq.Ft (G+2)",
+    year: "2024",
+    duration: "10 Months",
+    budget: "Turnkey EPC Elevation",
+    desc: "Modern multi-storey commercial showroom on ground floor with luxury residential living on upper floors. Features architectural exterior louvers, glass railing balconies, and durable weatherproofing.",
+    quote: "The 3D interactive model helped us finalize every facade detail and color choice before civil work started.",
+    author: "Pandian Commercial Group",
+    glbModel: "/models/pandian_residence.glb",
+    modelAuthor: "Client Architectural Model (Compressed WebGL)",
+    cameraOrbit: "0deg 75deg 105%",
+    cameraTarget: "auto auto auto",
+    rooms360: [
+      { id: "ground-store", name: "Commercial Ground Floor", tag: "Retail Front", panoramaUrl: "/panoramas/living-room.jpg", specs: "12'0\" Clear Height · Motorized Shutter" },
+      { id: "residence-living", name: "First Floor Living Room", tag: "Residential", panoramaUrl: "/panoramas/master-bedroom.jpg", specs: "Large Balcony Sitout · Toughened Glass" },
+      { id: "modular-kitchen", name: "Upper Level Modular Kitchen", tag: "Kitchen", panoramaUrl: "/panoramas/modular-kitchen.jpg", specs: "Quartz Counters · Concealed Chimney" },
+      { id: "terrace-deck", name: "Rooftop Terrace", tag: "Open Terrace", panoramaUrl: "/panoramas/sky-terrace.jpg", specs: "Cool-Roof Reflective Coating · Parapet Louvers" }
+    ],
+    civilSpecs: {
+      structure: "Seismic Zone-III Earthquake Resistant RCC Frame (IS-456)",
+      steel: "Fe550D High-Ductility TMT Rebars",
+      concrete: "Ultratech M25 Ready-Mix Concrete Matrix",
+      vastu: "100% Vastu Compliant Commercial & Residential Orientation",
+      ceiling: "11'6\" Structural Clear Height",
+      flooring: "Vitrified Slabs & Heavy Commercial Anti-Skid Finish",
+      handoverTime: "150 Days Handover Guarantee"
+    },
+    highlights: [
+      "Ground floor heavy-duty motorized commercial shutter provision",
+      "First & second floor cantilevered balconies with safety glass railings",
+      "Passive cooling vertical architectural louvers reducing direct sun glare",
+      "Full 3D visualization and interactive walkthrough prior to construction"
+    ]
+  },
+  {
     id: "rajmahal-aishvaryam",
     title: "Rajmahal Aishvaryam",
     img: "/images/danam/ddhvrktrjjjln58schqk.webp",

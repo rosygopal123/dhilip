@@ -163,7 +163,7 @@ export default function ProjectInteractiveModal({
     }
   }, [project, initialTab]);
 
-  // Load Google <model-viewer> script
+  // Load Google <model-viewer> script (local first, CDN fallback)
   useEffect(() => {
     if (typeof window !== "undefined" && customElements.get("model-viewer")) {
       setIs3dLoaded(true);
@@ -171,8 +171,19 @@ export default function ProjectInteractiveModal({
     }
     const s = document.createElement("script");
     s.type = "module";
-    s.src = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js";
-    s.onload = () => setIs3dLoaded(true);
+    s.src = "/js/model-viewer.min.js";
+    s.onload = () => {
+      customElements.whenDefined("model-viewer").then(() => setIs3dLoaded(true));
+    };
+    s.onerror = () => {
+      const fallback = document.createElement("script");
+      fallback.type = "module";
+      fallback.src = "https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js";
+      fallback.onload = () => {
+        customElements.whenDefined("model-viewer").then(() => setIs3dLoaded(true));
+      };
+      document.body.appendChild(fallback);
+    };
     document.body.appendChild(s);
   }, []);
 
