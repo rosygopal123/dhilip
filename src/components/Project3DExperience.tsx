@@ -1167,8 +1167,8 @@ export default function Project3DExperience() {
 
                   {/* Top Header: Left Controls (Badges & Mode) + Right Controls (Zoom/Reset) with No Overlap */}
                   <div className="absolute top-2.5 left-2 sm:left-4 right-2 sm:right-4 z-25 flex items-center justify-between pointer-events-none select-none gap-2">
-                    {/* Left: 3D Badge + White/Black Switcher + Lights Toggle */}
-                    <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto flex-wrap">
+                    {/* Left: 3D Badge + White/Black Switcher + Lights Toggle + Pins Toggle + View Inside (Smooth Mobile Scroll) */}
+                    <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-[calc(100%-105px)] sm:max-w-none shrink sm:shrink-0 py-0.5">
                       <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 px-2.5 sm:px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md shrink-0">
                         <Rotate3D className="w-3.5 h-3.5 text-[#C5A880] animate-spin-slow" />
                         <span className="hidden sm:inline">3D Villa Tour</span>
@@ -1178,7 +1178,7 @@ export default function Project3DExperience() {
                       <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 p-0.5 rounded-full flex items-center shadow-lg shrink-0">
                         <button
                           onClick={() => selectBgTheme("white")}
-                          className={`px-3 py-1 rounded-full text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all ${
+                          className={`px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all ${
                             bgTheme === "white"
                               ? "bg-white text-stone-900 font-bold shadow-md scale-105"
                               : "text-white/80 hover:text-white"
@@ -1191,7 +1191,7 @@ export default function Project3DExperience() {
 
                         <button
                           onClick={() => selectBgTheme("black")}
-                          className={`px-3 py-1 rounded-full text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all ${
+                          className={`px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all ${
                             bgTheme === "black"
                               ? "bg-black text-white font-bold ring-1 ring-white/60 shadow-md scale-105"
                               : "text-white/80 hover:text-white"
@@ -1238,7 +1238,8 @@ export default function Project3DExperience() {
                         title="Step Inside to View 360° Furnished Interior Rooms"
                       >
                         <DoorOpen className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-                        <span>View Inside 360°</span>
+                        <span className="hidden sm:inline">View Inside 360°</span>
+                        <span className="sm:hidden">360° Inside</span>
                       </button>
                     </div>
 
@@ -1465,7 +1466,7 @@ export default function Project3DExperience() {
 
                   {/* Real-time Interactive Color Picker & Palette Bar */}
                   {isModelLoaded && (
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-25 flex items-center gap-1.5 sm:gap-2.5 bg-[#0a0a0d]/95 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full shadow-2xl pointer-events-auto select-none max-w-[95%] overflow-x-auto">
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-25 flex items-center gap-1.5 sm:gap-2.5 bg-[#0a0a0d]/95 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full shadow-2xl pointer-events-auto select-none max-w-[95%] overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                       <div className="flex items-center gap-1.5 pr-1.5 sm:pr-2 border-r border-white/20 text-white/90 shrink-0">
                         <Palette className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span className="text-[10px] font-mono uppercase tracking-wider hidden sm:inline whitespace-nowrap">

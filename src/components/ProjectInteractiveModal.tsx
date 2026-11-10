@@ -23,9 +23,12 @@ import {
   ChevronRight,
   Eye,
   SlidersHorizontal,
-  Info
+  Info,
+  Lightbulb,
+  Palette
 } from "lucide-react";
 import BeforeAfterSlider from "./BeforeAfterSlider";
+import { DUAL_COLOR_THEMES, DualColorTheme } from "./Project3DExperience";
 
 interface ProjectInteractiveModalProps {
   project: ProjectItem | null;
@@ -115,6 +118,11 @@ export default function ProjectInteractiveModal({
   const [showGestureGuide, setShowGestureGuide] = useState<boolean>(true);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isModelLoaded, setIsModelLoaded] = useState<boolean>(false);
+  const [bgTheme, setBgTheme] = useState<"white" | "black">("black");
+  const [buildingLightsOn, setBuildingLightsOn] = useState<boolean>(true);
+  const [selectedThemeId, setSelectedThemeId] = useState<string>("white-charcoal");
+  const [primaryColor, setPrimaryColor] = useState<string>("#F5F6F4");
+  const [accentColor, setAccentColor] = useState<string>("#2B2E33");
 
   const modalContainerRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
@@ -188,6 +196,176 @@ export default function ProjectInteractiveModal({
     document.body.appendChild(s);
   }, []);
 
+  const hexToRGBA = (hex: string): [number, number, number, number] => {
+    const cleanHex = hex.replace("#", "");
+    const r = parseInt(cleanHex.substring(0, 2), 16) / 255;
+    const g = parseInt(cleanHex.substring(2, 4), 16) / 255;
+    const b = parseInt(cleanHex.substring(4, 6), 16) / 255;
+    return [r, g, b, 1.0];
+  };
+
+  const applyCustomColor = (target: "primary" | "accent", hex: string) => {
+    const newPrimary = target === "primary" ? hex : primaryColor;
+    const newAccent = target === "accent" ? hex : accentColor;
+    if (target === "primary") setPrimaryColor(hex);
+    if (target === "accent") setAccentColor(hex);
+    setSelectedThemeId("custom");
+
+    const mv = modelViewerRef.current;
+    if (!mv) return;
+
+    const materials = mv.model?.materials;
+    if (!materials || !Array.isArray(materials)) return;
+
+    const primaryRGBA = hexToRGBA(newPrimary);
+    const accentRGBA = hexToRGBA(newAccent);
+
+    for (const mat of materials) {
+      const name = (mat.name || "").toUpperCase();
+
+      const isPrimaryWall =
+        name === "PLASTER WHITE" ||
+        name === "M_PLASTER" ||
+        name === "M_WALLWARM" ||
+        name === "M_CEILING" ||
+        (name.includes("PLASTER") && !name.includes("BLACK")) ||
+        (name.includes("WALL") && !name.includes("LIGHT") && !name.includes("WOOD") && !name.includes("BLACK"));
+
+      if (isPrimaryWall && mat.pbrMetallicRoughness?.setBaseColorFactor) {
+        mat.pbrMetallicRoughness.setBaseColorFactor(primaryRGBA);
+      }
+
+      const isAccent =
+        name === "PLASTER BLACK" ||
+        name.includes("PLASTER BLACK") ||
+        name.includes("LOUVER") ||
+        name.includes("FENCE") ||
+        name === "M_FASCIA__GLB" ||
+        name === "M_METALDARK" ||
+        name === "M_METALBRONZE" ||
+        name === "M_SOFFIT" ||
+        name === "M_STEEL";
+
+      if (isAccent && mat.pbrMetallicRoughness?.setBaseColorFactor) {
+        mat.pbrMetallicRoughness.setBaseColorFactor(accentRGBA);
+      }
+    }
+  };
+
+  const selectBgTheme = (theme: "white" | "black") => {
+    setBgTheme(theme);
+    if (theme === "black") {
+      setBuildingLightsOn(true);
+      applyBuildingLights(true);
+    }
+  };
+
+  const applyBuildingLights = (on: boolean) => {
+    const mv = modelViewerRef.current;
+    if (!mv) return;
+
+    const materials = mv.model?.materials;
+    if (!materials || !Array.isArray(materials)) return;
+
+    for (const mat of materials) {
+      const name = (mat.name || "").toUpperCase();
+
+      const isLightFixture =
+        name.includes("LIGHT") ||
+        name.includes("LED") ||
+        name.includes("LAMP") ||
+        name.includes("CHANDELIER") ||
+        name.includes("BOLLARD") ||
+        name.includes("EMIT") ||
+        name.includes("POTLIGHT");
+
+      if (isLightFixture && mat.setEmissiveFactor) {
+        if (on) {
+          if (name.includes("POOL")) {
+            mat.setEmissiveFactor([0.2, 0.85, 1.0]);
+          } else if (name.includes("CHANDELIER") || name.includes("INTERIOR")) {
+            mat.setEmissiveFactor([1.0, 0.96, 0.82]);
+          } else {
+            mat.setEmissiveFactor([1.0, 0.94, 0.75]);
+          }
+        } else {
+          mat.setEmissiveFactor([0.0, 0.0, 0.0]);
+        }
+      }
+
+      const isWindowOrCurtain =
+        name === "GLAZING" ||
+        name.includes("GLAZING") ||
+        name.includes("CURTAIN") ||
+        name.includes("GLASS");
+
+      if (isWindowOrCurtain && !name.includes("RAILING") && mat.setEmissiveFactor) {
+        if (on) {
+          mat.setEmissiveFactor([0.55, 0.42, 0.22]);
+        } else {
+          mat.setEmissiveFactor([0.0, 0.0, 0.0]);
+        }
+      }
+
+      const isPoolWater = name.includes("WATER") || name.includes("POOL");
+      if (isPoolWater && mat.setEmissiveFactor) {
+        if (on) {
+          mat.setEmissiveFactor([0.15, 0.70, 0.95]);
+        } else {
+          mat.setEmissiveFactor([0.0, 0.0, 0.0]);
+        }
+      }
+    }
+  };
+
+  const toggleBuildingLights = () => {
+    const next = !buildingLightsOn;
+    setBuildingLightsOn(next);
+    applyBuildingLights(next);
+  };
+
+  const applyDualColorTheme = (theme: DualColorTheme) => {
+    setSelectedThemeId(theme.id);
+    setPrimaryColor(theme.primaryHex);
+    setAccentColor(theme.accentHex);
+    const mv = modelViewerRef.current;
+    if (!mv) return;
+
+    const materials = mv.model?.materials;
+    if (!materials || !Array.isArray(materials)) return;
+
+    for (const mat of materials) {
+      const name = (mat.name || "").toUpperCase();
+
+      const isPrimaryWall =
+        name === "PLASTER WHITE" ||
+        name === "M_PLASTER" ||
+        name === "M_WALLWARM" ||
+        name === "M_CEILING" ||
+        (name.includes("PLASTER") && !name.includes("BLACK")) ||
+        (name.includes("WALL") && !name.includes("LIGHT") && !name.includes("WOOD") && !name.includes("BLACK"));
+
+      if (isPrimaryWall && mat.pbrMetallicRoughness?.setBaseColorFactor) {
+        mat.pbrMetallicRoughness.setBaseColorFactor(theme.primaryRGBA);
+      }
+
+      const isAccent =
+        name === "PLASTER BLACK" ||
+        name.includes("PLASTER BLACK") ||
+        name.includes("LOUVER") ||
+        name.includes("FENCE") ||
+        name === "M_FASCIA__GLB" ||
+        name === "M_METALDARK" ||
+        name === "M_METALBRONZE" ||
+        name === "M_SOFFIT" ||
+        name === "M_STEEL";
+
+      if (isAccent && mat.pbrMetallicRoughness?.setBaseColorFactor) {
+        mat.pbrMetallicRoughness.setBaseColorFactor(theme.accentRGBA);
+      }
+    }
+  };
+
   // Track 3D model load in modal to dismiss loading spinner
   useEffect(() => {
     if (activeTab !== "3d") return;
@@ -199,14 +377,28 @@ export default function ProjectInteractiveModal({
       return () => clearTimeout(fallbackTimer);
     }
 
-    if (mv.loaded || mv.modelIsVisible) {
+    const handleReady = () => {
       setIsModelLoaded(true);
+      const current = DUAL_COLOR_THEMES.find((c) => c.id === selectedThemeId);
+      setTimeout(() => {
+        try {
+          if (current) {
+            applyDualColorTheme(current);
+          } else {
+            applyCustomColor("primary", primaryColor);
+          }
+          applyBuildingLights(buildingLightsOn);
+        } catch {}
+      }, 150);
+    };
+
+    if (mv.loaded || mv.modelIsVisible) {
+      handleReady();
       return;
     }
 
-    const handleReady = () => setIsModelLoaded(true);
     const handleProgress = (e: any) => {
-      if (e?.detail?.totalProgress >= 0.95) setIsModelLoaded(true);
+      if (e?.detail?.totalProgress >= 0.95) handleReady();
     };
 
     mv.addEventListener("load", handleReady);
@@ -215,7 +407,7 @@ export default function ProjectInteractiveModal({
 
     // Maximum 2.0s failsafe timer so user is never blocked by infinite spinner
     const timer = setTimeout(() => {
-      setIsModelLoaded(true);
+      handleReady();
     }, 2000);
 
     return () => {
@@ -592,32 +784,52 @@ export default function ProjectInteractiveModal({
         }`}
       >
         {/* Modal Top Header Bar */}
-        <div className="bg-[#0e121a] px-4 sm:px-6 py-3.5 border-b border-white/10 flex flex-wrap justify-between items-center gap-3 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-brand-forest/20 text-brand-leaf-light border border-brand-forest/30">
-              <Rotate3D className="w-5 h-5 text-amber-400 animate-spin-slow" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
-                  {project.badge}
-                </span>
-                <span className="text-[11px] font-mono text-white/50 flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-brand-leaf-light" />
-                  {project.location}
-                </span>
+        <div className="bg-[#0e121a] px-3.5 sm:px-6 py-2.5 sm:py-3.5 border-b border-white/10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2.5 sm:gap-3 shrink-0">
+          <div className="flex items-center justify-between w-full sm:w-auto gap-2">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="p-1.5 sm:p-2 rounded-xl bg-brand-forest/20 text-brand-leaf-light border border-brand-forest/30 shrink-0">
+                <Rotate3D className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-spin-slow" />
               </div>
-              <h3 className="font-display text-base sm:text-xl font-bold text-white tracking-tight mt-0.5">
-                {project.title}
-              </h3>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold bg-amber-400/10 px-1.5 sm:px-2 py-0.5 rounded border border-amber-400/20 truncate">
+                    {project.badge}
+                  </span>
+                  <span className="text-[10px] sm:text-[11px] font-mono text-white/50 flex items-center gap-1">
+                    <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-brand-leaf-light shrink-0" />
+                    <span className="truncate">{project.location}</span>
+                  </span>
+                </div>
+                <h3 className="font-display text-sm sm:text-base md:text-xl font-bold text-white tracking-tight mt-0.5 truncate">
+                  {project.title}
+                </h3>
+              </div>
+            </div>
+
+            {/* Mobile Actions: Fullscreen & Close on Top Right */}
+            <div className="flex items-center gap-1 text-white/70 shrink-0 sm:hidden">
+              <button
+                onClick={() => setIsFullscreen(!isFullscreen)}
+                className="p-1.5 hover:text-white hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+                title={isFullscreen ? "Exit Fullscreen" : "Fullscreen View"}
+              >
+                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
+              <button
+                onClick={onClose}
+                className="p-1.5 hover:text-white hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
-          {/* Interactive Mode Tabs */}
-          <div className="flex items-center bg-[#07090d] border border-white/15 p-1 rounded-2xl gap-1">
+          {/* Interactive Mode Tabs (Smooth swipe on mobile) */}
+          <div className="flex items-center bg-[#07090d] border border-white/15 p-1 rounded-2xl gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden w-full sm:w-auto">
             <button
               onClick={() => setActiveTab("3d")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-ui text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl font-ui text-[11px] sm:text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 activeTab === "3d"
                   ? "bg-brand-forest text-white shadow-md ring-1 ring-white/20"
                   : "text-white/60 hover:text-white hover:bg-white/10"
@@ -629,7 +841,7 @@ export default function ProjectInteractiveModal({
 
             <button
               onClick={() => setActiveTab("360")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-ui text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl font-ui text-[11px] sm:text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 activeTab === "360"
                   ? "bg-brand-forest text-white shadow-md ring-1 ring-white/20"
                   : "text-white/60 hover:text-white hover:bg-white/10"
@@ -641,19 +853,19 @@ export default function ProjectInteractiveModal({
 
             <button
               onClick={() => setActiveTab("before-after")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-ui text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl font-ui text-[11px] sm:text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 activeTab === "before-after"
                   ? "bg-brand-forest text-white shadow-md ring-1 ring-white/20"
                   : "text-white/60 hover:text-white hover:bg-white/10"
               }`}
             >
               <SlidersHorizontal className="w-3.5 h-3.5 text-indigo-300" />
-              <span className="hidden sm:inline">Before / After</span>
+              <span>Before / After</span>
             </button>
 
             <button
               onClick={() => setActiveTab("specs")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-ui text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl font-ui text-[11px] sm:text-xs font-semibold tracking-wide transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 activeTab === "specs"
                   ? "bg-brand-forest text-white shadow-md ring-1 ring-white/20"
                   : "text-white/60 hover:text-white hover:bg-white/10"
@@ -664,8 +876,8 @@ export default function ProjectInteractiveModal({
             </button>
           </div>
 
-          {/* Modal Header Actions */}
-          <div className="flex items-center gap-1 text-white/70">
+          {/* Desktop Close & Fullscreen Actions */}
+          <div className="hidden sm:flex items-center gap-1 text-white/70 shrink-0">
             <button
               onClick={() => setIsFullscreen(!isFullscreen)}
               className="p-2 hover:text-white hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
@@ -688,7 +900,9 @@ export default function ProjectInteractiveModal({
           
           {/* TAB 1: 3D Exterior Walkaround */}
           {activeTab === "3d" && (
-            <div className="relative w-full h-full min-h-[420px] sm:min-h-[500px] flex items-center justify-center bg-[#07090d]">
+            <div className={`relative w-full h-full min-h-[420px] sm:min-h-[500px] flex items-center justify-center transition-colors duration-500 overflow-hidden ${
+              bgTheme === "white" ? "bg-white" : "bg-black"
+            }`}>
               {is3dLoaded ? (
                 // @ts-ignore
                 <model-viewer
@@ -702,13 +916,13 @@ export default function ProjectInteractiveModal({
                   disable-pan
                   auto-rotate
                   auto-rotate-delay="999999"
-                  rotation-per-second="18deg"
-                  interaction-prompt="auto"
-                  shadow-intensity="1.6"
-                  shadow-softness="0.4"
+                  rotation-per-second="6deg"
+                  interaction-prompt="none"
+                  shadow-intensity={bgTheme === "white" ? "1.6" : "1.3"}
+                  shadow-softness={bgTheme === "white" ? "0.2" : "0.35"}
                   environment-image="neutral"
                   tone-mapping="neutral"
-                  exposure="1.15"
+                  exposure={bgTheme === "white" ? "1.35" : (buildingLightsOn ? "0.95" : "0.60")}
                   loading="eager"
                   reveal="auto"
                   camera-orbit={project.cameraOrbit || "35deg 72deg 80%"}
@@ -720,8 +934,9 @@ export default function ProjectInteractiveModal({
                     width: "100%",
                     height: "100%",
                     minHeight: isFullscreen ? "calc(100vh - 150px)" : "480px",
-                    background: "radial-gradient(ellipse at 50% 40%, #1a281d 0%, #0d1610 65%, #050a06 100%)",
-                    outline: "none"
+                    background: bgTheme === "white" ? "#ffffff" : "#000000",
+                    outline: "none",
+                    touchAction: "pan-y"
                   }}
                 >
                   <div slot="progress-bar" style={{ display: "none" }} />
@@ -730,7 +945,7 @@ export default function ProjectInteractiveModal({
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-white/60 gap-3 py-20">
                   <div className="w-8 h-8 border-2 border-brand-forest border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs font-mono">Initializing Google 3D Engine...</span>
+                  <span className="text-xs font-mono">Initializing 3D Engine...</span>
                 </div>
               )}
 
@@ -747,35 +962,189 @@ export default function ProjectInteractiveModal({
               )}
 
               {/* Viewfinder Reticles */}
-              <span className="pointer-events-none absolute left-4 top-4 z-20 h-4 w-4 border-l border-t border-white/40" />
-              <span className="pointer-events-none absolute right-4 top-4 z-20 h-4 w-4 border-r border-t border-white/40" />
-              <span className="pointer-events-none absolute left-4 bottom-4 z-20 h-4 w-4 border-l border-b border-white/40" />
-              <span className="pointer-events-none absolute right-4 bottom-4 z-20 h-4 w-4 border-r border-b border-white/40" />
+              <span className={`pointer-events-none absolute left-4 top-4 z-20 h-4 w-4 border-l border-t transition-colors duration-300 ${
+                bgTheme === "white" ? "border-slate-800/40" : "border-white/40"
+              }`} />
+              <span className={`pointer-events-none absolute right-4 top-4 z-20 h-4 w-4 border-r border-t transition-colors duration-300 ${
+                bgTheme === "white" ? "border-slate-800/40" : "border-white/40"
+              }`} />
+              <span className={`pointer-events-none absolute left-4 bottom-4 z-20 h-4 w-4 border-l border-b transition-colors duration-300 ${
+                bgTheme === "white" ? "border-slate-800/40" : "border-white/40"
+              }`} />
+              <span className={`pointer-events-none absolute right-4 bottom-4 z-20 h-4 w-4 border-r border-b transition-colors duration-300 ${
+                bgTheme === "white" ? "border-slate-800/40" : "border-white/40"
+              }`} />
 
-              {/* 3D Model HUD Controls */}
-              <div className="absolute top-4 right-4 z-25 flex items-center gap-1.5 bg-[#0b0e14]/90 backdrop-blur-md border border-white/20 p-1 rounded-2xl shadow-xl">
-                <button
-                  onClick={zoomModelOut}
-                  className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-xl transition-colors cursor-pointer"
-                  title="Zoom Out"
-                >
-                  <ZoomOut className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={zoomModelIn}
-                  className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-xl transition-colors cursor-pointer"
-                  title="Zoom In"
-                >
-                  <ZoomIn className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={resetModelCamera}
-                  className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-xl transition-colors cursor-pointer"
-                  title="Reset Camera Angle"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
+              {/* Top HUD Controls Bar (Responsive: Left Controls + Right Zoom/Reset) */}
+              <div className="absolute top-2.5 left-2 sm:left-4 right-2 sm:right-4 z-25 flex items-center justify-between pointer-events-none select-none gap-2">
+                {/* Left: 3D Badge + White/Black Switcher + Lights Toggle + View Inside 360 */}
+                <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto flex-wrap">
+                  <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 px-2.5 sm:px-3 py-1 rounded-full text-white text-[10px] sm:text-xs font-mono flex items-center gap-1.5 tracking-wider uppercase shadow-md shrink-0">
+                    <Rotate3D className="w-3.5 h-3.5 text-[#C5A880] animate-spin-slow" />
+                    <span className="hidden sm:inline">3D Exterior Tour</span>
+                  </div>
+
+                  {/* White & Black Background Switcher */}
+                  <div className="bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 p-0.5 rounded-full flex items-center shadow-lg shrink-0">
+                    <button
+                      onClick={() => selectBgTheme("white")}
+                      className={`px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all ${
+                        bgTheme === "white"
+                          ? "bg-white text-stone-900 font-bold shadow-md scale-105"
+                          : "text-white/80 hover:text-white"
+                      }`}
+                      title="White Background"
+                    >
+                      <span className="w-2.5 h-2.5 rounded-full bg-white border border-stone-400 shrink-0" />
+                      <span>White</span>
+                    </button>
+
+                    <button
+                      onClick={() => selectBgTheme("black")}
+                      className={`px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all ${
+                        bgTheme === "black"
+                          ? "bg-black text-white font-bold ring-1 ring-white/60 shadow-md scale-105"
+                          : "text-white/80 hover:text-white"
+                      }`}
+                      title="Black Background"
+                    >
+                      <span className="w-2.5 h-2.5 rounded-full bg-black border border-white/70 shrink-0" />
+                      <span>Black</span>
+                    </button>
+                  </div>
+
+                  {/* Dedicated Building Lights ON / OFF Toggle */}
+                  <button
+                    onClick={toggleBuildingLights}
+                    className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg shrink-0 ${
+                      buildingLightsOn
+                        ? "bg-amber-400 text-stone-950 font-bold border-amber-300 shadow-[0_0_14px_rgba(251,191,36,0.5)]"
+                        : "bg-[#0a0a0d]/90 text-white/70 hover:text-white border-white/15"
+                    }`}
+                    title="Toggle Architectural Lights ON / OFF"
+                  >
+                    <Lightbulb className={`w-3.5 h-3.5 ${buildingLightsOn ? "fill-stone-950 text-stone-950 animate-pulse" : "text-white/70"}`} />
+                    <span>{buildingLightsOn ? "Lights ON" : "Lights OFF"}</span>
+                  </button>
+
+                  {/* View Inside 360° Interior VR Walkthrough */}
+                  {project.rooms360 && project.rooms360.length > 0 && (
+                    <button
+                      onClick={() => setActiveTab("360")}
+                      className="px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg shrink-0 bg-amber-500/20 text-amber-300 border-amber-400/40 hover:bg-amber-500/30 font-semibold"
+                      title="Step Inside 360° Furnished Interior VR Rooms"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                      <span className="hidden sm:inline">View Inside 360°</span>
+                      <span className="sm:hidden">360° VR</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Right: Zoom & Reset Controls */}
+                <div className="flex items-center gap-0.5 sm:gap-1 bg-[#0a0a0d]/95 backdrop-blur-md border border-white/15 p-1 rounded-xl shadow-xl pointer-events-auto select-none shrink-0">
+                  <button
+                    onClick={zoomModelOut}
+                    className="px-1.5 sm:px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer flex items-center gap-1"
+                    title="Zoom Out"
+                  >
+                    <ZoomOut className="w-3.5 h-3.5" />
+                    <span className="text-[10px] uppercase hidden md:inline">Zoom Out</span>
+                  </button>
+                  <button
+                    onClick={zoomModelIn}
+                    className="px-1.5 sm:px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer border-l border-white/20 flex items-center gap-1"
+                    title="Zoom In"
+                  >
+                    <ZoomIn className="w-3.5 h-3.5" />
+                    <span className="text-[10px] uppercase hidden md:inline">Zoom In</span>
+                  </button>
+                  <button
+                    onClick={resetModelCamera}
+                    className="px-1.5 sm:px-2 py-1 text-white/90 hover:text-white hover:bg-white/20 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer border-l border-white/20 flex items-center gap-1"
+                    title="Reset View to Center"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span className="text-[10px] uppercase hidden md:inline">Reset</span>
+                  </button>
+                </div>
               </div>
+
+              {/* Bottom Architectural Real-Time Color Customization Bar */}
+              {isModelLoaded && (
+                <div className="absolute bottom-3 left-2 sm:left-4 right-2 sm:right-4 z-25 flex items-center gap-1.5 sm:gap-2 bg-[#0a0a0d]/90 backdrop-blur-md border border-white/15 px-2.5 sm:px-3 py-1.5 rounded-2xl shadow-xl overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="flex items-center gap-1 text-white/90 font-mono text-[10px] shrink-0">
+                    <Palette className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span className="text-[10px] font-mono uppercase tracking-wider hidden sm:inline whitespace-nowrap">
+                      Colors:
+                    </span>
+                  </div>
+
+                  {/* Primary Wall Color Picker */}
+                  <label
+                    className="group relative flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 cursor-pointer transition-all shadow-sm shrink-0"
+                    title="Click to pick custom Primary Wall color"
+                  >
+                    <span
+                      className="w-3.5 h-3.5 rounded-full border border-white shrink-0 shadow-xs"
+                      style={{ backgroundColor: primaryColor }}
+                    />
+                    <span className="text-[10px] font-mono text-white/90 whitespace-nowrap">
+                      Wall: <strong className="text-white">{primaryColor.toUpperCase()}</strong>
+                    </span>
+                    <input
+                      type="color"
+                      value={primaryColor}
+                      onChange={(e) => applyCustomColor("primary", e.target.value)}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                  </label>
+
+                  {/* Accent / Louver Color Picker */}
+                  <label
+                    className="group relative flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 cursor-pointer transition-all shadow-sm shrink-0"
+                    title="Click to pick custom Accent / Louver / Trim color"
+                  >
+                    <span
+                      className="w-3.5 h-3.5 rounded-full border border-white shrink-0 shadow-xs"
+                      style={{ backgroundColor: accentColor }}
+                    />
+                    <span className="text-[10px] font-mono text-white/90 whitespace-nowrap">
+                      Accent: <strong className="text-white">{accentColor.toUpperCase()}</strong>
+                    </span>
+                    <input
+                      type="color"
+                      value={accentColor}
+                      onChange={(e) => applyCustomColor("accent", e.target.value)}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                  </label>
+
+                  {/* Preset Theme Swatches */}
+                  <div className="flex items-center gap-1 sm:gap-1.5 pl-1.5 sm:pl-2 border-l border-white/20 shrink-0">
+                    {DUAL_COLOR_THEMES.map((theme) => {
+                      const isActive = selectedThemeId === theme.id;
+                      return (
+                        <button
+                          key={theme.id}
+                          onClick={() => applyDualColorTheme(theme)}
+                          title={`${theme.name} (${theme.tag}): ${theme.primaryLabel} + ${theme.accentLabel}`}
+                          className={`group relative w-5 h-5 sm:w-6 sm:h-6 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center p-[1px] ${
+                            isActive
+                              ? "ring-2 ring-amber-400 scale-110 shadow-lg"
+                              : "hover:scale-105 opacity-75 hover:opacity-100"
+                          }`}
+                        >
+                          <div className="w-full h-full rounded-full overflow-hidden flex border border-white/30">
+                            <div className="w-1/2 h-full" style={{ backgroundColor: theme.primaryHex }} />
+                            <div className="w-1/2 h-full" style={{ backgroundColor: theme.accentHex }} />
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Gesture Hint overlay */}
               {showGestureGuide && (
