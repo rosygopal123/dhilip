@@ -114,6 +114,7 @@ export default function ProjectInteractiveModal({
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [showGestureGuide, setShowGestureGuide] = useState<boolean>(true);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isModelLoaded, setIsModelLoaded] = useState<boolean>(false);
 
   const modalContainerRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
@@ -186,6 +187,44 @@ export default function ProjectInteractiveModal({
     };
     document.body.appendChild(s);
   }, []);
+
+  // Track 3D model load in modal to dismiss loading spinner
+  useEffect(() => {
+    if (activeTab !== "3d") return;
+    setIsModelLoaded(false);
+
+    const mv = modelViewerRef.current;
+    if (!mv) {
+      const fallbackTimer = setTimeout(() => setIsModelLoaded(true), 1500);
+      return () => clearTimeout(fallbackTimer);
+    }
+
+    if (mv.loaded || mv.modelIsVisible) {
+      setIsModelLoaded(true);
+      return;
+    }
+
+    const handleReady = () => setIsModelLoaded(true);
+    const handleProgress = (e: any) => {
+      if (e?.detail?.totalProgress >= 0.95) setIsModelLoaded(true);
+    };
+
+    mv.addEventListener("load", handleReady);
+    mv.addEventListener("progress", handleProgress);
+    mv.addEventListener("error", handleReady);
+
+    // Maximum 2.0s failsafe timer so user is never blocked by infinite spinner
+    const timer = setTimeout(() => {
+      setIsModelLoaded(true);
+    }, 2000);
+
+    return () => {
+      clearTimeout(timer);
+      mv.removeEventListener("load", handleReady);
+      mv.removeEventListener("progress", handleProgress);
+      mv.removeEventListener("error", handleReady);
+    };
+  }, [project?.id, activeTab, is3dLoaded]);
 
   // Stop auto-rotation when user interacts with 3D model
   useEffect(() => {
@@ -656,6 +695,8 @@ export default function ProjectInteractiveModal({
                   ref={modelViewerRef}
                   src={project.glbModel}
                   alt={project.title}
+                  onLoad={() => setIsModelLoaded(true)}
+                  onError={() => setIsModelLoaded(true)}
                   camera-controls
                   disable-tap
                   disable-pan
@@ -671,7 +712,7 @@ export default function ProjectInteractiveModal({
                   loading="eager"
                   reveal="auto"
                   camera-orbit={project.cameraOrbit || "35deg 72deg 80%"}
-                  camera-target={project.cameraTarget || "0m 4.5m -5m"}
+                  camera-target={project.cameraTarget || "auto auto auto"}
                   min-camera-orbit="auto auto 40%"
                   max-camera-orbit="auto auto 200%"
                   field-of-view={project.fieldOfView || "30deg"}
@@ -683,21 +724,25 @@ export default function ProjectInteractiveModal({
                     outline: "none"
                   }}
                 >
-                  {/* Model Viewer Slot Overlays */}
-                  <div slot="progress-bar" className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-30">
-                    <div className="flex flex-col items-center gap-3 text-white">
-                      <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-                      <span className="text-xs font-mono tracking-wider uppercase text-amber-300">
-                        Loading 3D Architectural Model...
-                      </span>
-                    </div>
-                  </div>
+                  <div slot="progress-bar" style={{ display: "none" }} />
                 {/* @ts-ignore */}
                 </model-viewer>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-white/60 gap-3 py-20">
                   <div className="w-8 h-8 border-2 border-brand-forest border-t-transparent rounded-full animate-spin" />
                   <span className="text-xs font-mono">Initializing Google 3D Engine...</span>
+                </div>
+              )}
+
+              {/* Seamless Loading Spinner that smoothly disappears once model is ready */}
+              {is3dLoaded && !isModelLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-30 pointer-events-none transition-opacity duration-300">
+                  <div className="flex flex-col items-center gap-3 text-white">
+                    <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-xs font-mono tracking-wider uppercase text-amber-300">
+                      Loading 3D Architectural Model...
+                    </span>
+                  </div>
                 </div>
               )}
 
