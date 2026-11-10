@@ -6,6 +6,8 @@ import ScrollCanvas from "@/components/ScrollCanvas";
 import Project3DExperience from "@/components/Project3DExperience";
 import InteriorTour360 from "@/components/InteriorTour360";
 import StandardsCommitment from "@/components/StandardsCommitment";
+import ConstructionCostCalculator from "@/components/ConstructionCostCalculator";
+import FreeConsultationOffer from "@/components/FreeConsultationOffer";
 import TrustedClients from "@/components/TrustedClients";
 import ClientTestimonials from "@/components/ClientTestimonials";
 import HomeFAQ from "@/components/HomeFAQ";
@@ -236,6 +238,9 @@ export default function HomePage() {
       {/* 5. The Standards We Work By (IS-456, BOQ, On-Time Handover) */}
       <StandardsCommitment />
 
+      {/* 5B. Construction Cost Calculator (30-Second Instant Estimate) */}
+      <ConstructionCostCalculator />
+
       {/* 6. Landmark Completed Projects */}
       <section className="py-24 bg-surface-1 text-center">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
@@ -347,6 +352,9 @@ export default function HomePage() {
 
       {/* 8. What Our Clients Say (Verified Client Reviews & 4.9★ Rating) */}
       <ClientTestimonials />
+
+      {/* 8B. Low-Commitment Free Plot Vastu & Structural Consultation Offer */}
+      <FreeConsultationOffer />
 
       {/* 9. Frequently Asked Questions (FAQ Accordion with Search) */}
       <HomeFAQ />
