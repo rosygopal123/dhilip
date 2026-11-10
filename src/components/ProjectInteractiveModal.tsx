@@ -63,13 +63,12 @@ void main() {
   float tanHalfFov = tan(u_fov * 0.5);
   vec3 ray = normalize(vec3(screen.x * tanHalfFov * u_aspect, -screen.y * tanHalfFov, 1.0));
 
-  // Correct Pitch rotation around X-axis (pitch > 0 tilts camera up towards ceiling)
   float cp = cos(u_pitch);
   float sp = sin(u_pitch);
   vec3 rPitch = vec3(
     ray.x,
-    ray.y * cp + ray.z * sp,
-    -ray.y * sp + ray.z * cp
+    ray.y * cp - ray.z * sp,
+    ray.y * sp + ray.z * cp
   );
 
   float cy = cos(u_yaw);
@@ -111,7 +110,7 @@ export default function ProjectInteractiveModal({
   const [autoRotate, setAutoRotate] = useState<boolean>(true);
   const [yaw, setYaw] = useState<number>(0);
   const [pitch, setPitch] = useState<number>(0);
-  const [fov, setFov] = useState<number>(1.05);
+  const [fov, setFov] = useState<number>(1.25);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [showGestureGuide, setShowGestureGuide] = useState<boolean>(true);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
@@ -126,7 +125,7 @@ export default function ProjectInteractiveModal({
   const lastMousePosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const yawRef = useRef<number>(0);
   const pitchRef = useRef<number>(0);
-  const fovRef = useRef<number>(1.05);
+  const fovRef = useRef<number>(1.25);
   const autoRotateRef = useRef<boolean>(true);
   const isDraggingRef = useRef<boolean>(false);
   const nightFactorRef = useRef<number>(0);
@@ -462,9 +461,8 @@ export default function ProjectInteractiveModal({
     let nextYaw = (yawRef.current - dx * sensitivity) % (Math.PI * 2);
     if (nextYaw < 0) nextYaw += Math.PI * 2;
 
-    // Pitch clamped to natural architectural human eye-level (prevents polar wrapping/distortion)
-    const maxPitch = 0.52;
-    const nextPitch = Math.max(-maxPitch, Math.min(maxPitch, pitchRef.current - dy * sensitivity));
+    const maxPitch = 1.18;
+    const nextPitch = Math.max(-maxPitch, Math.min(maxPitch, pitchRef.current + dy * sensitivity));
 
     yawRef.current = nextYaw;
     pitchRef.current = nextPitch;

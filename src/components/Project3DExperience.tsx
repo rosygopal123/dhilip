@@ -363,51 +363,7 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
   }
 ];
 
-export interface Interior360Room {
-  id: string;
-  name: string;
-  tag: string;
-  panoramaUrl: string;
-  specs: string;
-  features: string;
-}
-
-export const INTERIOR_360_ROOMS: Interior360Room[] = [
-  {
-    id: "living-room",
-    name: "Living & Atrium",
-    tag: "Double Volume",
-    panoramaUrl: "/panoramas/living-room.jpg",
-    specs: "480 Sq.Ft · 14' 6\" Clear Height · Italian Statuario Marble · Ambient LED Coves",
-    features: "Patio Pocket Sliders · Acoustic Glass · Double Height Chandelier · Courtyard View"
-  },
-  {
-    id: "master-bedroom",
-    name: "Master Suite",
-    tag: "King Sanctuary",
-    panoramaUrl: "/panoramas/master-bedroom.jpg",
-    specs: "360 Sq.Ft · 10' 6\" Clear Height · Burma Teak Accents · Walk-in Wardrobe",
-    features: "Private Balcony Overlook · Integrated Vanity · Concealed LED Coves · Ensuite Bath"
-  },
-  {
-    id: "modular-kitchen",
-    name: "Modular Kitchen",
-    tag: "German Blum",
-    panoramaUrl: "/panoramas/modular-kitchen.jpg",
-    specs: "220 Sq.Ft · German Blum Soft-Close · Quartz Countertop · 9' 6\" Island",
-    features: "Breakfast Counter · Concealed Pantry · Built-in Induction · Anti-Fingerprint Acrylic"
-  },
-  {
-    id: "sky-terrace",
-    name: "Sky Terrace Lounge",
-    tag: "Rooftop Open",
-    panoramaUrl: "/panoramas/sky-terrace.jpg",
-    specs: "520 Sq.Ft Open Deck · Weatherproof Decking · Glass Pergola · 3' 6\" Safety Railing",
-    features: "Rooftop Planters · Exterior Ambient Louvers · Stargazing Lounge · Madurai Horizon"
-  }
-];
-
-// WebGL Equirectangular Shader: Mathematically calibrated for eye-level realism with ZERO polar wrap distortion
+// WebGL Equirectangular Shader Sources for 360 Interior VR Room Tour
 const VS_PANORAMA = `
 attribute vec2 a_position;
 varying vec2 v_uv;
@@ -430,21 +386,18 @@ varying vec2 v_uv;
 #define PI 3.14159265358979323846
 
 void main() {
-  // Screen ray coordinates [-1, 1]
   vec2 screen = (v_uv - 0.5) * 2.0;
   float tanHalfFov = tan(u_fov * 0.5);
   vec3 ray = normalize(vec3(screen.x * tanHalfFov * u_aspect, -screen.y * tanHalfFov, 1.0));
 
-  // Correct Pitch rotation around X-axis (pitch > 0 tilts camera up towards ceiling)
   float cp = cos(u_pitch);
   float sp = sin(u_pitch);
   vec3 rPitch = vec3(
     ray.x,
-    ray.y * cp + ray.z * sp,
-    -ray.y * sp + ray.z * cp
+    ray.y * cp - ray.z * sp,
+    ray.y * sp + ray.z * cp
   );
 
-  // Correct Yaw rotation around Y-axis (yaw rotates 360 degrees horizontally)
   float cy = cos(u_yaw);
   float sy = sin(u_yaw);
   vec3 rYaw = vec3(
@@ -453,11 +406,9 @@ void main() {
     -rPitch.x * sy + rPitch.z * cy
   );
 
-  // Spherical coordinate transformation
   float lon = atan(rYaw.x, rYaw.z);
-  float lat = asin(clamp(rPitch.y, -0.9999, 0.9999));
+  float lat = asin(clamp(rYaw.y, -0.9999, 0.9999));
 
-  // Equirectangular mapping with seamless horizontal 360 wrap
   vec2 texCoord = vec2(
     fract(lon / (2.0 * PI) + 0.5),
     clamp(lat / PI + 0.5, 0.001, 0.999)
@@ -465,42 +416,22 @@ void main() {
 
   vec4 col = texture2D(u_image, texCoord);
 
-  // Ambient luxury 2700K night lighting grading
   if (u_night_factor > 0.0) {
-    vec3 nightTint = vec3(col.r * 1.08 + 0.04, col.g * 0.88, col.b * 0.70) * 0.85;
-    col.rgb = mix(col.rgb, nightTint, u_night_factor);
+    vec3 nightWarm = vec3(col.r * 1.08 + 0.04, col.g * 0.88, col.b * 0.70) * 0.85;
+    col.rgb = mix(col.rgb, nightWarm, u_night_factor);
   }
 
   gl_FragColor = col;
 }
 `;
 
-function Interior360Canvas({
-  panoramaUrl,
-  isNight,
-  onResetRef
-}: {
-  panoramaUrl: string;
-  isNight: boolean;
-  onResetRef?: React.MutableRefObject<(() => void) | null>;
-}) {
+function Interior360Canvas({ panoramaUrl, isNight }: { panoramaUrl: string; isNight: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isDraggingRef = useRef(false);
   const lastPosRef = useRef({ x: 0, y: 0 });
   const yawRef = useRef(0);
   const pitchRef = useRef(0);
-  const fovRef = useRef(1.0); // 1.0 rad (~57.3 deg vertical FOV)
   const animFrameRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (onResetRef) {
-      onResetRef.current = () => {
-        yawRef.current = 0;
-        pitchRef.current = 0;
-        fovRef.current = 1.0;
-      };
-    }
-  }, [onResetRef]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -576,104 +507,66 @@ function Interior360Canvas({
     const render = () => {
       if (!running || !gl || !canvas) return;
 
-      // Gentle auto-pan when user is not actively dragging
+      // Auto gentle continuous pan when user is not touching
       if (!isDraggingRef.current) {
-        yawRef.current += 0.0006;
+        yawRef.current += 0.0008;
       }
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = Math.round(canvas.clientWidth * dpr);
-      const h = Math.round(canvas.clientHeight * dpr);
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w;
-        canvas.height = h;
-        gl.viewport(0, 0, w, h);
+      if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        gl.viewport(0, 0, canvas.width, canvas.height);
       }
 
       gl.useProgram(prog);
       gl.uniform1f(uYaw, yawRef.current);
       gl.uniform1f(uPitch, pitchRef.current);
-      gl.uniform1f(uFov, fovRef.current);
+      gl.uniform1f(uFov, 1.25);
       gl.uniform1f(uAspect, canvas.width / (canvas.height || 1));
       gl.uniform1f(uNight, isNight ? 0.75 : 0.0);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       animFrameRef.current = requestAnimationFrame(render);
     };
-
-    animFrameRef.current = requestAnimationFrame(render);
-
-    const onMouseDown = (e: MouseEvent) => {
-      isDraggingRef.current = true;
-      lastPosRef.current = { x: e.clientX, y: e.clientY };
-    };
-    const onMouseMove = (e: MouseEvent) => {
-      if (!isDraggingRef.current) return;
-      const dx = e.clientX - lastPosRef.current.x;
-      const dy = e.clientY - lastPosRef.current.y;
-      lastPosRef.current = { x: e.clientX, y: e.clientY };
-
-      yawRef.current -= dx * 0.0035;
-      // Clamped to +/-0.48 radians (+/-27.5 deg): gives full view of ceiling cove and floor while preventing polar wrap
-      pitchRef.current = Math.max(-0.48, Math.min(0.48, pitchRef.current - dy * 0.0035));
-    };
-    const onMouseUp = () => {
-      isDraggingRef.current = false;
-    };
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      fovRef.current = Math.max(0.75, Math.min(1.25, fovRef.current + e.deltaY * 0.001));
-    };
-
-    const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length === 1) {
-        isDraggingRef.current = true;
-        lastPosRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-      }
-    };
-    const onTouchMove = (e: TouchEvent) => {
-      if (!isDraggingRef.current || e.touches.length !== 1) return;
-      const dx = e.touches[0].clientX - lastPosRef.current.x;
-      const dy = e.touches[0].clientY - lastPosRef.current.y;
-      lastPosRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-
-      yawRef.current -= dx * 0.004;
-      pitchRef.current = Math.max(-0.48, Math.min(0.48, pitchRef.current - dy * 0.004));
-    };
-    const onTouchEnd = () => {
-      isDraggingRef.current = false;
-    };
-
-    canvas.addEventListener("mousedown", onMouseDown);
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-    canvas.addEventListener("wheel", onWheel, { passive: false });
-    canvas.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: true });
-    window.addEventListener("touchend", onTouchEnd);
+    render();
 
     return () => {
       running = false;
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-      canvas.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-      canvas.removeEventListener("wheel", onWheel);
-      canvas.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("touchend", onTouchEnd);
-      if (gl) {
-        if (tex) gl.deleteTexture(tex);
-        if (buf) gl.deleteBuffer(buf);
-        if (prog) gl.deleteProgram(prog);
-      }
     };
-  }, [panoramaUrl, isNight, onResetRef]);
+  }, [panoramaUrl, isNight]);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    isDraggingRef.current = true;
+    lastPosRef.current = { x: e.clientX, y: e.clientY };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return;
+    const dx = e.clientX - lastPosRef.current.x;
+    const dy = e.clientY - lastPosRef.current.y;
+    lastPosRef.current = { x: e.clientX, y: e.clientY };
+    yawRef.current -= dx * 0.004;
+    pitchRef.current = Math.max(-1.4, Math.min(1.4, pitchRef.current + dy * 0.004));
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    isDraggingRef.current = false;
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+  };
 
   return (
     <canvas
       ref={canvasRef}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
       className="w-full h-full cursor-grab active:cursor-grabbing block"
+      style={{ touchAction: "none" }}
     />
   );
 }
@@ -692,10 +585,9 @@ export default function Project3DExperience() {
   const [buildingLightsOn, setBuildingLightsOn] = useState<boolean>(true);
   const [showHotspots, setShowHotspots] = useState<boolean>(true);
   const [activeHotspot, setActiveHotspot] = useState<ProjectHotspot | null>(null);
-  const [show360Modal, setShow360Modal] = useState<boolean>(false);
+  const [show360InteriorModal, setShow360InteriorModal] = useState<boolean>(false);
   const [active360RoomId, setActive360RoomId] = useState<string>("living-room");
   const [is360Night, setIs360Night] = useState<boolean>(false);
-  const reset360ViewRef = useRef<(() => void) | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const modelViewerRef = useRef<any>(null);
 
@@ -1015,6 +907,41 @@ export default function Project3DExperience() {
     }
   };
 
+  const INTERIOR_360_ROOMS = [
+    {
+      id: "living-room",
+      name: "Living & Atrium",
+      tag: "Double Volume",
+      panoramaUrl: "/panoramas/living-room.jpg",
+      specs: "480 Sq.Ft · 14'6\" Height · Italian Statuario Marble · Ambient LED Coves",
+      features: "Patio Pocket Sliders · Acoustic Glass · Double Height Chandelier"
+    },
+    {
+      id: "master-bedroom",
+      name: "Master Suite",
+      tag: "King Sanctuary",
+      panoramaUrl: "/panoramas/master-bedroom.jpg",
+      specs: "320 Sq.Ft · Burma Teak Accents · Walk-in Wardrobe Provision · 35dB Noise Cutoff",
+      features: "Private Balcony Access · False Ceiling Indirect Warm Glow"
+    },
+    {
+      id: "modular-kitchen",
+      name: "Modular Kitchen",
+      tag: "German Blum",
+      panoramaUrl: "/panoramas/modular-kitchen.jpg",
+      specs: "220 Sq.Ft · Seamless Quartz Countertops · Blum Soft-Close Pullouts · SS304 Sink",
+      features: "Integrated Chimney Duct · Quartz Breakfast Island"
+    },
+    {
+      id: "sky-terrace",
+      name: "Sky Terrace Lounge",
+      tag: "Rooftop Open",
+      panoramaUrl: "/panoramas/sky-terrace.jpg",
+      specs: "650 Sq.Ft · Weatherproof WPC Decking · Toughened Glass Balustrades · Solar Ready",
+      features: "Drip Irrigation Planters · FRP Waterproof Membrane"
+    }
+  ];
+
   const realProjects = [
     { name: "Rajmahal Aishvaryam", loc: "Madurai", img: "/images/danam/ddhvrktrjjjln58schqk.webp", tag: "Turnkey EPC" },
     { name: "Theni Anandham", loc: "Aruppukottai", img: "/images/danam/l3s2jgqoz98xoktjyzvk.webp", tag: "Commercial" },
@@ -1094,11 +1021,11 @@ export default function Project3DExperience() {
             </button>
 
             <button
-              onClick={() => setShow360Modal(true)}
-              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm"
+              onClick={() => setShow360InteriorModal(true)}
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 border border-amber-500/30"
               title="Step Inside Furnished 360° Interior VR Rooms"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
               <span>Step Inside 360°</span>
             </button>
           </div>
@@ -1197,13 +1124,13 @@ export default function Project3DExperience() {
                         <span>{showHotspots ? "Pins ON" : "Pins OFF"}</span>
                       </button>
 
-                      {/* Step Inside 360° Furnished Rooms */}
+                      {/* View Inside 360° Interior VR Walkthrough */}
                       <button
-                        onClick={() => setShow360Modal(true)}
-                        className="px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg shrink-0 bg-emerald-500/20 text-emerald-300 border-emerald-400/50 hover:bg-emerald-500/30"
-                        title="Step inside 360° virtual rooms (Living, Bedroom, Kitchen, Terrace)"
+                        onClick={() => setShow360InteriorModal(true)}
+                        className="px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg shrink-0 bg-amber-500/20 text-amber-300 border-amber-400/40 hover:bg-amber-500/35 font-bold"
+                        title="Step Inside to View 360° Furnished Interior Rooms"
                       >
-                        <DoorOpen className="w-3.5 h-3.5 text-emerald-400" />
+                        <DoorOpen className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
                         <span>View Inside 360°</span>
                       </button>
                     </div>
@@ -1607,15 +1534,14 @@ export default function Project3DExperience() {
                   >
                     Reset view
                   </button>
-                  <button
-                    onClick={() => setShow360Modal(true)}
-                    className="text-[#C5A880] hover:text-white text-[11px] flex items-center gap-1 transition-colors font-semibold uppercase tracking-wider cursor-pointer"
+                  <a
+                    href="#interior-360-tour"
+                    className="text-[#C5A880] hover:text-white text-[11px] flex items-center gap-1 transition-colors font-semibold uppercase tracking-wider"
                     title="Step Inside 360 Rooms"
                   >
-                    <DoorOpen className="w-3 h-3 text-emerald-400" />
                     <span>Interior 360°</span>
                     <ArrowRight className="w-3 h-3" />
-                  </button>
+                  </a>
                   <a
                     href="/skyline-villas.html"
                     target="_blank"
@@ -1836,77 +1762,69 @@ export default function Project3DExperience() {
         </div>
       </div>
 
-      {/* 360° Interior Virtual Walkthrough Modal (Mathematically Calibrated, Zero-Wrap Realism) */}
-      {show360Modal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200">
-          <div className="relative w-full max-w-5xl bg-[#0c0c10] border border-white/15 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 bg-[#121218] border-b border-white/10">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 shrink-0">
+      {/* 360° Interior VR Walkthrough Modal */}
+      {show360InteriorModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-5xl bg-[#0a0a0d] border border-white/15 rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-white/10 bg-[#121217]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
                   <Compass className="w-4 h-4 animate-spin-slow" />
                 </div>
-                <div className="min-w-0">
+                <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-display text-sm sm:text-base font-bold text-white truncate">
+                    <h3 className="font-display text-sm sm:text-base font-bold text-white">
                       360° Interior Virtual Walkthrough
                     </h3>
-                    <span className="hidden sm:inline bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 font-mono text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold uppercase hidden sm:inline">
                       Turnkey Spec
                     </span>
                   </div>
-                  <p className="text-[11px] text-white/60 truncate font-ui">
-                    Real Madurai villa interior finish · Eye-level spherical perspective
+                  <p className="text-[10px] sm:text-xs text-white/60 font-mono">
+                    Drag mouse or touch 360° to look around • Real Madurai villa interior finish
                   </p>
                 </div>
               </div>
 
-              {/* Day / Night lighting toggle + Close Button */}
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2">
+                {/* Night Glow Toggle */}
                 <button
-                  onClick={() => setIs360Night(!is360Night)}
-                  className={`px-3 py-1.5 rounded-xl font-mono text-xs flex items-center gap-1.5 cursor-pointer transition-all border ${
+                  onClick={() => setIs360Night((prev) => !prev)}
+                  className={`px-3 py-1 rounded-full text-xs font-mono flex items-center gap-1.5 cursor-pointer border transition-all ${
                     is360Night
-                      ? "bg-amber-400/20 text-amber-300 border-amber-400/50 shadow-[0_0_12px_rgba(251,191,36,0.25)]"
+                      ? "bg-amber-400 text-stone-950 font-bold border-amber-300"
                       : "bg-white/10 text-white/80 hover:text-white border-white/15"
                   }`}
-                  title="Toggle Natural Day / Warm Night Lighting"
+                  title="Toggle Day / Night Ambient Lighting in Room"
                 >
-                  {is360Night ? (
-                    <>
-                      <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-                      <span className="hidden sm:inline">Warm Night</span>
-                    </>
-                  ) : (
-                    <>
-                      <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
-                      <span className="hidden sm:inline">Natural Day</span>
-                    </>
-                  )}
+                  <Moon className={`w-3.5 h-3.5 ${is360Night ? "fill-stone-950" : ""}`} />
+                  <span className="hidden sm:inline">{is360Night ? "Warm Night" : "Natural Day"}</span>
                 </button>
 
+                {/* Close Button */}
                 <button
-                  onClick={() => setShow360Modal(false)}
-                  className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-colors cursor-pointer border border-white/15"
-                  title="Close 360° Walkthrough"
+                  onClick={() => setShow360InteriorModal(false)}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/15"
+                  title="Return to 3D Villa"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Room Tabs */}
-            <div className="flex items-center gap-1.5 px-4 py-2.5 bg-[#0e0e14] border-b border-white/10 overflow-x-auto select-none">
-              <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest mr-1 shrink-0">
-                Room:
+            {/* Room Switcher Tabs */}
+            <div className="flex items-center gap-1.5 px-4 sm:px-6 py-2.5 bg-black/40 border-b border-white/10 overflow-x-auto">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-white/50 mr-1 hidden sm:inline">
+                Select Room:
               </span>
               {INTERIOR_360_ROOMS.map((room) => {
-                const isActive = room.id === active360RoomId;
+                const isActive = active360RoomId === room.id;
                 return (
                   <button
                     key={room.id}
                     onClick={() => setActive360RoomId(room.id)}
-                    className={`px-3 py-1.5 rounded-xl font-ui text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    className={`px-3 py-1.5 rounded-xl font-ui text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                       isActive
                         ? "bg-amber-500 text-stone-950 font-bold shadow-md shadow-amber-500/20"
                         : "bg-white/5 text-white/70 hover:text-white hover:bg-white/10 border border-white/10"
@@ -1929,35 +1847,20 @@ export default function Project3DExperience() {
                   "/panoramas/living-room.jpg"
                 }
                 isNight={is360Night}
-                onResetRef={reset360ViewRef}
               />
 
               {/* Viewport Overlay Controls */}
               <div className="pointer-events-none absolute left-4 top-4 z-20 flex items-center gap-2">
-                <span className="bg-black/75 backdrop-blur-md border border-white/20 text-white font-mono text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                <span className="bg-black/70 backdrop-blur-md border border-white/20 text-white font-mono text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>360° Interior VR · Real Scale</span>
+                  <span>360° Equirectangular VR</span>
                 </span>
               </div>
 
-              {/* Reset View Button */}
-              <div className="absolute right-4 bottom-4 z-20 flex items-center gap-1.5">
-                <button
-                  onClick={() => {
-                    if (reset360ViewRef.current) reset360ViewRef.current();
-                  }}
-                  className="bg-black/75 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white/90 hover:text-white px-2.5 py-1 rounded-xl font-mono text-[11px] flex items-center gap-1.5 shadow-lg cursor-pointer transition-colors"
-                  title="Reset Camera to Center Eye-Level"
-                >
-                  <RotateCcw className="w-3 h-3 text-amber-400" />
-                  <span>Reset View</span>
-                </button>
-              </div>
-
               {/* Gesture Guide */}
-              <div className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-black/75 backdrop-blur-md border border-white/15 px-3 py-1 rounded-full text-white/80 font-mono text-[10px] flex items-center gap-1.5 shadow-lg">
+              <div className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-black/70 backdrop-blur-md border border-white/15 px-3 py-1 rounded-full text-white/80 font-mono text-[10px] flex items-center gap-1.5">
                 <Compass className="w-3 h-3 text-amber-400 animate-spin-slow" />
-                <span>Drag to look 360° · Mouse wheel / pinch to zoom</span>
+                <span>Click & drag horizontally/vertically to look 360°</span>
               </div>
             </div>
 
@@ -1966,7 +1869,7 @@ export default function Project3DExperience() {
               const currentRoom = INTERIOR_360_ROOMS.find((r) => r.id === active360RoomId);
               if (!currentRoom) return null;
               return (
-                <div className="p-4 sm:p-5 bg-[#121218] border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="p-4 sm:p-5 bg-[#121217] border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="font-display text-sm font-bold text-white">
@@ -1988,7 +1891,7 @@ export default function Project3DExperience() {
                     <button
                       onClick={() => {
                         const text = encodeURIComponent(
-                          `Hi Danam Holdings, I am viewing the 360° interior walkthrough of the ${currentRoom.name} (${selectedProject.title}) and would like turnkey interior pricing.`
+                          `Hi Danam Holdings, I was viewing the 360° interior tour of the ${currentRoom.name} (${selectedProject.title}) and would like turnkey interior pricing.`
                         );
                         window.open(`https://wa.me/918883332499?text=${text}`, "_blank");
                       }}
@@ -1998,7 +1901,7 @@ export default function Project3DExperience() {
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      onClick={() => setShow360Modal(false)}
+                      onClick={() => setShow360InteriorModal(false)}
                       className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-mono transition-colors cursor-pointer border border-white/15"
                     >
                       Back to 3D Villa
