@@ -360,6 +360,71 @@ export const PROJECT_3D_LIST: Project3DItem[] = [
         focusTarget: "0.4m 3.8m -6.5m"
       }
     ]
+  },
+  {
+    id: "pandian-elevation-03",
+    title: "Pandian Commercial & Residence",
+    tagline: "Contemporary multi-storey elevation featuring ground commercial shutter and upper designer residences",
+    category: "Commercial Complex",
+    location: "Madurai Central / Bypass Road",
+    builtUpArea: "3,650 Sq.Ft (G+2)",
+    glbModel: "/models/pandian_residence.glb",
+    thumbnail: "/images/danam/about-villa.webp",
+    author: "Client Project Elevation",
+    cameraTarget: "auto auto auto",
+    cameraOrbit: "0deg 75deg 105%",
+    specs: {
+      structure: "Engineered Heavy RCC Column-Beam Frame",
+      steel: "Fe550D TMT Reinforcement",
+      concrete: "Ultratech M25 Ready-Mix Concrete",
+      vastu: "Commercial Vastu Compliant Facing",
+      floors: "G+2 Floors with Double Balconies",
+      handoverTime: "150 Days Handover Guarantee"
+    },
+    highlights: [
+      "Ground floor heavy-duty commercial shutter provision",
+      "Upper level cantilevered balconies with safety glass railings",
+      "Exterior vertical louvers for passive sun-shading",
+      "Waterproofing & heat-reflective coating across terrace"
+    ],
+    hotspots: [
+      {
+        id: "pan-commercial",
+        number: 1,
+        title: "Ground Floor Commercial Shutter",
+        category: "Commercial Civil Engineering",
+        position: "0m 1.5m 5m",
+        normal: "0m 0m 1m",
+        specs: "Heavy-gauge motorized roll-up shutter with weather-sealed frame for retail/commercial operations.",
+        materials: ["IS 2062 Grade Steel", "Reinforced Plinth Beams", "Concealed Wiring"],
+        focusOrbit: "0deg 80deg 50%",
+        focusTarget: "0m 1.5m 5m"
+      },
+      {
+        id: "pan-balcony",
+        number: 2,
+        title: "First Floor Residential Balcony",
+        category: "Architectural Elevation",
+        position: "-2m 6m 2m",
+        normal: "0m 0m 1m",
+        specs: "Cantilevered balcony projection with 12mm toughened safety glass railing and weather-resistant facade tiles.",
+        materials: ["Fe550D TMT Steel", "12mm Toughened Glass", "Anti-Skid Tiles"],
+        focusOrbit: "-15deg 70deg 50%",
+        focusTarget: "-2m 6m 2m"
+      },
+      {
+        id: "pan-louvers",
+        number: 3,
+        title: "Vertical Decorative Facade Louvers",
+        category: "Facade Design",
+        position: "2.5m 7m 1m",
+        normal: "0m 0m 1m",
+        specs: "Treated vertical architectural louvers designed for tropical passive cooling and modern elevation aesthetics.",
+        materials: ["Aluminum Extrusion", "Wood Grain Texture", "Anti-Rust Coating"],
+        focusOrbit: "20deg 75deg 50%",
+        focusTarget: "2.5m 7m 1m"
+      }
+    ]
   }
 ];
 
