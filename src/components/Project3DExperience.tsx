@@ -648,7 +648,7 @@ export default function Project3DExperience() {
   const [accentColor, setAccentColor] = useState<string>("#2B2E33");
   const [bgTheme, setBgTheme] = useState<"white" | "black">("black");
   const [buildingLightsOn, setBuildingLightsOn] = useState<boolean>(true);
-  const [showHotspots, setShowHotspots] = useState<boolean>(true);
+  const [showHotspots, setShowHotspots] = useState<boolean>(false);
   const [activeHotspot, setActiveHotspot] = useState<ProjectHotspot | null>(null);
   const [show360InteriorModal, setShow360InteriorModal] = useState<boolean>(false);
   const [active360RoomId, setActive360RoomId] = useState<string>("living-room");
@@ -1075,73 +1075,73 @@ export default function Project3DExperience() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-8 relative z-10">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-5 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-brand-forest/10 border border-brand-forest/20 text-brand-forest text-xs font-bold uppercase tracking-wider mb-2.5">
-              <Rotate3D className="w-3.5 h-3.5 animate-spin-slow" />
-              <span>Interactive 3D Experience</span>
-            </div>
-            <h2 className="font-display text-2xl md:text-4xl font-bold tracking-tight text-text-primary">
-              Experience Your Building in 3D
-            </h2>
-            <p className="font-ui text-xs md:text-sm text-text-secondary max-w-2xl mt-1.5 leading-relaxed">
-              Don’t settle for flat 2D blueprints. Walk around, orbit 360°, inspect structural elevations, and verify architectural finishes before laying a single brick.
-            </p>
+        <div className="max-w-3xl mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-brand-forest/10 border border-brand-forest/20 text-brand-forest text-xs font-bold uppercase tracking-wider mb-2.5">
+            <Rotate3D className="w-3.5 h-3.5 animate-spin-slow" />
+            <span>Interactive 3D Experience</span>
           </div>
-
-          {/* Mode Switcher Tabs */}
-          <div className="flex items-center bg-surface-0 border border-border-medium p-1 rounded-xl shadow-xs self-stretch md:self-auto justify-between sm:justify-center overflow-x-auto gap-1">
-            <button
-              onClick={() => setActiveView("3d")}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
-                activeView === "3d"
-                  ? "bg-brand-forest text-white shadow-sm"
-                  : "text-text-secondary hover:text-text-primary"
-              }`}
-            >
-              <Rotate3D className="w-3.5 h-3.5" />
-              <span>Live 3D Walkaround</span>
-            </button>
-
-            <button
-              onClick={() => setActiveView("photos")}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
-                activeView === "photos"
-                  ? "bg-brand-forest text-white shadow-sm"
-                  : "text-text-secondary hover:text-text-primary"
-              }`}
-            >
-              <Camera className="w-3.5 h-3.5" />
-              <span>Project Photos</span>
-            </button>
-
-            <button
-              onClick={() => setActiveView("specs")}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
-                activeView === "specs"
-                  ? "bg-brand-forest text-white shadow-sm"
-                  : "text-text-secondary hover:text-text-primary"
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Civil Specs</span>
-            </button>
-
-            <button
-              onClick={() => setShow360InteriorModal(true)}
-              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 border border-amber-500/30"
-              title="Step Inside Furnished 360° Interior VR Rooms"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-              <span>Step Inside 360°</span>
-            </button>
-          </div>
+          <h2 className="font-display text-2xl md:text-4xl font-bold tracking-tight text-text-primary">
+            Experience Your Building in 3D
+          </h2>
+          <p className="font-ui text-xs md:text-sm text-text-secondary mt-1.5 leading-relaxed">
+            Don’t settle for flat 2D blueprints. Walk around, orbit 360°, inspect structural elevations, and verify architectural finishes before laying a single brick.
+          </p>
         </div>
 
         {/* Main Showcase Container */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left / Center: Interactive 3D Viewer (Clean Framed 3D Card with Dark Architectural Theme) */}
-          <div className="lg:col-span-7 bg-[#0a0a0d] border border-white/10 rounded-[22px] overflow-hidden shadow-2xl flex flex-col">
+          {/* Left / Center: Interactive 3D Viewer (With Mode Switcher Tabs placed directly above 3D Design) */}
+          <div className="lg:col-span-7 flex flex-col gap-3.5">
+            {/* Mode Switcher Tabs (Placed directly above 3D Design) */}
+            <div className="flex items-center bg-surface-0 border border-border-medium p-1 rounded-xl shadow-xs self-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden gap-1 max-w-full">
+              <button
+                onClick={() => setActiveView("3d")}
+                className={`flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-2 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+                  activeView === "3d"
+                    ? "bg-brand-forest text-white shadow-sm"
+                    : "text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                <Rotate3D className="w-3.5 h-3.5" />
+                <span>3D Walkaround</span>
+              </button>
+
+              <button
+                onClick={() => setActiveView("photos")}
+                className={`flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-2 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+                  activeView === "photos"
+                    ? "bg-brand-forest text-white shadow-sm"
+                    : "text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>Project Photos</span>
+              </button>
+
+              <button
+                onClick={() => setActiveView("specs")}
+                className={`flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-2 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+                  activeView === "specs"
+                    ? "bg-brand-forest text-white shadow-sm"
+                    : "text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Civil Specs</span>
+              </button>
+
+              <button
+                onClick={() => setShow360InteriorModal(true)}
+                className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-2 rounded-lg font-ui text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 border border-amber-500/30"
+                title="Step Inside Furnished 360° Interior VR Rooms"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                <span>Step Inside 360°</span>
+              </button>
+            </div>
+
+            {/* 3D Design Stage Card */}
+            <div className="bg-[#0a0a0d] border border-white/10 rounded-[22px] overflow-hidden shadow-2xl flex flex-col">
             {/* Viewer Stage: Clean Luxury 3D Card with Architectural Corner Accents */}
             <div className={`relative w-full transition-colors duration-500 overflow-hidden h-[340px] sm:h-[400px] lg:h-[460px] ${
               bgTheme === "white" ? "bg-white" : "bg-black"
@@ -1215,20 +1215,6 @@ export default function Project3DExperience() {
                       >
                         <Lightbulb className={`w-3.5 h-3.5 ${buildingLightsOn ? "fill-stone-950 text-stone-950 animate-pulse" : "text-white/70"}`} />
                         <span>{buildingLightsOn ? "Lights ON" : "Lights OFF"}</span>
-                      </button>
-
-                      {/* Hotspot Pins Toggle ("Hubstop Pins") */}
-                      <button
-                        onClick={toggleHotspots}
-                        className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all backdrop-blur-md border shadow-lg shrink-0 ${
-                          showHotspots
-                            ? "bg-amber-500/20 text-amber-300 border-amber-400/40 hover:bg-amber-500/30"
-                            : "bg-[#0a0a0d]/90 text-white/60 hover:text-white border-white/15"
-                        }`}
-                        title="Toggle 3D Civil Engineering Hotspot Pins"
-                      >
-                        <MapPin className={`w-3.5 h-3.5 ${showHotspots ? "text-amber-400" : "text-white/60"}`} />
-                        <span>{showHotspots ? "Pins ON" : "Pins OFF"}</span>
                       </button>
 
                       {/* View Inside 360° Interior VR Walkthrough */}
@@ -1664,6 +1650,7 @@ export default function Project3DExperience() {
                   </a>
                 </div>
               </div>
+            </div>
             </div>
           </div>
 
